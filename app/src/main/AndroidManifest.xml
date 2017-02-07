@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".app.MainActivity">
+        <activity android:name=".app.MainActivity" android:theme="@style/MainViewPagerTheme">
 
         </activity>
 

@@ -12,5 +12,8 @@
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/background_splash</item>
     </style>
+    <!--main view pager theme-->
+    <style name="MainViewPagerTheme" parent="Theme.AppCompat.NoActionBar">
+    </style>
 
 </resources>
