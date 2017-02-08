@@ -1,38 +1,34 @@
 package com.japhethwaswa.magentomobileone.model;
 
+import android.graphics.drawable.Drawable;
+
 /**
- * Created by web0002 on 2/7/2017.
+ * Created by Japheth Waswa on 2/7/2017.
  */
 
 public class PreData {
 
-    private String imageSrc;
-    private int imageSrcInt;
+    private String imageUrl;
     private String title;
     private String briefDescription;
 
     public PreData(){}
 
-    public PreData(int imageSrcInt,String title,String briefDescription){
-        this.imageSrcInt = imageSrcInt;
+    public PreData(String imageUrl,String title,String briefDescription){
+
+        this.imageUrl = imageUrl;
         this.title = title;
         this.briefDescription = briefDescription;
+
     }
 
-    public int getImageSrcInt() {
-        return imageSrcInt;
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImageSrcInt(int imageSrcInt) {
-        this.imageSrcInt = imageSrcInt;
-    }
-
-    public String getImageSrc() {
-        return imageSrc;
-    }
-
-    public void setImageSrc(String imageSrc) {
-        this.imageSrc = imageSrc;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getTitle() {
