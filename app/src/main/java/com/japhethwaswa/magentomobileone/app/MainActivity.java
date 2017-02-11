@@ -1,28 +1,33 @@
 package com.japhethwaswa.magentomobileone.app;
 
+
 import android.databinding.DataBindingUtil;
+import android.os.AsyncTask;
 import android.os.StrictMode;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.appcompat.BuildConfig;
 import android.util.Log;
 
+import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.MainViewPagerAdapter;
+import com.japhethwaswa.magentomobileone.job.MyJobsBuilder;
 import com.japhethwaswa.magentomobileone.databinding.ActivityMainBinding;
+import com.japhethwaswa.magentomobileone.job.RetrieveProducts;
 import com.japhethwaswa.magentomobileone.model.PreData;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class MainActivity extends AppCompatActivity {
 
+    private JobManager jobManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //StrictMode
-            StrictMode.VmPolicy vmPolicy = new StrictMode.VmPolicy.Builder()
+        StrictMode.VmPolicy vmPolicy = new StrictMode.VmPolicy.Builder()
                     .detectAll()
                     .penaltyLog()
                     .build();
@@ -35,15 +40,21 @@ public class MainActivity extends AppCompatActivity {
         //inflate layout
         ActivityMainBinding activityMainBinding = DataBindingUtil.setContentView(this,R.layout.activity_main);
 
+        //job manager efficient in running background processes.
+        jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
 
+        getMagentoResource("alpesa");
         List<PreData> pagerItem = getPreData();
-
-        //ViewPager viewPager = (ViewPager) findViewById(R.id.main_view_pager);
 
         MainViewPagerAdapter mainViewPagerAdapter = new MainViewPagerAdapter(this,pagerItem);
 
-        //viewPager.setAdapter(mainViewPagerAdapter);
         activityMainBinding.mainViewPager.setAdapter(mainViewPagerAdapter);
+
+    }
+
+    private void getMagentoResource(String customers) {
+        jobManager.addJobInBackground(new RetrieveProducts(customers));
+        //new GetCustomersFromURLTask().execute();
 
     }
 
@@ -74,4 +85,58 @@ public class MainActivity extends AppCompatActivity {
 
         return preDataList;
     }
+
+
+
+    /**private class GetCustomersFromURLTask extends AsyncTask<Void,Void,String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            return loadJSON();
+        }
+
+        private String loadJSON() {
+
+            try{
+
+                URL url = new URL("https://www.alladin.co.ke/alpesa");
+                HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+                try{
+                    //process the request.
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String line;
+                    while((line = bufferedReader.readLine()) != null){
+                        stringBuilder.append(line).append("\n");
+                    }
+                    //close the bufferedReader
+                    bufferedReader.close();
+                    Log.e("Response",stringBuilder.toString());
+
+                }finally {
+
+                    //disconnect
+                    urlConnection.disconnect();
+                }
+
+            }catch (Exception e){
+                Log.e("ERROR-CONN",e.getMessage(),e);
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+        }
+
+
+    }**/
+
 }

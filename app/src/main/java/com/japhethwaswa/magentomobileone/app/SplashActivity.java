@@ -6,8 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.appcompat.BuildConfig;
 
-import com.japhethwaswa.magentomobileone.R;
-
 public class SplashActivity extends AppCompatActivity {
 
     @Override
@@ -27,4 +25,6 @@ public class SplashActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+
 }
