@@ -2,12 +2,15 @@ package com.japhethwaswa.magentomobileone.app;
 
 
 import android.databinding.DataBindingUtil;
-import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.StringRequestListener;
 import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.MainViewPagerAdapter;
@@ -55,6 +58,21 @@ public class MainActivity extends AppCompatActivity {
     private void getMagentoResource(String customers) {
         jobManager.addJobInBackground(new RetrieveProducts(customers));
         //new GetCustomersFromURLTask().execute();
+
+        AndroidNetworking.get("https://www.alladin.co.ke/alpesa")
+                .setTag("NetTest")
+                .setPriority(Priority.HIGH)
+                .build().getAsString(new StringRequestListener() {
+            @Override
+            public void onResponse(String response) {
+                Log.e("NetTestResponse",response);
+            }
+
+            @Override
+            public void onError(ANError anError) {
+                Log.e("NetTestError",anError.toString());
+            }
+        });
 
     }
 
