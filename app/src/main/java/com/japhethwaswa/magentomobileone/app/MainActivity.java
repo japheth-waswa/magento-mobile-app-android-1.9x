@@ -1,11 +1,13 @@
 package com.japhethwaswa.magentomobileone.app;
 
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -44,17 +46,20 @@ public class MainActivity extends AppCompatActivity {
         ActivityMainBinding activityMainBinding = DataBindingUtil.setContentView(this,R.layout.activity_main);
 
         //job manager efficient in running background processes.
-        jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
+       /** jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
 
-        getMagentoResource("alpesa");
+        getMagentoResource("alpesa");**/
+
         List<PreData> pagerItem = getPreData();
 
         MainViewPagerAdapter mainViewPagerAdapter = new MainViewPagerAdapter(this,pagerItem);
 
         activityMainBinding.mainViewPager.setAdapter(mainViewPagerAdapter);
 
+
     }
 
+    /**android job manager and networking**
     private void getMagentoResource(String customers) {
         jobManager.addJobInBackground(new RetrieveProducts(customers));
         //new GetCustomersFromURLTask().execute();
@@ -75,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    **/
 
     //bg thread to fetch data from an endpoint.
     public List<PreData> getPreData(){
@@ -105,56 +112,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void skipClicked(View view) {
 
-    /**private class GetCustomersFromURLTask extends AsyncTask<Void,Void,String> {
+        Intent intent = new Intent(this,NavDrawerActivity.class);
+         startActivity(intent);
+         finish();
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            return loadJSON();
-        }
-
-        private String loadJSON() {
-
-            try{
-
-                URL url = new URL("https://www.alladin.co.ke/alpesa");
-                HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
-                try{
-                    //process the request.
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String line;
-                    while((line = bufferedReader.readLine()) != null){
-                        stringBuilder.append(line).append("\n");
-                    }
-                    //close the bufferedReader
-                    bufferedReader.close();
-                    Log.e("Response",stringBuilder.toString());
-
-                }finally {
-
-                    //disconnect
-                    urlConnection.disconnect();
-                }
-
-            }catch (Exception e){
-                Log.e("ERROR-CONN",e.getMessage(),e);
-
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-        }
-
-
-    }**/
+    }
 
 }

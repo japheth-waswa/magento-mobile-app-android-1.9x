@@ -13,7 +13,15 @@
         <item name="android:windowBackground">@drawable/background_splash</item>
     </style>
     <!--main view pager theme-->
-    <style name="MainViewPagerTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="MainViewPagerTheme" parent="Theme.AppCompat.NoActionBar"></style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

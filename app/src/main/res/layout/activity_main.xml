@@ -2,16 +2,17 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/activity_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.japhethwaswa.magentomobileone.app.MainActivity">
+        tools:context="com.japhethwaswa.magentomobileone.app.MainActivity"
+        android:orientation="vertical">
 
         <android.support.v4.view.ViewPager
             android:id="@+id/main_view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"></android.support.v4.view.ViewPager>
-    </RelativeLayout>
+    </LinearLayout>
 </layout>
 
