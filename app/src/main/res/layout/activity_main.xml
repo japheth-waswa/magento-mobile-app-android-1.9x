@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/activity_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="com.japhethwaswa.magentomobileone.app.MainActivity"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
         <android.support.v4.view.ViewPager
             android:id="@+id/main_view_pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></android.support.v4.view.ViewPager>
-    </LinearLayout>
+            android:layout_height="match_parent"/>
+        <com.rd.PageIndicatorView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="37dp"
+            app:piv_viewPager="@id/main_view_pager"
+            app:piv_radius="11dp"
+            app:piv_interactiveAnimation="true"
+            app:piv_animationType="thinWorm"
+            app:piv_dynamicCount="true"/>
+    </RelativeLayout>
 </layout>
 

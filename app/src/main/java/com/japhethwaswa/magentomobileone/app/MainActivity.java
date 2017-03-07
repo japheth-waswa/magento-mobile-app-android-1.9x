@@ -16,6 +16,7 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.MainViewPagerAdapter;
+import com.japhethwaswa.magentomobileone.databinding.MainViewPagerItemBinding;
 import com.japhethwaswa.magentomobileone.job.MyJobsBuilder;
 import com.japhethwaswa.magentomobileone.databinding.ActivityMainBinding;
 import com.japhethwaswa.magentomobileone.job.RetrieveProducts;
@@ -27,7 +28,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private JobManager jobManager;
+    //private JobManager jobManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         MainViewPagerAdapter mainViewPagerAdapter = new MainViewPagerAdapter(this,pagerItem);
 
         activityMainBinding.mainViewPager.setAdapter(mainViewPagerAdapter);
+
 
 
     }

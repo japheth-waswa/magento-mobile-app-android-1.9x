@@ -16,21 +16,22 @@
             android:scaleType="centerCrop"
             app:imageUrl="@{predata.imageUrl}"/>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/main_relativeLayout">
+            android:id="@+id/main_linearLayout"
+            android:gravity="bottom"
+            android:orientation="vertical">
             <TextView
                 android:id="@+id/main_view_pager_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/standardPadding"
                 android:paddingRight="@dimen/standardPadding"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
+                android:layout_gravity="center"
                 android:layout_marginBottom="20dp"
                 android:text="@{predata.title}"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/holo_red_dark"
                 android:textSize="23sp"
                 android:textStyle="bold"/>
 
@@ -40,19 +41,31 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/standardPadding"
                 android:paddingRight="@dimen/standardPadding"
-                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
                 android:layout_marginBottom="20dp"
                 android:layout_below="@id/main_view_pager_title"
                 android:text="@{predata.briefDescription}"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/holo_red_dark"
                 android:textSize="15sp"/>
 
-        </RelativeLayout>
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="SKIP"
-            android:onClick="skipClicked"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:background="@drawable/btn_bg_main"
+                android:textColor="@android:color/holo_red_dark"
+                android:text="@string/sign_in"
+                android:onClick="signInClicked"/>
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:background="@android:color/transparent"
+                android:textColor="@android:color/holo_red_dark"
+                android:text="@string/skip"
+                android:textStyle="bold"
+                android:onClick="skipClicked"/>
+        </LinearLayout>
 
     </FrameLayout>
 </layout>
