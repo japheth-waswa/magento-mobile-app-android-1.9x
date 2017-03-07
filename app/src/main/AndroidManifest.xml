@@ -27,6 +27,12 @@
             android:name=".app.NavDrawerActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
+        
+        <provider
+            android:authorities="com.japhethwaswa.magentomobileone.db.jumboprovider"
+            android:name=".db.JumboProvider"
+            android:exported="false"/>
+        
     </application>
 
 </manifest>

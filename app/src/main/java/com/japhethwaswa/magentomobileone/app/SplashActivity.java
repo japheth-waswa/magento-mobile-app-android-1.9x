@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,8 +38,9 @@ public class SplashActivity extends AppCompatActivity {
         //SQLiteDatabase db = helper.getReadableDatabase();
         //createPagerItems();
         //updatePager();
-        deletePager();
+        //deletePager();
         //readPagerItems();
+        upgradeCreatePagerItems();
 
 
         /****====****/
@@ -148,6 +150,18 @@ public class SplashActivity extends AppCompatActivity {
         String selection = PagerEntry._ID + "=?";
         String[] selectionArgs = {"1"};
         int numRowsDeleted = db.delete(PagerEntry.TABLE_NAME,selection,selectionArgs);
+    }
+
+    private void upgradeCreatePagerItems(){
+        ContentValues values =  new ContentValues();
+        values.put(PagerEntry.COLUMN_TITLE,"wolladem");
+        values.put(PagerEntry.COLUMN_BRIEF_DESCRIPTION,"dem brief description comes here");
+        values.put(PagerEntry.COLUMN_IMAGE_URL_LOCAL,"dem http://magento-29325-63476-210388.cloudwaysapps.com/media/jumbo_mobile/Penguins.jpg");
+        values.put(PagerEntry.COLUMN_IMAGE_URL_REMOTE,"");
+        values.put(PagerEntry.COLUMN_UPDATED_AT,"dem 2017-03-06 10:43:37");
+
+        Uri uri = getContentResolver().insert(PagerEntry.CONTENT_URI,values);
+        Log.d("SplashActivity","inserted page " + uri);
     }
 
 

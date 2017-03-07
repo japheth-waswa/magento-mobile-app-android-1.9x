@@ -1,9 +1,18 @@
 package com.japhethwaswa.magentomobileone.db;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 public final class JumboContract {
+    public static final String CONTENT_AUTHORITY = "com.japhethwaswa.magentomobileone.db.jumboprovider";
+    public static final String PATH_PAGER = "pager";
+    public static final String PATH_MAIN = "main";
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
+
     public static final class PagerEntry implements BaseColumns{
+
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI,PATH_PAGER);
+
         //Table name
         public static final String TABLE_NAME = "pager";
         //column field names
@@ -16,6 +25,7 @@ public final class JumboContract {
     }
 
     public static final class MainEntry implements BaseColumns{
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI,PATH_MAIN);
         //Table name
         public static final String TABLE_NAME = "main";
         //column field names
