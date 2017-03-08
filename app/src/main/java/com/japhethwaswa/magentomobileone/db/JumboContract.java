@@ -37,4 +37,8 @@ public final class JumboContract {
         public static final String COLUMN_SECTION = "section";
         public static final String COLUMN_UPDATED_AT = "updated_at";
     }
+
+    /**public String concatString(String path){
+        return "content://" + path;
+    }**/
 }

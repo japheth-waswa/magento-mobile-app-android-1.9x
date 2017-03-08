@@ -1,5 +1,7 @@
 package com.japhethwaswa.magentomobileone;
 
+import com.japhethwaswa.magentomobileone.db.JumboContract;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -13,5 +15,15 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
+    }
+
+    @Test
+    public void test_path(){
+        //arrange
+        JumboContract jumboContract = new JumboContract();
+        //act
+        String content = jumboContract.concatString("com.japhethwaswa.mobilemagento");
+        //assert
+        assertEquals("content://com.japhethwaswa.mobilemagento",content);
     }
 }
