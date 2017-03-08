@@ -2,10 +2,16 @@ package com.japhethwaswa.magentomobileone.db;
 
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.japhethwaswa.magentomobileone.R;
+import com.japhethwaswa.magentomobileone.app.SplashActivity;
 import com.japhethwaswa.magentomobileone.db.JumboContract.PagerEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.MainEntry;
+
+import static java.security.AccessController.getContext;
 
 public class DatabaseHelper extends SQLiteOpenHelper{
 
@@ -47,4 +53,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         db.execSQL("DROP TABLE IF EXISTS " + MainEntry.TABLE_NAME);
         onCreate(db);
     }
+
+
+   /** public static String uriString(Context context) {
+        Resources res = context.getResources();
+        String baseUri = res.getString(R.string.apiBaseUrl);
+        return baseUri;
+    }**/
 }

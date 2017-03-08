@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Magento Mobile One</string>
+    <string name="apiBaseUrl">http://magento-29325-63476-210388.cloudwaysapps.com/</string>
+    <string name="jumbo_main_data_url">jumbomobile/jumbo/main</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

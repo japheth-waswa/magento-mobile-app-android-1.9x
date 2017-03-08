@@ -16,8 +16,7 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.MainViewPagerAdapter;
-import com.japhethwaswa.magentomobileone.databinding.MainViewPagerItemBinding;
-import com.japhethwaswa.magentomobileone.job.MyJobsBuilder;
+import com.japhethwaswa.magentomobileone.job.builder.MyJobsBuilder;
 import com.japhethwaswa.magentomobileone.databinding.ActivityMainBinding;
 import com.japhethwaswa.magentomobileone.job.RetrieveProducts;
 import com.japhethwaswa.magentomobileone.model.PreData;
@@ -47,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         ActivityMainBinding activityMainBinding = DataBindingUtil.setContentView(this,R.layout.activity_main);
 
         //job manager efficient in running background processes.
-       /** jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
+       /**jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
 
         getMagentoResource("alpesa");**/
 
@@ -61,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**android job manager and networking**
+    /**android job manager and networking
     private void getMagentoResource(String customers) {
         jobManager.addJobInBackground(new RetrieveProducts(customers));
         //new GetCustomersFromURLTask().execute();

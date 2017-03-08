@@ -4,22 +4,23 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.appcompat.BuildConfig;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.db.JumboContract.PagerEntry;
-import com.japhethwaswa.magentomobileone.db.JumboContract.MainEntry;
 
 import com.japhethwaswa.magentomobileone.db.DatabaseHelper;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
+import com.japhethwaswa.magentomobileone.job.RetrieveMainData;
+import com.japhethwaswa.magentomobileone.job.builder.MyJobsBuilder;
+import com.japhethwaswa.magentomobileone.job.RetrieveProducts;
 
 public class SplashActivity extends AppCompatActivity {
-
+private JobManager jobManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //StrictMode
@@ -41,13 +42,18 @@ public class SplashActivity extends AppCompatActivity {
         //updatePager();
         //deletePager();
         //readPagerItems();
-        upgradeCreatePagerItems();
+        //upgradeCreatePagerItems();
 
 
         /****====****/
         //check if pager already exists(was viewed)
         Boolean pagerObsolete = pagerStatus();
+
         //initiate job to get both pager and main items
+        jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
+        jobManager.addJobInBackground(new RetrieveMainData());
+        //String baseUri = getString(R.string.apiBaseUrl);
+        //Log.e("baseUri",baseUri);
 
         /**if(pagerObsolete == true){
          Intent intent = new Intent(this,NavDrawerActivity.class);
@@ -168,6 +174,7 @@ public class SplashActivity extends AppCompatActivity {
         //Uri uri = getContentResolver().insert(PagerEntry.CONTENT_URI,values);
         //Log.d("SplashActivity","inserted page " + uri);
     }
+
 
 
 }

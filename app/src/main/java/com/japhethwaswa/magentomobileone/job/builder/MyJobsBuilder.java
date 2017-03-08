@@ -1,4 +1,4 @@
-package com.japhethwaswa.magentomobileone.job;
+package com.japhethwaswa.magentomobileone.job.builder;
 
 import android.content.Context;
 import android.os.Build;
@@ -8,10 +8,6 @@ import com.birbit.android.jobqueue.config.Configuration;
 import com.birbit.android.jobqueue.log.CustomLogger;
 import com.birbit.android.jobqueue.scheduling.FrameworkJobSchedulerService;
 import com.birbit.android.jobqueue.scheduling.GcmJobSchedulerService;
-
-/**
- * Created by web0002 on 2/11/2017.
- */
 
 public class MyJobsBuilder {
 
