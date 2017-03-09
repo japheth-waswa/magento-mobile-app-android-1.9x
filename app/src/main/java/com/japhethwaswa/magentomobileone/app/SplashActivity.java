@@ -84,6 +84,7 @@ private JobManager jobManager;
         Cursor cursor = db.query(PagerEntry.TABLE_NAME, projection, null, null, null, null, null);
         int pagerCount = cursor.getCount();
         cursor.close();
+        db.close();
 
         if (pagerCount > 0) {
             //is obsolete don't show the MainActivity.
@@ -106,6 +107,7 @@ private JobManager jobManager;
         values.put(PagerEntry.COLUMN_UPDATED_AT, "2017-03-06 10:43:37");
 
         long pagerId = db.insert(PagerEntry.TABLE_NAME, null, values);
+        db.close();
     }
 
     private void readPagerItems() {

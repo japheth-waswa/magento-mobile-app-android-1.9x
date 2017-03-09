@@ -2,7 +2,10 @@ package com.japhethwaswa.magentomobileone.app;
 
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +19,8 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.MainViewPagerAdapter;
+import com.japhethwaswa.magentomobileone.db.JumboContract;
+import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 import com.japhethwaswa.magentomobileone.job.builder.MyJobsBuilder;
 import com.japhethwaswa.magentomobileone.databinding.ActivityMainBinding;
 import com.japhethwaswa.magentomobileone.job.RetrieveProducts;
@@ -28,66 +33,87 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     //private JobManager jobManager;
+    private ArrayList<PreData> preDataList;
+    private MainViewPagerAdapter mainViewPagerAdapter;
+    private ActivityMainBinding activityMainBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //StrictMode
         StrictMode.VmPolicy vmPolicy = new StrictMode.VmPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build();
-            StrictMode.setVmPolicy(vmPolicy);
+                .detectAll()
+                .penaltyLog()
+                .build();
+        StrictMode.setVmPolicy(vmPolicy);
         /**==============**/
 
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
 
         //inflate layout
-        ActivityMainBinding activityMainBinding = DataBindingUtil.setContentView(this,R.layout.activity_main);
+        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         //job manager efficient in running background processes.
-       /**jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
+        /**jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
 
-        getMagentoResource("alpesa");**/
+         getMagentoResource("alpesa");**/
 
-        List<PreData> pagerItem = getPreData();
+        //List<PreData> pagerItems = getPreData();
+        //preDataList = (ArrayList<PreData>) getPreData();
+        preDataList = new ArrayList<>();
 
-        MainViewPagerAdapter mainViewPagerAdapter = new MainViewPagerAdapter(this,pagerItem);
+        if(savedInstanceState != null){
+            preDataList = (ArrayList<PreData>) savedInstanceState.getSerializable("mainPagerArray");
+        }
+
+
+        //mainViewPagerAdapter = new MainViewPagerAdapter(this,pagerItems);
+        mainViewPagerAdapter = new MainViewPagerAdapter(preDataList);
 
         activityMainBinding.mainViewPager.setAdapter(mainViewPagerAdapter);
 
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //getPreData();
+        if(preDataList.size() < 1){
+            getPagerData();
+        }
 
     }
 
     /**android job manager and networking
-    private void getMagentoResource(String customers) {
-        jobManager.addJobInBackground(new RetrieveProducts(customers));
-        //new GetCustomersFromURLTask().execute();
+     private void getMagentoResource(String customers) {
+     jobManager.addJobInBackground(new RetrieveProducts(customers));
+     //new GetCustomersFromURLTask().execute();
 
-        AndroidNetworking.get("https://www.alladin.co.ke/alpesa")
-                .setTag("NetTest")
-                .setPriority(Priority.HIGH)
-                .build().getAsString(new StringRequestListener() {
-            @Override
-            public void onResponse(String response) {
-                Log.e("NetTestResponse",response);
-            }
-
-            @Override
-            public void onError(ANError anError) {
-                Log.e("NetTestError",anError.toString());
-            }
-        });
-
+     AndroidNetworking.get("https://www.alladin.co.ke/alpesa")
+     .setTag("NetTest")
+     .setPriority(Priority.HIGH)
+     .build().getAsString(new StringRequestListener() {
+    @Override public void onResponse(String response) {
+    Log.e("NetTestResponse",response);
     }
 
-    **/
+    @Override public void onError(ANError anError) {
+    Log.e("NetTestError",anError.toString());
+    }
+    });
+
+     }
+
+     **/
 
     //bg thread to fetch data from an endpoint.
-    public List<PreData> getPreData(){
 
-        ArrayList<PreData> preDataList = new ArrayList<>();
+    //bg thread to fetch data from an endpoint.
+    //public  ArrayList<PreData> getPreData() {
+   /** public  void getPreData() {
+
+        preDataList = new ArrayList<>();
 
         String[] imageUrls = new String[]{
                 "http://i2.cdn.cnn.com/cnnnext/dam/assets/160614121003-08-instant-vacation-restricted-super-169.jpg",
@@ -95,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         };
 
         String[] titles = new String[]{
-            "This clean !","That haircut !"
+                "This clean !", "That haircut !"
         };
 
         String[] briefDescription = new String[]{
@@ -104,20 +130,83 @@ public class MainActivity extends AppCompatActivity {
         };
 
         int count = imageUrls.length;
-
-        for(int i = 0;i < count;i++){
-            preDataList.add(new PreData(imageUrls[i],titles[i],briefDescription[i]));
+        preDataList.clear();
+        for (int i = 0; i < count; i++) {
+            PreData preData = new PreData();
+            preData.setImageUrl(imageUrls[i]);
+            preData.setTitle(titles[i]);
+            preData.setBriefDescription(briefDescription[i]);
+            preDataList.add(preData);
         }
 
-        return preDataList;
+        mainViewPagerAdapter.updatePagerItems(preDataList);
+        //mainViewPagerAdapter.notifyDataSetChanged();
+
+    }**/
+
+    private void getPagerData() {
+
+        /**==**/
+        String[] projection = {
+                JumboContract.PagerEntry.COLUMN_TITLE,
+                JumboContract.PagerEntry.COLUMN_BRIEF_DESCRIPTION,
+                JumboContract.PagerEntry.COLUMN_IMAGE_URL_LOCAL,
+                JumboContract.PagerEntry.COLUMN_IMAGE_URL_REMOTE,
+                JumboContract.PagerEntry.COLUMN_UPDATED_AT
+        };
+        JumboQueryHandler handler = new JumboQueryHandler(this.getContentResolver()) {
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                try {
+                    if (cursor != null) {
+                        preDataList.clear();
+                        while (cursor.moveToNext()) {
+                            String title = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_TITLE));
+                            String briefDescription = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_BRIEF_DESCRIPTION));
+                            String localUrl = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_IMAGE_URL_LOCAL));
+                            String remoteUrl = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_IMAGE_URL_REMOTE));
+                            String updated_at = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_UPDATED_AT));
+
+                            //Log.e("item-val", title);
+                            //Log.e("item-val", updated_at);
+
+                            String imageUrl = localUrl;
+                            if (localUrl == null) {
+                                imageUrl = remoteUrl;
+                            }
+                            PreData preData = new PreData();
+                            preData.setImageUrl(imageUrl);
+                            preData.setTitle(title);
+                            preData.setBriefDescription(briefDescription);
+                            preDataList.add(preData);
+                        }
+                        //update adapter and automaticaly notifiy dataset changed
+                        mainViewPagerAdapter.updatePagerItems(preDataList);
+                    }
+                    cursor.close();
+                } finally {
+
+                }
+            }
+        };
+        handler.startQuery(1, null, JumboContract.PagerEntry.CONTENT_URI, projection, null, null, null);
+        /**===**/
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //save the predatalist to avoid refetching from db and check onstart if size is bigger before refetching from db
+        outState.putSerializable("mainPagerArray",preDataList);
+
     }
 
 
     public void skipClicked(View view) {
 
-        Intent intent = new Intent(this,NavDrawerActivity.class);
-         startActivity(intent);
-         finish();
+        Intent intent = new Intent(this, NavDrawerActivity.class);
+        startActivity(intent);
+        finish();
 
     }
 

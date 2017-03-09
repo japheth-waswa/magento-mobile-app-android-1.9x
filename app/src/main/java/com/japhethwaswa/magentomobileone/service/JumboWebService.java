@@ -40,44 +40,19 @@ public class JumboWebService {
                 .build().getAsJSONObject(new JSONObjectRequestListener() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.e("MainDataRequest", response.toString());
+               // Log.e("MainDataRequest", response.toString());
                 //parse the json object extracting pager data and main data
                 try {
                     JSONArray pagerArray = response.getJSONArray("pager");
                     // pagerArray.length();
                     if (pagerArray.length() > 0) {
-                        updatePager(pagerArray, context);
+                        insertPager(pagerArray, context);
                     }
-                    Log.e("MainDataPagerArray", pagerArray.toString());
-                    Log.e("MainDataPagerArrLength", String.valueOf(pagerArray.length()));
-                    
-                    /**==**/
-                    String[] projection = {
-                            JumboContract.PagerEntry.COLUMN_TITLE,
-                            JumboContract.PagerEntry.COLUMN_BRIEF_DESCRIPTION,
-                            JumboContract.PagerEntry.COLUMN_IMAGE_URL_LOCAL,
-                            JumboContract.PagerEntry.COLUMN_IMAGE_URL_REMOTE,
-                            JumboContract.PagerEntry.COLUMN_UPDATED_AT
-                    };
-                    JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver()){
-                        @Override
-                        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                            try{
-                                if(cursor != null){
-                                    while(cursor.moveToNext()){
-                                        String title = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_TITLE));
-                                        String updated_at = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_UPDATED_AT));
-                                        Log.e("item-val",title);
-                                        Log.e("item-val",updated_at);
-                                    }
-                                }
-                            }finally{
-
-                            }
-                        }
-                    };
-                    handler.startQuery(1, null, JumboContract.PagerEntry.CONTENT_URI, projection, null, null, null);
-                    /**===**/
+                    //TODO broadcast that pager data has been successfully inserted
+                    //TODO update main data to db
+                    //TODO broadcast main data has been successfully updated
+                    /**Log.e("MainDataPagerArray", pagerArray.toString());
+                    Log.e("MainDataPagerArrLength", String.valueOf(pagerArray.length()));**/
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -86,7 +61,7 @@ public class JumboWebService {
 
             @Override
             public void onError(ANError anError) {
-                Log.e("MainDataRequestError", anError.toString());
+                //Log.e("MainDataRequestError", anError.toString());
             }
         });
 
@@ -122,7 +97,7 @@ public class JumboWebService {
          return null;**/
     }
 
-    private static void updatePager(JSONArray pagerArray, Context context) {
+    private static void insertPager(JSONArray pagerArray, Context context) {
 
         JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
         //delete all previous data
@@ -133,7 +108,8 @@ public class JumboWebService {
             try {
 
                 JSONObject pagerObject = pagerArray.getJSONObject(i);
-                Log.e("item-1", pagerObject.getString("title"));
+
+                //Log.e("item-1", pagerObject.getString("title"));
 
                 ContentValues values = new ContentValues();
                 values.put(JumboContract.PagerEntry.COLUMN_TITLE, pagerObject.getString("title"));
