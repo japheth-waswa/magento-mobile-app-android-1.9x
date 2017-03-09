@@ -20,7 +20,8 @@ import com.japhethwaswa.magentomobileone.job.builder.MyJobsBuilder;
 import com.japhethwaswa.magentomobileone.job.RetrieveProducts;
 
 public class SplashActivity extends AppCompatActivity {
-private JobManager jobManager;
+    private JobManager jobManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //StrictMode
@@ -55,19 +56,19 @@ private JobManager jobManager;
         //String baseUri = getString(R.string.apiBaseUrl);
         //Log.e("baseUri",baseUri);
 
-        /**if(pagerObsolete == true){
-         Intent intent = new Intent(this,NavDrawerActivity.class);
-         startActivity(intent);
-         finish();
-         }
-         if(pagerObsolete == false){
-         Intent intent = new Intent(this,MainActivity.class);
-         startActivity(intent);
-         finish();
-         }**/
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
+        if (pagerObsolete == true) {
+            //load HomeActivity
+            Intent intent = new Intent(this, NavDrawerActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        if (pagerObsolete == false) {
+            //load MainActivity
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
     }
 
     private Boolean pagerStatus() {
@@ -95,6 +96,7 @@ private JobManager jobManager;
         }
     }
 
+    /**me-no**
     private void createPagerItems() {
         DatabaseHelper helper = new DatabaseHelper(this);
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -126,13 +128,13 @@ private JobManager jobManager;
          String[] selectionArgs = {"1"};**/
 
         //Cursor cursor = db.query(PagerEntry.TABLE_NAME,projection,selection,selectionArgs,null,null,null);
-        Cursor cursor = db.query(PagerEntry.TABLE_NAME, projection, null, null, null, null, null);
+    /**me-no**    Cursor cursor = db.query(PagerEntry.TABLE_NAME, projection, null, null, null, null, null);
         int i = cursor.getCount();
 
         /**while(cursor.moveToNext()){
          Log.d("Record identifier",String.valueOf(cursor.getColumnIndex(PagerEntry._ID)));
          }**/
-        Log.d("row count", String.valueOf(i));
+    /**me-no**    Log.d("row count", String.valueOf(i));
         cursor.close();
     }
 
@@ -156,7 +158,7 @@ private JobManager jobManager;
         /**DatabaseHelper helper = new DatabaseHelper(this);
          SQLiteDatabase db = helper.getWritableDatabase();**/
 
-        String selection = PagerEntry._ID + "=?";
+      /**me-no**  String selection = PagerEntry._ID + "=?";
         String[] selectionArgs = {"1"};
         //int numRowsDeleted = db.delete(PagerEntry.TABLE_NAME,selection,selectionArgs);
         JumboQueryHandler handler = new JumboQueryHandler(this.getContentResolver());
@@ -175,8 +177,7 @@ private JobManager jobManager;
         handler.startInsert(1, null, PagerEntry.CONTENT_URI, values);
         //Uri uri = getContentResolver().insert(PagerEntry.CONTENT_URI,values);
         //Log.d("SplashActivity","inserted page " + uri);
-    }
-
+    }**me-no**/
 
 
 }

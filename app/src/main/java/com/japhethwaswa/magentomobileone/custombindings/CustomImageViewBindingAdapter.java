@@ -17,8 +17,8 @@ public class CustomImageViewBindingAdapter {
         Glide
                 .with(view.getContext())
                 .load(imageUrl)
-                .placeholder(R.drawable.ic_loading)
-                .error(R.drawable.ic_broken_image_black_48dp)
+                .placeholder(R.drawable.ic_loader)
+                .error(R.drawable.ic_error_img)
                 .into(view);
     }
     @BindingAdapter({"imageUrl","imagePlaceholder"})

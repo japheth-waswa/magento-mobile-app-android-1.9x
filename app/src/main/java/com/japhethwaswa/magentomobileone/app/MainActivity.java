@@ -4,6 +4,7 @@ package com.japhethwaswa.magentomobileone.app;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.os.CountDownTimer;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.os.StrictMode;
@@ -33,8 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private  boolean dataAbsent = true;
     //private JobManager jobManager;
     private ArrayList<PreData> preDataList;
     private MainViewPagerAdapter mainViewPagerAdapter;
@@ -65,18 +67,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //List<PreData> pagerItems = getPreData();
         //preDataList = (ArrayList<PreData>) getPreData();
-       /**me-no** preDataList = new ArrayList<>();
+        /**me-no** preDataList = new ArrayList<>();
 
-        if(savedInstanceState != null){
-            preDataList = (ArrayList<PreData>) savedInstanceState.getSerializable("mainPagerArray");
-        }
+         if(savedInstanceState != null){
+         preDataList = (ArrayList<PreData>) savedInstanceState.getSerializable("mainPagerArray");
+         }
 
 
-        //mainViewPagerAdapter = new MainViewPagerAdapter(this,pagerItems);
-        mainViewPagerAdapter = new MainViewPagerAdapter(preDataList);**/
+         //mainViewPagerAdapter = new MainViewPagerAdapter(this,pagerItems);
+         mainViewPagerAdapter = new MainViewPagerAdapter(preDataList);**/
+        //start loader
+        activityMainBinding.mainPageLoader.startProgress();
 
-       getSupportLoaderManager().initLoader(URL_LOADER,null,this);
-       //getLoaderManager().initLoader(URL_LOADER,null,this);
+        //start countdown to 10seconds if no data then load home view
+        startCountDown();
+
+        getSupportLoaderManager().initLoader(URL_LOADER, null, this);
+        //getLoaderManager().initLoader(URL_LOADER,null,this);
         mainViewPagerAdapter = new MainViewPagerAdapter(cursor);
 
         activityMainBinding.mainViewPager.setAdapter(mainViewPagerAdapter);
@@ -84,16 +91,36 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     }
 
+    private void startCountDown() {
+        new CountDownTimer(10000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+
+                if (dataAbsent == true) {
+                    //no data in the cursor therefore load the HomeActivity
+                    Intent intent = new Intent(MainActivity.this,NavDrawerActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        }.start();
+
+    }
+
     //comment
     /**me-no**@Override
-    protected void onStart() {
-        super.onStart();
-        //getPreData();
-        if(preDataList.size() < 1){
-            getPagerData();
-        }
+     protected void onStart() {
+     super.onStart();
+     //getPreData();
+     if(preDataList.size() < 1){
+     getPagerData();
+     }
 
-    }**/
+     }**/
 
     /**android job manager and networking
      private void getMagentoResource(String customers) {
@@ -121,97 +148,99 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     //bg thread to fetch data from an endpoint.
     //public  ArrayList<PreData> getPreData() {
-   /** public  void getPreData() {
+    /** public  void getPreData() {
 
-        preDataList = new ArrayList<>();
+     preDataList = new ArrayList<>();
 
-        String[] imageUrls = new String[]{
-                "http://i2.cdn.cnn.com/cnnnext/dam/assets/160614121003-08-instant-vacation-restricted-super-169.jpg",
-                "http://www.wonderslist.com/wp-content/uploads/2016/02/Warcraft-1.jpg"
-        };
+     String[] imageUrls = new String[]{
+     "http://i2.cdn.cnn.com/cnnnext/dam/assets/160614121003-08-instant-vacation-restricted-super-169.jpg",
+     "http://www.wonderslist.com/wp-content/uploads/2016/02/Warcraft-1.jpg"
+     };
 
-        String[] titles = new String[]{
-                "This clean !", "That haircut !"
-        };
+     String[] titles = new String[]{
+     "This clean !", "That haircut !"
+     };
 
-        String[] briefDescription = new String[]{
-                "Everything that happens in the world of fashion happens for a reason.",
-                "Distribution of resources among men can be a life changing aspect."
-        };
+     String[] briefDescription = new String[]{
+     "Everything that happens in the world of fashion happens for a reason.",
+     "Distribution of resources among men can be a life changing aspect."
+     };
 
-        int count = imageUrls.length;
-        preDataList.clear();
-        for (int i = 0; i < count; i++) {
-            PreData preData = new PreData();
-            preData.setImageUrl(imageUrls[i]);
-            preData.setTitle(titles[i]);
-            preData.setBriefDescription(briefDescription[i]);
-            preDataList.add(preData);
-        }
+     int count = imageUrls.length;
+     preDataList.clear();
+     for (int i = 0; i < count; i++) {
+     PreData preData = new PreData();
+     preData.setImageUrl(imageUrls[i]);
+     preData.setTitle(titles[i]);
+     preData.setBriefDescription(briefDescription[i]);
+     preDataList.add(preData);
+     }
 
-        mainViewPagerAdapter.updatePagerItems(preDataList);
-        //mainViewPagerAdapter.notifyDataSetChanged();
+     mainViewPagerAdapter.updatePagerItems(preDataList);
+     //mainViewPagerAdapter.notifyDataSetChanged();
 
-    }**/
+     }**/
 
-   //comment
-   /**me-no** private void getPagerData() {
+    //comment
+    /**me-no** private void getPagerData() {
 
-        /**==**/
+     /**==**/
     /**me-no**String[] projection = {
-                JumboContract.PagerEntry.COLUMN_TITLE,
-                JumboContract.PagerEntry.COLUMN_BRIEF_DESCRIPTION,
-                JumboContract.PagerEntry.COLUMN_IMAGE_URL_LOCAL,
-                JumboContract.PagerEntry.COLUMN_IMAGE_URL_REMOTE,
-                JumboContract.PagerEntry.COLUMN_UPDATED_AT
-        };
-        JumboQueryHandler handler = new JumboQueryHandler(this.getContentResolver()) {
-            @Override
-            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                try {
-                    if (cursor != null) {
-                        preDataList.clear();
-                        while (cursor.moveToNext()) {
-                            String title = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_TITLE));
-                            String briefDescription = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_BRIEF_DESCRIPTION));
-                            String localUrl = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_IMAGE_URL_LOCAL));
-                            String remoteUrl = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_IMAGE_URL_REMOTE));
-                            String updated_at = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_UPDATED_AT));
+     JumboContract.PagerEntry.COLUMN_TITLE,
+     JumboContract.PagerEntry.COLUMN_BRIEF_DESCRIPTION,
+     JumboContract.PagerEntry.COLUMN_IMAGE_URL_LOCAL,
+     JumboContract.PagerEntry.COLUMN_IMAGE_URL_REMOTE,
+     JumboContract.PagerEntry.COLUMN_UPDATED_AT
+     };
+     JumboQueryHandler handler = new JumboQueryHandler(this.getContentResolver()) {
+    @Override protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+    try {
+    if (cursor != null) {
+    preDataList.clear();
+    while (cursor.moveToNext()) {
+    String title = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_TITLE));
+    String briefDescription = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_BRIEF_DESCRIPTION));
+    String localUrl = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_IMAGE_URL_LOCAL));
+    String remoteUrl = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_IMAGE_URL_REMOTE));
+    String updated_at = cursor.getString(cursor.getColumnIndex(JumboContract.PagerEntry.COLUMN_UPDATED_AT));
 
-                            //Log.e("item-val", title);
-                            //Log.e("item-val", updated_at);
+    //Log.e("item-val", title);
+    //Log.e("item-val", updated_at);
 
-                            String imageUrl = localUrl;
-                            if (localUrl == null) {
-                                imageUrl = remoteUrl;
-                            }
-                            PreData preData = new PreData();
-                            preData.setImageUrl(imageUrl);
-                            preData.setTitle(title);
-                            preData.setBriefDescription(briefDescription);
-                            preDataList.add(preData);
-                        }
-                        //update adapter and automaticaly notifiy dataset changed
-                        mainViewPagerAdapter.updatePagerItems(preDataList);
-                    }
-                    cursor.close();
-                } finally {
+    String imageUrl = localUrl;
+    if (localUrl == null) {
+    imageUrl = remoteUrl;
+    }
+    PreData preData = new PreData();
+    preData.setImageUrl(imageUrl);
+    preData.setTitle(title);
+    preData.setBriefDescription(briefDescription);
+    preDataList.add(preData);
+    }
+    //update adapter and automaticaly notifiy dataset changed
+    mainViewPagerAdapter.updatePagerItems(preDataList);
+    }
+    cursor.close();
+    } finally {
 
-                }
-            }
-        };
-        handler.startQuery(1, null, JumboContract.PagerEntry.CONTENT_URI, projection, null, null, null);
-        /**===**/
+    }
+    }
+    };
+     handler.startQuery(1, null, JumboContract.PagerEntry.CONTENT_URI, projection, null, null, null);
+     /**===**/
     //me-no//}
 
     //comment
-/**me-no** @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //save the predatalist to avoid refetching from db and check onstart if size is bigger before refetching from db
-        outState.putSerializable("mainPagerArray",preDataList);
 
-    }**/
+    /**
+     * me-no** @Override
+     * protected void onSaveInstanceState(Bundle outState) {
+     * super.onSaveInstanceState(outState);
+     * //save the predatalist to avoid refetching from db and check onstart if size is bigger before refetching from db
+     * outState.putSerializable("mainPagerArray",preDataList);
+     * <p>
+     * }
+     **/
 
 
     public void skipClicked(View view) {
@@ -232,11 +261,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 JumboContract.PagerEntry.COLUMN_UPDATED_AT
         };
 
-        return new CursorLoader(this,JumboContract.PagerEntry.CONTENT_URI, projection, null, null, null);
+        return new CursorLoader(this, JumboContract.PagerEntry.CONTENT_URI, projection, null, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        //ensure you disable the loader only if cursor is null
+        if(data.getCount() > 0){
+            dataAbsent = false;
+            activityMainBinding.mainPageLoader.stopProgress();
+        }
+
         mainViewPagerAdapter.setCursor(data);
     }
 

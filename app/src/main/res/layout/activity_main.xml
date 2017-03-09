@@ -9,6 +9,11 @@
         android:layout_height="match_parent"
         tools:context="com.japhethwaswa.magentomobileone.app.MainActivity"
         android:orientation="horizontal">
+        <id.arieridwan.lib.PageLoader
+            android:id="@+id/mainPageLoader"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:setLoadingImage="@drawable/ic_loader"/>
 
         <android.support.v4.view.ViewPager
             android:id="@+id/main_view_pager"
