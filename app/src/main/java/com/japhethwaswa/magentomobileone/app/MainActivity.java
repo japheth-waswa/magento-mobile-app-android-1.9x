@@ -7,6 +7,9 @@ import android.databinding.DataBindingUtil;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.os.StrictMode;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,12 +33,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     //private JobManager jobManager;
     private ArrayList<PreData> preDataList;
     private MainViewPagerAdapter mainViewPagerAdapter;
     private ActivityMainBinding activityMainBinding;
+    private static final int URL_LOADER = 0;
+    Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         //List<PreData> pagerItems = getPreData();
         //preDataList = (ArrayList<PreData>) getPreData();
-        preDataList = new ArrayList<>();
+       /**me-no** preDataList = new ArrayList<>();
 
         if(savedInstanceState != null){
             preDataList = (ArrayList<PreData>) savedInstanceState.getSerializable("mainPagerArray");
@@ -68,14 +73,19 @@ public class MainActivity extends AppCompatActivity {
 
 
         //mainViewPagerAdapter = new MainViewPagerAdapter(this,pagerItems);
-        mainViewPagerAdapter = new MainViewPagerAdapter(preDataList);
+        mainViewPagerAdapter = new MainViewPagerAdapter(preDataList);**/
+
+       getSupportLoaderManager().initLoader(URL_LOADER,null,this);
+       //getLoaderManager().initLoader(URL_LOADER,null,this);
+        mainViewPagerAdapter = new MainViewPagerAdapter(cursor);
 
         activityMainBinding.mainViewPager.setAdapter(mainViewPagerAdapter);
 
 
     }
 
-    @Override
+    //comment
+    /**me-no**@Override
     protected void onStart() {
         super.onStart();
         //getPreData();
@@ -83,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             getPagerData();
         }
 
-    }
+    }**/
 
     /**android job manager and networking
      private void getMagentoResource(String customers) {
@@ -144,10 +154,11 @@ public class MainActivity extends AppCompatActivity {
 
     }**/
 
-    private void getPagerData() {
+   //comment
+   /**me-no** private void getPagerData() {
 
         /**==**/
-        String[] projection = {
+    /**me-no**String[] projection = {
                 JumboContract.PagerEntry.COLUMN_TITLE,
                 JumboContract.PagerEntry.COLUMN_BRIEF_DESCRIPTION,
                 JumboContract.PagerEntry.COLUMN_IMAGE_URL_LOCAL,
@@ -191,15 +202,16 @@ public class MainActivity extends AppCompatActivity {
         };
         handler.startQuery(1, null, JumboContract.PagerEntry.CONTENT_URI, projection, null, null, null);
         /**===**/
-    }
+    //me-no//}
 
-    @Override
+    //comment
+/**me-no** @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         //save the predatalist to avoid refetching from db and check onstart if size is bigger before refetching from db
         outState.putSerializable("mainPagerArray",preDataList);
 
-    }
+    }**/
 
 
     public void skipClicked(View view) {
@@ -210,4 +222,26 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = {
+                JumboContract.PagerEntry.COLUMN_TITLE,
+                JumboContract.PagerEntry.COLUMN_BRIEF_DESCRIPTION,
+                JumboContract.PagerEntry.COLUMN_IMAGE_URL_LOCAL,
+                JumboContract.PagerEntry.COLUMN_IMAGE_URL_REMOTE,
+                JumboContract.PagerEntry.COLUMN_UPDATED_AT
+        };
+
+        return new CursorLoader(this,JumboContract.PagerEntry.CONTENT_URI, projection, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mainViewPagerAdapter.setCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mainViewPagerAdapter.setCursor(null);
+    }
 }
