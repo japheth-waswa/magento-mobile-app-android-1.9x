@@ -17,7 +17,9 @@ import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PAGER;
 
 public class JumboProvider extends ContentProvider {
 
-    /**constants for the operation**/
+    /**
+     * constants for the operation
+     **/
     private static final int PAGERS = 1;
     private static final int PAGER_ID = 2;
     private static final int MAINS = 3;
@@ -29,12 +31,12 @@ public class JumboProvider extends ContentProvider {
     static {
 
         //pager data uri
-        uriMatcher.addURI(CONTENT_AUTHORITY,PATH_PAGER,PAGERS);
-        uriMatcher.addURI(CONTENT_AUTHORITY,PATH_PAGER + "/#",PAGER_ID);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PAGER, PAGERS);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PAGER + "/#", PAGER_ID);
 
         //main data uri
-        uriMatcher.addURI(CONTENT_AUTHORITY,PATH_MAIN,MAINS);
-        uriMatcher.addURI(CONTENT_AUTHORITY,PATH_MAIN + "/#",MAIN_ID);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_MAIN, MAINS);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_MAIN + "/#", MAIN_ID);
     }
 
     private DatabaseHelper helper;
@@ -53,28 +55,29 @@ public class JumboProvider extends ContentProvider {
         Cursor cursor;
         int match = uriMatcher.match(uri);
         //4 possible scenarios
-        switch (match){
+        switch (match) {
             case PAGERS:
-                cursor = db.query(JumboContract.PagerEntry.TABLE_NAME,projection,selection,selectionArgs,null,null,sortOrder);
+                cursor = db.query(JumboContract.PagerEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case PAGER_ID:
                 selection = JumboContract.PagerEntry._ID + "=?";
-                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
-                cursor = db.query(JumboContract.PagerEntry.TABLE_NAME,projection,selection,selectionArgs,null,null,sortOrder);
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(JumboContract.PagerEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case MAINS:
-                cursor = db.query(JumboContract.MainEntry.TABLE_NAME,projection,selection,selectionArgs,null,null,sortOrder);
+                cursor = db.query(JumboContract.MainEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case MAIN_ID:
                 selection = JumboContract.MainEntry._ID + "=?";
-                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
-                cursor = db.query(JumboContract.MainEntry.TABLE_NAME,projection,selection,selectionArgs,null,null,sortOrder);
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(JumboContract.MainEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown Uri");
         }
-         cursor.setNotificationUri(getContext().getContentResolver(),uri);
-        return  cursor;
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        //db.close();
+        return cursor;
     }
 
     @Nullable
@@ -87,26 +90,27 @@ public class JumboProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         int match = uriMatcher.match(uri);
-        switch (match){
+        switch (match) {
             case PAGERS:
-                return insertRecord(uri,values, JumboContract.PagerEntry.TABLE_NAME);
+                return insertRecord(uri, values, JumboContract.PagerEntry.TABLE_NAME);
             case MAINS:
-                return insertRecord(uri,values, JumboContract.MainEntry.TABLE_NAME);
+                return insertRecord(uri, values, JumboContract.MainEntry.TABLE_NAME);
             default:
-                throw new IllegalArgumentException("Unkwown uri: "+ uri);
+                throw new IllegalArgumentException("Unkwown uri: " + uri);
 
         }
     }
 
     private Uri insertRecord(Uri uri, ContentValues values, String tableName) {
         SQLiteDatabase db = helper.getWritableDatabase();
-        long id = db.insert(tableName,null,values);
-        if(id == -1){
-            Log.e("Error","insert error for uri: "+ uri);
+        long id = db.insert(tableName, null, values);
+        db.close();
+        if (id == -1) {
+            Log.e("Error", "insert error for uri: " + uri);
             return null;
         }
-        getContext().getContentResolver().notifyChange(uri,null);
-        return ContentUris.withAppendedId(uri,id);
+        getContext().getContentResolver().notifyChange(uri, null);
+        return ContentUris.withAppendedId(uri, id);
     }
 
     @Override
@@ -130,6 +134,7 @@ public class JumboProvider extends ContentProvider {
         //this time we need a writable database
         SQLiteDatabase db = helper.getWritableDatabase();
         int id = db.delete(tableName, selection, selectionArgs);
+        db.close();
         if (id == -1) {
             Log.e("Error", "delete unknown URI " + uri);
             return -1;
@@ -156,10 +161,12 @@ public class JumboProvider extends ContentProvider {
         //this time we need a writable database
         SQLiteDatabase db = helper.getWritableDatabase();
         int id = db.update(tableName, values, selection, selectionArgs);
+        db.close();
         if (id == 0) {
             Log.e("Error", "update error for URI " + uri);
             return -1;
         }
+
         return id;
     }
 }

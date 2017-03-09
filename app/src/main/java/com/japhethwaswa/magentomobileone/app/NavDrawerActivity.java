@@ -1,5 +1,7 @@
 package com.japhethwaswa.magentomobileone.app;
 
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.NavigationView;
@@ -8,10 +10,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.japhethwaswa.magentomobileone.R;
+import com.japhethwaswa.magentomobileone.db.JumboContract;
+import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 
 public class NavDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -42,6 +47,22 @@ public class NavDrawerActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        String[] projection = {
+                JumboContract.MainEntry.COLUMN_KEY_HOME
+        };
+        JumboQueryHandler handler = new JumboQueryHandler(this.getContentResolver()){
+
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                Cursor cursor1 = cursor;
+                Log.e("jeff-lilcot",String.valueOf(cursor1.getCount()));
+                cursor1.close();
+            }
+        };
+        handler.startQuery(7,null,JumboContract.MainEntry.CONTENT_URI,projection,null,null,null);
+
+
     }
 
     @Override

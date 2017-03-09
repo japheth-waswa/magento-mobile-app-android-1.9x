@@ -1,5 +1,6 @@
 package com.japhethwaswa.magentomobileone.service;
 
+import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
@@ -40,7 +41,7 @@ public class JumboWebService {
                 .build().getAsJSONObject(new JSONObjectRequestListener() {
             @Override
             public void onResponse(JSONObject response) {
-               // Log.e("MainDataRequest", response.toString());
+                // Log.e("MainDataRequest", response.toString());
                 //parse the json object extracting pager data and main data
                 try {
                     JSONArray pagerArray = response.getJSONArray("pager");
@@ -48,11 +49,15 @@ public class JumboWebService {
                     if (pagerArray.length() > 0) {
                         insertPager(pagerArray, context);
                     }
-                    //TODO broadcast that pager data has been successfully inserted
-                    //TODO update main data to db
-                    //TODO broadcast main data has been successfully updated
+
+
+                    JSONArray mainArray = response.getJSONArray("main");
+                    // pagerArray.length();
+                    if (mainArray.length() > 0) {
+                        updateMain(mainArray, context);
+                    }
                     /**Log.e("MainDataPagerArray", pagerArray.toString());
-                    Log.e("MainDataPagerArrLength", String.valueOf(pagerArray.length()));**/
+                     Log.e("MainDataPagerArrLength", String.valueOf(pagerArray.length()));**/
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -97,11 +102,49 @@ public class JumboWebService {
          return null;**/
     }
 
+    private static void updateMain(JSONArray mainArray, Context context) {
+
+        //foreach item update
+        for (int i = 0; i <= mainArray.length(); i++) {
+            try {
+
+                JSONObject mainObject = mainArray.getJSONObject(i);
+                final ContentValues values = new ContentValues();
+                String keyHome = mainObject.getString("key_home");
+                values.put(JumboContract.MainEntry.COLUMN_KEY_HOME, keyHome);
+                values.put(JumboContract.MainEntry.COLUMN_CATEGORY_ID, mainObject.getString("category_id"));
+                values.put(JumboContract.MainEntry.COLUMN_PRODUCT_ID, mainObject.getString("product_id"));
+                values.put(JumboContract.MainEntry.COLUMN_IMAGE_URL, mainObject.getString("image_url"));
+                values.put(JumboContract.MainEntry.COLUMN_SECTION, mainObject.getString("section"));
+                values.put(JumboContract.MainEntry.COLUMN_UPDATED_AT, mainObject.getString("updated_at"));
+
+                String selection = JumboContract.MainEntry.COLUMN_KEY_HOME + "=?";
+                String[] selectionArgs = {keyHome};
+
+                JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver()) {
+                    @Override
+                    protected void onUpdateComplete(int token, Object cookie, int result) {
+
+                        //no data therefore insert
+                        if (result == -1) {
+                            this.startInsert(5,null,JumboContract.MainEntry.CONTENT_URI,values);
+                        }
+
+                    }
+                };
+                handler.startUpdate(3, null, JumboContract.MainEntry.CONTENT_URI, values, selection, selectionArgs);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private static void insertPager(JSONArray pagerArray, Context context) {
 
         JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
         //delete all previous data
-        handler.startDelete(2,null,JumboContract.PagerEntry.CONTENT_URI,null,null);
+        handler.startDelete(2, null, JumboContract.PagerEntry.CONTENT_URI, null, null);
 
         //perform new inserts
         for (int i = 0; i <= pagerArray.length(); i++) {
