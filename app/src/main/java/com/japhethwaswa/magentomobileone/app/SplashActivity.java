@@ -58,7 +58,7 @@ public class SplashActivity extends AppCompatActivity {
 
         if (pagerObsolete == true) {
             //load HomeActivity
-            Intent intent = new Intent(this, NavDrawerActivity.class);
+            Intent intent = new Intent(this, HomeActivity.class);
             startActivity(intent);
             finish();
         }

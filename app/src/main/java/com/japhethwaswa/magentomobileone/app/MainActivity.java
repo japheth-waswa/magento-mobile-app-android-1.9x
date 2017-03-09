@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 if (dataAbsent == true) {
                     //no data in the cursor therefore load the HomeActivity
-                    Intent intent = new Intent(MainActivity.this,NavDrawerActivity.class);
+                    Intent intent = new Intent(MainActivity.this,HomeActivity.class);
                     startActivity(intent);
                     finish();
                 }
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public void skipClicked(View view) {
 
-        Intent intent = new Intent(this, NavDrawerActivity.class);
+        Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
         finish();
 
