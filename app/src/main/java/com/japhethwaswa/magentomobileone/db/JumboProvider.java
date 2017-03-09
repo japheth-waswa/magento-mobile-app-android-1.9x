@@ -104,7 +104,7 @@ public class JumboProvider extends ContentProvider {
     private Uri insertRecord(Uri uri, ContentValues values, String tableName) {
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = db.insert(tableName, null, values);
-        db.close();
+        //db.close();
         if (id == -1) {
             Log.e("Error", "insert error for uri: " + uri);
             return null;
@@ -134,7 +134,7 @@ public class JumboProvider extends ContentProvider {
         //this time we need a writable database
         SQLiteDatabase db = helper.getWritableDatabase();
         int id = db.delete(tableName, selection, selectionArgs);
-        db.close();
+        //db.close();
         if (id == -1) {
             Log.e("Error", "delete unknown URI " + uri);
             return -1;
@@ -161,7 +161,7 @@ public class JumboProvider extends ContentProvider {
         //this time we need a writable database
         SQLiteDatabase db = helper.getWritableDatabase();
         int id = db.update(tableName, values, selection, selectionArgs);
-        db.close();
+        //db.close();
         if (id == 0) {
             Log.e("Error", "update error for URI " + uri);
             return -1;
