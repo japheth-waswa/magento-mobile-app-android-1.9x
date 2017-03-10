@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -82,6 +83,8 @@ public class HomeActivity extends AppCompatActivity
         );
         /**activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
          activityHomeBinding.homeTabs.setupWithViewPager(activityHomeBinding.viewPagerHome);**/
+
+        //Snackbar.make(activityHomeBinding.getRoot(),"jefflilcot",Snackbar.LENGTH_LONG).show();
 
 
     }

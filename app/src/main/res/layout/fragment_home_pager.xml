@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
-<ScrollView
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<android.support.v4.widget.NestedScrollView
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    >
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Fragement home bro. fsjalkd
+        android:text="Start Fragement home bro. fsjalkd
          fasjdfklaj sdfklajs dfklaj sdfklaj fkljsf
          f sadlfkasjd flaskdjf askldfj asfkldjasfkl sdj
          fdas flkajf sdklfja sklfjas fkldj fklasjf dklafj
@@ -49,6 +51,6 @@ Fragement home bro. fsjalkd
          fdas flkajf sdklfja sklfjas fkldj fklasjf dklafj
          fjsdklfa jdfklasj fkdlsj fakldfj asklfj askldfj asdklf
          dklaj sfdklj afkldj faklsfj daklfjdkfas"/>
-</ScrollView>
+</android.support.v4.widget.NestedScrollView>
 
 </layout>
