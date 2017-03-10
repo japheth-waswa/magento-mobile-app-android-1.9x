@@ -1,14 +1,21 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
+    <!--dynamic theme-->
+    <style name="dynamicTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="android:textColorSecondary">@color/textColorSecondary</item>
-        <item name="android:windowBackground">@color/windowBackground</item>
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+    </style>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="@style/dynamicTheme">
+        <!-- Customize your theme here. -->
+
+    </style>
+
+    <!--drawer arrow style-->
+    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="spinBars">true</item>
+        <item name="color">@color/colorAccent</item>
     </style>
 
     <!--splash screen theme-->
