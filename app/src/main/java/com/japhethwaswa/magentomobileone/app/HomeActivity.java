@@ -58,7 +58,6 @@ public class HomeActivity extends AppCompatActivity
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, activityHomeBinding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         //drawer.setDrawerListener(toggle);
-
         activityHomeBinding.drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
