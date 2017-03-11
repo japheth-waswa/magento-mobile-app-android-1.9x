@@ -1,11 +1,8 @@
 package com.japhethwaswa.magentomobileone.fragment;
 
-import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -18,8 +15,6 @@ import android.view.ViewGroup;
 
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.HomeViewPagerAdapter;
-import com.japhethwaswa.magentomobileone.app.HomeActivity;
-import com.japhethwaswa.magentomobileone.app.MainActivity;
 import com.japhethwaswa.magentomobileone.databinding.FragmentHomePagerBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
@@ -52,7 +47,7 @@ public class HomeFragmentPager extends Fragment implements LoaderManager.LoaderC
         fragmentHomePagerBinding.setHomeVars(homeVars);
 
         //set up the viewpager adapter
-        homeViewPagerAdapter = new HomeViewPagerAdapter(cursor);
+        homeViewPagerAdapter = new HomeViewPagerAdapter(cursor,fragmentHomePagerBinding);
         fragmentHomePagerBinding.homeViewPager.setAdapter(homeViewPagerAdapter);
 
 
@@ -136,7 +131,8 @@ public class HomeFragmentPager extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        homeViewPagerAdapter.setCursor(null);
+        homeViewPagerAdapter.setCursor(null,initialPosition);
+        resetInitPos();
     }
 
     public void loadDataToHomeTab(Cursor data) {
@@ -184,8 +180,10 @@ public class HomeFragmentPager extends Fragment implements LoaderManager.LoaderC
         JumboQueryHandler handler = new JumboQueryHandler(getActivity().getContentResolver()) {
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                homeViewPagerAdapter.setCursor(cursor);
+                homeViewPagerAdapter.setCursor(cursor,initialPosition);
+                resetInitPos();
                 cursor.close();
+
             }
 
         };
@@ -194,7 +192,7 @@ public class HomeFragmentPager extends Fragment implements LoaderManager.LoaderC
     }
 
     //set current item if view pages already created
-    public void PageViewReady() {
+    /**public void PageViewReady() {
 
         if (initialPosition != -1) {
             Log.e("jeff", "set wherever");
@@ -203,5 +201,9 @@ public class HomeFragmentPager extends Fragment implements LoaderManager.LoaderC
             initialPosition = -1;
         }
 
+    }**/
+
+    private void resetInitPos(){
+        initialPosition = -1;
     }
 }
