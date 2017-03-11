@@ -2,7 +2,6 @@ package com.japhethwaswa.magentomobileone.model;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.graphics.drawable.Drawable;
 
 import com.android.databinding.library.baseAdapters.BR;
 

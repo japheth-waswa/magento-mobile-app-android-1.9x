@@ -76,7 +76,7 @@ public class JumboProvider extends ContentProvider {
                 throw new IllegalArgumentException("Unknown Uri");
         }
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
-        //db.close();
+
         return cursor;
     }
 

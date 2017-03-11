@@ -1,56 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="homeVars"
+            type="com.japhethwaswa.magentomobileone.model.HomeVars"/>
+    </data>
+
 <android.support.v4.widget.NestedScrollView
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     >
-
-    <TextView
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp">
+    <RelativeLayout
+        android:id="@+id/activity_main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Start Fragement home bro. fsjalkd
-         fasjdfklaj sdfklajs dfklaj sdfklaj fkljsf
-         f sadlfkasjd flaskdjf askldfj asfkldjasfkl sdj
-         fdas flkajf sdklfja sklfjas fkldj fklasjf dklafj
-         fjsdklfa jdfklasj fkdlsj fakldfj asklfj askldfj asdklf
-         dklaj sfdklj afkldj faklsfj daklfjdkfas
-Fragement home bro. fsjalkd
-         fasjdfklaj sdfklajs dfklaj sdfklaj fkljsf
-         f sadlfkasjd flaskdjf askldfj asfkldjasfkl sdj
-         fdas flkajf sdklfja sklfjas fkldj fklasjf dklafj
-         fjsdklfa jdfklasj fkdlsj fakldfj asklfj askldfj asdklf
-         dklaj sfdklj afkldj faklsfj daklfjdkfas
-Fragement home bro. fsjalkd
-         fasjdfklaj sdfklajs dfklaj sdfklaj fkljsf
-         f sadlfkasjd flaskdjf askldfj asfkldjasfkl sdj
-         fdas flkajf sdklfja sklfjas fkldj fklasjf dklafj
-         fjsdklfa jdfklasj fkdlsj fakldfj asklfj askldfj asdklf
-         dklaj sfdklj afkldj faklsfj daklfjdkfas
-Fragement home bro. fsjalkd
-         fasjdfklaj sdfklajs dfklaj sdfklaj fkljsf
-         f sadlfkasjd flaskdjf askldfj asfkldjasfkl sdj
-         fdas flkajf sdklfja sklfjas fkldj fklasjf dklafj
-         fjsdklfa jdfklasj fkdlsj fakldfj asklfj askldfj asdklf
-         dklaj sfdklj afkldj faklsfj daklfjdkfas
-Fragement home bro. fsjalkd
-         fasjdfklaj sdfklajs dfklaj sdfklaj fkljsf
-         f sadlfkasjd flaskdjf askldfj asfkldjasfkl sdj
-         fdas flkajf sdklfja sklfjas fkldj fklasjf dklafj
-         fjsdklfa jdfklasj fkdlsj fakldfj asklfj askldfj asdklf
-         dklaj sfdklj afkldj faklsfj daklfjdkfas
-Fragement home bro. fsjalkd
-         fasjdfklaj sdfklajs dfklaj sdfklaj fkljsf
-         f sadlfkasjd flaskdjf askldfj asfkldjasfkl sdj
-         fdas flkajf sdklfja sklfjas fkldj fklasjf dklafj
-         fjsdklfa jdfklasj fkdlsj fakldfj asklfj askldfj asdklf
-         dklaj sfdklj afkldj faklsfj daklfjdkfas
-Fragement home bro. fsjalkd
-         fasjdfklaj sdfklajs dfklaj sdfklaj fkljsf
-         f sadlfkasjd flaskdjf askldfj asfkldjasfkl sdj
-         fdas flkajf sdklfja sklfjas fkldj fklasjf dklafj
-         fjsdklfa jdfklasj fkdlsj fakldfj asklfj askldfj asdklf
-         dklaj sfdklj afkldj faklsfj daklfjdkfas"/>
+        android:layout_height="wrap_content">
+        <android.support.v4.view.ViewPager
+            android:id="@+id/home_view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"/>
+        <com.rd.PageIndicatorView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="37dp"
+            app:piv_viewPager="@id/home_view_pager"
+            app:piv_radius="11dp"
+            app:piv_interactiveAnimation="true"
+            app:piv_animationType="thinWorm"
+            app:piv_dynamicCount="true"/>
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp">
+        <ImageView
+            android:id="@+id/section_two_one"
+            android:layout_height="300dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:scaleType="fitXY"
+            app:imageUrl="@{homeVars.sectionTwoOne}"
+            android:paddingRight="10dp"/>
+        <ImageView
+            android:id="@+id/section_two_two"
+            android:layout_height="300dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:scaleType="fitXY"
+            app:imageUrl="@{homeVars.sectionTwoTwo}"
+            android:paddingLeft="10dp"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/section_three"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:imageUrl="@{homeVars.sectionThree}"
+        android:scaleType="centerCrop"
+        android:layout_marginBottom="20dp"/>
+
+</LinearLayout>
+
 </android.support.v4.widget.NestedScrollView>
 
 </layout>
