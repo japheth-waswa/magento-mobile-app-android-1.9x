@@ -4,9 +4,7 @@
 
     <data>
 
-        <variable
-            name="homeVars"
-            type="com.japhethwaswa.magentomobileone.model.HomeVars" />
+        <variable name="homeVars" type="com.japhethwaswa.magentomobileone.model.HomeVars" />
     </data>
 
     <android.support.v4.widget.NestedScrollView
@@ -80,9 +78,7 @@
                 android:layout_height="200dp"
                 android:layout_marginBottom="20dp"
                 android:scaleType="centerCrop"
-                app:imageUrl="@{homeVars.sectionThree}"
-                android:tag="3"
-                android:onClick="clickedMe"/>
+                app:imageUrl="@{homeVars.sectionThree}"/>
 
         </LinearLayout>
 
