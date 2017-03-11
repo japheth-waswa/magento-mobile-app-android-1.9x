@@ -34,6 +34,10 @@ public class HomeFragmentPager extends Fragment implements LoaderManager.LoaderC
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         fragmentHomePagerBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home_pager, container, false);
+
+        //show loader
+        fragmentHomePagerBinding.homeFragPageLoader.startProgress();
+
         getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
 
         //restart loader if bundle has content
@@ -82,6 +86,8 @@ public class HomeFragmentPager extends Fragment implements LoaderManager.LoaderC
         //ensure you disable the loader only if cursor is null
         //cursor = data;
         if (data.getCount() > 0) {
+            //hide the loader
+            fragmentHomePagerBinding.homeFragPageLoader.stopProgress();
             //loop through the cursor getting the item
             while (data.moveToNext()) {
 
@@ -90,22 +96,10 @@ public class HomeFragmentPager extends Fragment implements LoaderManager.LoaderC
 
 
             }
-            //activityMainBinding.mainPageLoader.stopProgress();
         }
 
         //fetch specific data for sliders
         fetchSliderData();
-
-        //homeViewPagerAdapter.setCursor(data);
-        //set current item
-        //startCountDown();
-        /**if(initialPosition != -1){
-         Log.e("jeff","set wherever");
-         Log.e("jeff",String.valueOf(initialPosition));
-         fragmentHomePagerBinding.homeViewPager.setCurrentItem(initialPosition);
-         initialPosition = -1;
-         }**/
-
 
     }
 
@@ -190,18 +184,6 @@ public class HomeFragmentPager extends Fragment implements LoaderManager.LoaderC
 
         handler.startQuery(17, null, JumboContract.MainEntry.CONTENT_URI, projection, selection, selectionArgs, JumboContract.MainEntry.COLUMN_KEY_HOME);
     }
-
-    //set current item if view pages already created
-    /**public void PageViewReady() {
-
-        if (initialPosition != -1) {
-            Log.e("jeff", "set wherever");
-            Log.e("jeff", String.valueOf(initialPosition));
-            fragmentHomePagerBinding.homeViewPager.setCurrentItem(initialPosition);
-            initialPosition = -1;
-        }
-
-    }**/
 
     private void resetInitPos(){
         initialPosition = -1;
