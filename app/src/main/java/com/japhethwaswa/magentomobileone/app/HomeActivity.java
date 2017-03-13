@@ -15,8 +15,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
+import android.view.View;
+import android.widget.BaseAdapter;
+import android.widget.HeaderViewListAdapter;
+import android.widget.ListView;
 
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.HomeTextTabsAdapter;
@@ -34,6 +40,7 @@ public class HomeActivity extends AppCompatActivity
     private List<Fragment> fragmentList = new ArrayList<>();
     private List<String> titleList = new ArrayList<>();
     private ActivityHomeBinding activityHomeBinding;
+    private String[] navItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,23 +78,43 @@ public class HomeActivity extends AppCompatActivity
 
         HomeTextTabsAdapter homeTextTabsAdapter = new HomeTextTabsAdapter(getSupportFragmentManager(), fragmentList, titleList);
 
-       /** activityHomeBinding.layoutNavToolbar.viewPagerHome.setAdapter(homeTextTabsAdapter);
-        activityHomeBinding.layoutNavToolbar.homeTabs.setupWithViewPager(
-                activityHomeBinding.layoutNavToolbar.viewPagerHome
-        );**/
+        /** activityHomeBinding.layoutNavToolbar.viewPagerHome.setAdapter(homeTextTabsAdapter);
+         activityHomeBinding.layoutNavToolbar.homeTabs.setupWithViewPager(
+         activityHomeBinding.layoutNavToolbar.viewPagerHome
+         );**/
         activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
         activityHomeBinding.homeTabs.setupWithViewPager(
                 activityHomeBinding.viewPagerHome
         );
         /**activityHomeBinding.layoutContentActivityHome.viewPagerHome.setAdapter(homeTextTabsAdapter);
-        activityHomeBinding.layoutContentActivityHome.homeTabs.setupWithViewPager(
-                activityHomeBinding.layoutContentActivityHome.viewPagerHome
-        );
-        /**activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
+         activityHomeBinding.layoutContentActivityHome.homeTabs.setupWithViewPager(
+         activityHomeBinding.layoutContentActivityHome.viewPagerHome
+         );
+         /**activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
          activityHomeBinding.homeTabs.setupWithViewPager(activityHomeBinding.viewPagerHome);**/
 
         //Snackbar.make(activityHomeBinding.getRoot(),"jefflilcot",Snackbar.LENGTH_LONG).show();
 
+        navItems = new String[]{"jeff", "lilcot"};
+        Menu menu = activityHomeBinding.layoutNavViewMain.navView.getMenu();
+
+        SubMenu subMenu = menu.addSubMenu(78,Menu.NONE,Menu.NONE,"jean");
+        subMenu.setGroupCheckable(78,true,true);
+        //menu.add(78, Menu.NONE, Menu.NONE, "jean");
+        //menu.setGroupCheckable(78,true,true);
+        for (int i = 1; i <= 3; i++) {
+           // menu.add("runtime item "+ i);
+            subMenu.add(78, i, i, "runtime item " + i).setIcon(R.drawable.ic_cart);
+        }
+        for (int i = 0, count = activityHomeBinding.layoutNavViewMain.navView.getChildCount(); i < count; i++) {
+            final View child = activityHomeBinding.layoutNavViewMain.navView.getChildAt(i);
+            if (child != null && child instanceof ListView) {
+                final ListView menuView = (ListView) child;
+                final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
+                final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
+                wrapped.notifyDataSetChanged();
+            }
+        }
 
     }
 
@@ -139,7 +166,7 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-
+        Log.e("jeff-waswa", String.valueOf(id));
         if (id == R.id.nav_camera) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
@@ -155,7 +182,7 @@ public class HomeActivity extends AppCompatActivity
         }
 
         /**DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);**/
+         drawer.closeDrawer(GravityCompat.START);**/
         activityHomeBinding.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
