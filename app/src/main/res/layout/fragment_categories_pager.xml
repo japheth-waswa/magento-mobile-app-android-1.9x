@@ -5,15 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+    <id.arieridwan.lib.PageLoader
+        android:id="@+id/categoryFragPageLoader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:setLoadingImage="@drawable/ic_loader" />
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/categoriesHomeList"/>
-    <id.arieridwan.lib.PageLoader
-        android:id="@+id/categoryFragPageLoader"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:setLoadingImage="@drawable/ic_loader" />
+
 </LinearLayout>
 
 </layout>
