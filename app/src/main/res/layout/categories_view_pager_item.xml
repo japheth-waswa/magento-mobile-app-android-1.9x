@@ -9,7 +9,9 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_marginBottom="@dimen/standardPadding">
+        android:layout_marginBottom="@dimen/standardPadding"
+        android:layout_marginLeft="@dimen/standardPadding"
+        android:layout_marginRight="@dimen/standardPadding">
 
         <ImageView
             android:id="@+id/category_view_pager_image"

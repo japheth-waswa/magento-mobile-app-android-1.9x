@@ -120,6 +120,7 @@ public class JumboWebService {
                 if(mainObject.has("categoryTitle")){
                     title = mainObject.getString("categoryTitle");
                 }
+                title = "jeanlilcot";
                 values.put(JumboContract.MainEntry.COLUMN_TITLE,title);
                 values.put(JumboContract.MainEntry.COLUMN_UPDATED_AT, mainObject.getString("updated_at"));
 

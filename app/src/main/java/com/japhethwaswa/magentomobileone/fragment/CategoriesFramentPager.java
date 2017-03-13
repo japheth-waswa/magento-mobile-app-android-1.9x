@@ -8,8 +8,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,15 +41,38 @@ public class CategoriesFramentPager extends Fragment  implements LoaderManager.L
       categoriesRecyclerViewAdapter = new CategoriesRecyclerViewAdapter(cursor);
         fragmentCategoriesPagerBinding.categoriesHomeList.setAdapter(categoriesRecyclerViewAdapter);
 
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        fragmentCategoriesPagerBinding.categoriesHomeList.setLayoutManager(llm);
+        /**LinearLayoutManager layoutMgr = new LinearLayoutManager(getActivity());
+        layoutMgr.setOrientation(LinearLayoutManager.HORIZONTAL);**/
+
+        //get screen width
+        int  scrWidth = getScreenDimensions();
+        int numItems = 1;
+
+        if(scrWidth >= 800 ){
+            numItems = 2;
+        }
+        if(scrWidth >= 1280 ){
+            numItems = 3;
+        }
+        GridLayoutManager layoutMgr = new GridLayoutManager(getActivity(),numItems);
+
+        fragmentCategoriesPagerBinding.categoriesHomeList.setLayoutManager(layoutMgr);
 
         return fragmentCategoriesPagerBinding.getRoot();
     }
 
-   @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public int getScreenDimensions(){
+        DisplayMetrics dm = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int width = dm.widthPixels;
+        /**int height = dm.heightPixels;
+        int dens = dm.densityDpi;
+        double wi = (double)width / (double)dens;
+        double hi = (double)height / (double)dens;
+        double x = Math.pow(wi,2);
+        double y = Math.pow(hi,2);
+        double screenInches = Math.sqrt(x+y);**/
+        return width;
     }
 
     @Override
@@ -58,12 +83,14 @@ public class CategoriesFramentPager extends Fragment  implements LoaderManager.L
                 JumboContract.MainEntry.COLUMN_IMAGE_URL
         };
 
+        //TODO selection and selectioArgs to select catgories only
         return new CursorLoader(this.getActivity(), JumboContract.MainEntry.CONTENT_URI, projection, null, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
+        //TODO setup and reset loader progress
         categoriesRecyclerViewAdapter.setCursor(data);
     }
 
