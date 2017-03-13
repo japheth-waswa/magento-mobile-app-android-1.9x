@@ -41,7 +41,7 @@ public class HomeActivity extends AppCompatActivity
     private List<Fragment> fragmentList = new ArrayList<>();
     private List<String> titleList = new ArrayList<>();
     private ActivityHomeBinding activityHomeBinding;
-    private String[] navItems;
+    private NavMenuManager navMenuManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +94,9 @@ public class HomeActivity extends AppCompatActivity
          /**activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
          activityHomeBinding.homeTabs.setupWithViewPager(activityHomeBinding.viewPagerHome);**/
 
-        NavMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
+        //TODO on load manager finish activate menu update
+        navMenuManager = new NavMenuManager(this);
+        navMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
 
 
     }
