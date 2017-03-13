@@ -34,6 +34,7 @@ public class CategoriesFramentPager extends Fragment  implements LoaderManager.L
         fragmentCategoriesPagerBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_categories_pager, container, false);
 
         //show loader before initializing cursor loader
+        fragmentCategoriesPagerBinding.categoryFragPageLoader.startProgress();
         //initialize cursor loader
         getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
 
@@ -82,15 +83,19 @@ public class CategoriesFramentPager extends Fragment  implements LoaderManager.L
                 JumboContract.MainEntry.COLUMN_TITLE,
                 JumboContract.MainEntry.COLUMN_IMAGE_URL
         };
+        String selection = JumboContract.MainEntry.COLUMN_SECTION + "=?";
+        String[] selectionArgs = {"4"};
+        String orderBy = JumboContract.MainEntry.COLUMN_KEY_HOME;
 
-        //TODO selection and selectioArgs to select catgories only
-        return new CursorLoader(this.getActivity(), JumboContract.MainEntry.CONTENT_URI, projection, null, null, null);
+        return new CursorLoader(this.getActivity(), JumboContract.MainEntry.CONTENT_URI, projection,selection,selectionArgs,orderBy);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        //TODO setup and reset loader progress
+        if(data.getCount() > 0){
+            fragmentCategoriesPagerBinding.categoryFragPageLoader.stopProgress();
+        }
         categoriesRecyclerViewAdapter.setCursor(data);
     }
 
