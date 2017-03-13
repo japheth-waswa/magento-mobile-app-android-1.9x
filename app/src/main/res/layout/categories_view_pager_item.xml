@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable  name="homeData" type="com.japhethwaswa.magentomobileone.model.HomeData"/>
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginBottom="@dimen/standardPadding">
+
+        <ImageView
+            android:id="@+id/category_view_pager_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:imageUrl="@{homeData.imageUrl}"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/category_view_pager_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/standardPadding"
+                android:paddingRight="@dimen/standardPadding"
+                android:text="@{homeData.title}"
+                android:textColor="@android:color/white"
+                android:textSize="23sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+</layout>

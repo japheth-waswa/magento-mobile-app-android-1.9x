@@ -116,6 +116,11 @@ public class JumboWebService {
                 values.put(JumboContract.MainEntry.COLUMN_PRODUCT_ID, mainObject.getString("product_id"));
                 values.put(JumboContract.MainEntry.COLUMN_IMAGE_URL, mainObject.getString("image_url"));
                 values.put(JumboContract.MainEntry.COLUMN_SECTION, mainObject.getString("section"));
+                String title = null;
+                if(mainObject.has("categoryTitle")){
+                    title = mainObject.getString("categoryTitle");
+                }
+                values.put(JumboContract.MainEntry.COLUMN_TITLE,title);
                 values.put(JumboContract.MainEntry.COLUMN_UPDATED_AT, mainObject.getString("updated_at"));
 
                 String selection = JumboContract.MainEntry.COLUMN_KEY_HOME + "=?";

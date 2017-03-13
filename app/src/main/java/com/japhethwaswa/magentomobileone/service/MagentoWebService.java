@@ -7,9 +7,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Created by web0002 on 2/11/2017.
- */
 
 public class MagentoWebService {
 

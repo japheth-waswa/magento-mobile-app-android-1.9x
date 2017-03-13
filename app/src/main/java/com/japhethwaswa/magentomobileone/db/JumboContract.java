@@ -34,6 +34,7 @@ public final class JumboContract {
         public static final String COLUMN_PRODUCT_ID = "product_id";
         public static final String COLUMN_IMAGE_URL = "image_url";
         public static final String COLUMN_KEY_HOME= "key_home";
+        public static final String COLUMN_TITLE= "title";
         public static final String COLUMN_SECTION = "section";
         public static final String COLUMN_UPDATED_AT = "updated_at";
     }

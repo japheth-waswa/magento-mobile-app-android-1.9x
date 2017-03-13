@@ -14,6 +14,18 @@ public class HomeData extends BaseObservable{
     private String keyHome;
     private String section;
     private String updatedAt;
+    private String title;
+
+    @Bindable
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+        notifyPropertyChanged(BR.title);
+    }
+
 
     @Bindable
     public String getCategoryId() {

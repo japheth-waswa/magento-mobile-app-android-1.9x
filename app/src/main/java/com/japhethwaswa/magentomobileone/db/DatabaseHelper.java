@@ -25,6 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                     MainEntry.COLUMN_IMAGE_URL + " TEXT, " +
                     MainEntry.COLUMN_KEY_HOME + " TEXT, " +
                     MainEntry.COLUMN_SECTION + " TEXT, " +
+                    MainEntry.COLUMN_TITLE + " TEXT, " +
                     MainEntry.COLUMN_UPDATED_AT + " TEXT " +
                     ")";
     private static final String TABLE_PAGERS_CREATE=

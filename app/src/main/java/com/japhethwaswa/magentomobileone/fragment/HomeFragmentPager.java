@@ -38,6 +38,7 @@ public class HomeFragmentPager extends Fragment implements LoaderManager.LoaderC
         //show loader
         fragmentHomePagerBinding.homeFragPageLoader.startProgress();
 
+        //initialize cursor loader
         getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
 
         //restart loader if bundle has content
@@ -85,7 +86,9 @@ public class HomeFragmentPager extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         //ensure you disable the loader only if cursor is null
         //cursor = data;
+
         if (data.getCount() > 0) {
+
             //hide the loader
             fragmentHomePagerBinding.homeFragPageLoader.stopProgress();
             //loop through the cursor getting the item
