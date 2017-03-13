@@ -30,6 +30,7 @@ import com.japhethwaswa.magentomobileone.databinding.ActivityHomeBinding;
 import com.japhethwaswa.magentomobileone.databinding.ContentActivityHomeBinding;
 import com.japhethwaswa.magentomobileone.fragment.CategoriesFramentPager;
 import com.japhethwaswa.magentomobileone.fragment.HomeFragmentPager;
+import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,28 +94,8 @@ public class HomeActivity extends AppCompatActivity
          /**activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
          activityHomeBinding.homeTabs.setupWithViewPager(activityHomeBinding.viewPagerHome);**/
 
-        //Snackbar.make(activityHomeBinding.getRoot(),"jefflilcot",Snackbar.LENGTH_LONG).show();
+        NavMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
 
-        navItems = new String[]{"jeff", "lilcot"};
-        Menu menu = activityHomeBinding.layoutNavViewMain.navView.getMenu();
-
-        SubMenu subMenu = menu.addSubMenu(78,Menu.NONE,Menu.NONE,"jean");
-        subMenu.setGroupCheckable(78,true,true);
-        //menu.add(78, Menu.NONE, Menu.NONE, "jean");
-        //menu.setGroupCheckable(78,true,true);
-        for (int i = 1; i <= 3; i++) {
-           // menu.add("runtime item "+ i);
-            subMenu.add(78, i, i, "runtime item " + i).setIcon(R.drawable.ic_cart);
-        }
-        for (int i = 0, count = activityHomeBinding.layoutNavViewMain.navView.getChildCount(); i < count; i++) {
-            final View child = activityHomeBinding.layoutNavViewMain.navView.getChildAt(i);
-            if (child != null && child instanceof ListView) {
-                final ListView menuView = (ListView) child;
-                final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
-                final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
-                wrapped.notifyDataSetChanged();
-            }
-        }
 
     }
 
@@ -167,19 +148,7 @@ public class HomeActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         Log.e("jeff-waswa", String.valueOf(id));
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
 
         /**DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
          drawer.closeDrawer(GravityCompat.START);**/
