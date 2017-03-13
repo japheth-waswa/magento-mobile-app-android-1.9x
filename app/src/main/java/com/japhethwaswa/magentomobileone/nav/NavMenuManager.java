@@ -17,6 +17,7 @@ import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 
 public class NavMenuManager extends ContextWrapper{
+    private Cursor cursor;
     private NavigationView navView;
     private Menu menu;
     private SubMenu subMenu;
@@ -34,6 +35,7 @@ public class NavMenuManager extends ContextWrapper{
 
     private void getCategories(){
 
+        //TODO order fetch in ascending order of category id
         String[] projection = {
                 JumboContract.MainEntry.COLUMN_CATEGORY_ID,
                 JumboContract.MainEntry.COLUMN_PRODUCT_ID,
@@ -60,6 +62,8 @@ public class NavMenuManager extends ContextWrapper{
     }
 
     private void updateMenuDeal(Cursor cursor) {
+        this.cursor = cursor;
+
         //TODO loop through the category cursor updating the menu
         //TODO take care of the parent who will be the main sub menu.
         //TODO initiate background job to get 5 items in each category(should be done by the home activity only the rest should fetch real time)

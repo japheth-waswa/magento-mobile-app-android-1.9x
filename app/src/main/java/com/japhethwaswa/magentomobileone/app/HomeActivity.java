@@ -149,8 +149,7 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        Log.e("jeff-waswa", String.valueOf(id));
-
+        //TODO start a fragment to load items in this category
 
         /**DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
          drawer.closeDrawer(GravityCompat.START);**/
