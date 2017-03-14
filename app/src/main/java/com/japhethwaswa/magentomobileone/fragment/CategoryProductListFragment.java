@@ -1,6 +1,7 @@
 package com.japhethwaswa.magentomobileone.fragment;
 
 
+import android.content.Context;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -18,30 +19,48 @@ import android.view.ViewGroup;
 
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.recyclerview.CategoriesRecyclerViewAdapter;
+import com.japhethwaswa.magentomobileone.databinding.ActivityCategoryBinding;
 import com.japhethwaswa.magentomobileone.databinding.FragmentCategoryProductListBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 
 public class CategoryProductListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     private Cursor cursor;
     private static final int URL_LOADER = 9;
-    private int categoryId;
+    int categoryId;
     private CategoriesRecyclerViewAdapter categoriesRecyclerViewAdapter;
-
     private FragmentCategoryProductListBinding fragmentCategoryProductListBinding;
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //TODO start background job to fetch this category products from magento api
         fragmentCategoryProductListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_category_product_list,container,false);
+
+        //get the passed category id
+        Bundle bundle =  getArguments();
+        categoryId = bundle.getInt("categoryIdFrag");
+
+        if(savedInstanceState != null ){
+            categoryId = savedInstanceState.getInt("categoryIdFrag");
+        }
+        Log.e("jeff-waswa",String.valueOf(categoryId));
+
         //todo remember to save categoryId on screen rotation
         //todo initialize cursor loader after categoryId has been set.
-        //initialize cursor loader
-        getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
+
+
         //todo create custom adapter for the recyclerview
+
+        //todo set the category name in toolbar appropriate after fetching from db(note on screen rotation)
+        //activityCategoryBinding.btnNavToolbar.setTitle("jeff lilcot");
 
         //setup the adapter
         categoriesRecyclerViewAdapter = new CategoriesRecyclerViewAdapter(cursor);
         fragmentCategoryProductListBinding.categoryProductRecycler.setAdapter(categoriesRecyclerViewAdapter);
+
+        //initialize cursor loader
+        getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
 
         //get screen width
         int  scrWidth = getScreenDimensions();
@@ -59,6 +78,12 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         fragmentCategoryProductListBinding.categoryProductRecycler.setLayoutManager(layoutMgr);
 
     return fragmentCategoryProductListBinding.getRoot();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("categoryIdFrag",categoryId);
     }
 
     @Override
@@ -106,5 +131,6 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
          double screenInches = Math.sqrt(x+y);**/
         return width;
     }
+
 
 }

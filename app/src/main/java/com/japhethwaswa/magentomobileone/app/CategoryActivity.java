@@ -41,9 +41,8 @@ public class CategoryActivity extends AppCompatActivity
     private NavMenuManager navMenuManager;
     private static final int URL_LOADER = 0;
     private int categoryId;
-    CategoryProductListFragment categoryProductListFragment;
-    FragmentTransaction fragmentTransaction;
-    FragmentManager fragmentManager;
+    private Cursor cursor;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,13 +58,10 @@ public class CategoryActivity extends AppCompatActivity
 
         //get data from the HomeActivity
         Intent intent = getIntent();
-
-        if(intent != null){
-            categoryId = intent.getIntExtra("categoryId",0);
-        }
+        categoryId = intent.getIntExtra("categoryId", 0);
 
         //if categoryId =0 return to the previous activity
-        if(categoryId == 0){
+        if (categoryId == 0) {
             Intent homeIntent = new Intent(this, HomeActivity.class);
             startActivity(homeIntent);
             finish();
@@ -75,7 +71,7 @@ public class CategoryActivity extends AppCompatActivity
         activityCategoryBinding = DataBindingUtil.setContentView(this, R.layout.activity_category);
 
         //initialize loader
-        getSupportLoaderManager().initLoader(URL_LOADER,null,this);
+        getSupportLoaderManager().initLoader(URL_LOADER, null, this);
 
         /**Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
          setSupportActionBar(toolbar);**/
@@ -99,14 +95,8 @@ public class CategoryActivity extends AppCompatActivity
         navMenuManager = new NavMenuManager(this);
         //navMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
 
-        //start fragment passing the categoryId
-        fragmentManager = getSupportFragmentManager();
-        categoryProductListFragment = new CategoryProductListFragment();
-        fragmentTransaction = fragmentManager.beginTransaction();
-        //unique
-        fragmentTransaction.replace(R.id.categoriesProdListFragment,categoryProductListFragment,"categoryProductsFragment");
-        fragmentTransaction.commit();
-
+        //start fragment
+        startCatFragment();
 
 
     }
@@ -145,8 +135,14 @@ public class CategoryActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
         int id = item.getItemId();
-        //TODO start a fragment to load items in this category
+
+        categoryId = id;
+        //todo use the cursor to get the category name and update in toolbar-use background thread
+
+        //start a fragment to load items in this category
+        startCatFragment();
 
         /**DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
          drawer.closeDrawer(GravityCompat.START);**/
@@ -157,7 +153,7 @@ public class CategoryActivity extends AppCompatActivity
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         //todo perfom query to fetch categories
-       String[] projection = {
+        String[] projection = {
                 JumboContract.MainEntry.COLUMN_CATEGORY_ID,
                 JumboContract.MainEntry.COLUMN_PRODUCT_ID,
                 JumboContract.MainEntry.COLUMN_UPDATED_AT,
@@ -171,13 +167,29 @@ public class CategoryActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        this.cursor = data;
         //initiate categories menu update
-        navMenuManager.updateMenuDeal(data,activityCategoryBinding.layoutNavViewMain.navView);
+        navMenuManager.updateMenuDeal(data, activityCategoryBinding.layoutNavViewMain.navView);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        //do nothing
+        //todo reset the cursor or do nothing
     }
+
+    public void startCatFragment() {
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        CategoryProductListFragment categoryProductListFragment = new CategoryProductListFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("categoryIdFrag", categoryId);
+        categoryProductListFragment.setArguments(bundle);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        //unique
+
+        fragmentTransaction.replace(R.id.categoriesProdListFragment, categoryProductListFragment, "catProdFragment");
+        fragmentTransaction.commit();
+    }
+
 
 }
