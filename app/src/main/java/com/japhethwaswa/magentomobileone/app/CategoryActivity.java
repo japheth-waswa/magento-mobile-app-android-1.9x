@@ -3,11 +3,13 @@ package com.japhethwaswa.magentomobileone.app;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -15,37 +17,33 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
-import android.view.View;
-import android.widget.BaseAdapter;
-import android.widget.HeaderViewListAdapter;
-import android.widget.ListView;
 
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.HomeTextTabsAdapter;
+import com.japhethwaswa.magentomobileone.databinding.ActivityCategoryBinding;
 import com.japhethwaswa.magentomobileone.databinding.ActivityHomeBinding;
-import com.japhethwaswa.magentomobileone.databinding.ContentActivityHomeBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.fragment.CategoriesFramentPager;
+import com.japhethwaswa.magentomobileone.fragment.CategoryProductListFragment;
 import com.japhethwaswa.magentomobileone.fragment.HomeFragmentPager;
 import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity
+public class CategoryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    private List<Fragment> fragmentList = new ArrayList<>();
-    private List<String> titleList = new ArrayList<>();
-    private ActivityHomeBinding activityHomeBinding;
+    private ActivityCategoryBinding activityCategoryBinding;
     private NavMenuManager navMenuManager;
     private static final int URL_LOADER = 0;
+    private int categoryId;
+    CategoryProductListFragment categoryProductListFragment;
+    FragmentTransaction fragmentTransaction;
+    FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +57,22 @@ public class HomeActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
 
-        //TODO start background job to fetch categories from magento api
-        activityHomeBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
+        //get data from the HomeActivity
+        Intent intent = getIntent();
 
-        //prepare the ViewPager fragments
-        prepareDataSource();
+        if(intent != null){
+            categoryId = intent.getIntExtra("categoryId",0);
+        }
+
+        //if categoryId =0 return to the previous activity
+        if(categoryId == 0){
+            Intent homeIntent = new Intent(this, HomeActivity.class);
+            startActivity(homeIntent);
+            finish();
+        }
+
+
+        activityCategoryBinding = DataBindingUtil.setContentView(this, R.layout.activity_category);
 
         //initialize loader
         getSupportLoaderManager().initLoader(URL_LOADER,null,this);
@@ -71,63 +80,42 @@ public class HomeActivity extends AppCompatActivity
         /**Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
          setSupportActionBar(toolbar);**/
 
-        setSupportActionBar(activityHomeBinding.toolbar);
+        setSupportActionBar(activityCategoryBinding.toolbar);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, activityHomeBinding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, activityCategoryBinding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         //drawer.setDrawerListener(toggle);
-        activityHomeBinding.drawerLayout.setDrawerListener(toggle);
+        activityCategoryBinding.drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
         /** NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
          navigationView.setNavigationItemSelectedListener(this);**/
-        activityHomeBinding.layoutNavViewMain.navView.setNavigationItemSelectedListener(this);
+        activityCategoryBinding.layoutNavViewMain.navView.setNavigationItemSelectedListener(this);
 
-
-        HomeTextTabsAdapter homeTextTabsAdapter = new HomeTextTabsAdapter(getSupportFragmentManager(), fragmentList, titleList);
-
-        /** activityHomeBinding.layoutNavToolbar.viewPagerHome.setAdapter(homeTextTabsAdapter);
-         activityHomeBinding.layoutNavToolbar.homeTabs.setupWithViewPager(
-         activityHomeBinding.layoutNavToolbar.viewPagerHome
-         );**/
-        activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
-        activityHomeBinding.homeTabs.setupWithViewPager(
-                activityHomeBinding.viewPagerHome
-        );
-        /**activityHomeBinding.layoutContentActivityHome.viewPagerHome.setAdapter(homeTextTabsAdapter);
-         activityHomeBinding.layoutContentActivityHome.homeTabs.setupWithViewPager(
-         activityHomeBinding.layoutContentActivityHome.viewPagerHome
-         );
-         /**activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
-         activityHomeBinding.homeTabs.setupWithViewPager(activityHomeBinding.viewPagerHome);**/
 
         //TODO on load manager finish activate menu update
         navMenuManager = new NavMenuManager(this);
         //navMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
 
+        //start fragment passing the categoryId
+        fragmentManager = getSupportFragmentManager();
+        categoryProductListFragment = new CategoryProductListFragment();
+        fragmentTransaction = fragmentManager.beginTransaction();
+        //unique
+        fragmentTransaction.replace(R.id.categoriesProdListFragment,categoryProductListFragment,"categoryProductsFragment");
+        fragmentTransaction.commit();
 
-    }
 
 
-    private void prepareDataSource() {
-
-        addDataSource(new HomeFragmentPager(), "Home");
-        addDataSource(new CategoriesFramentPager(), "Categories");
-
-    }
-
-    private void addDataSource(Fragment fragment, String title) {
-        fragmentList.add(fragment);
-        titleList.add(title);
     }
 
     @Override
     public void onBackPressed() {
         //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (activityHomeBinding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            activityHomeBinding.drawerLayout.closeDrawer(GravityCompat.START);
+        if (activityCategoryBinding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            activityCategoryBinding.drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -158,14 +146,11 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        //TODO start the CategoryActivity and load fragment into it
-        Intent intent = new Intent(this, CategoryActivity.class);
-        intent.putExtra("categoryId",id);
-        startActivity(intent);
+        //TODO start a fragment to load items in this category
 
         /**DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
          drawer.closeDrawer(GravityCompat.START);**/
-        activityHomeBinding.drawerLayout.closeDrawer(GravityCompat.START);
+        activityCategoryBinding.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -187,7 +172,7 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         //initiate categories menu update
-        navMenuManager.updateMenuDeal(data,activityHomeBinding.layoutNavViewMain.navView);
+        navMenuManager.updateMenuDeal(data,activityCategoryBinding.layoutNavViewMain.navView);
     }
 
     @Override
