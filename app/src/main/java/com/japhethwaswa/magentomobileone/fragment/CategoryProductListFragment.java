@@ -24,7 +24,7 @@ import com.japhethwaswa.magentomobileone.databinding.FragmentCategoryProductList
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 
 public class CategoryProductListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
-    private Cursor cursor;
+    Cursor cursor;
     private static final int URL_LOADER = 9;
     int categoryId;
     private CategoriesRecyclerViewAdapter categoriesRecyclerViewAdapter;
@@ -34,6 +34,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         //TODO start background job to fetch this category products from magento api
         fragmentCategoryProductListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_category_product_list,container,false);
 
@@ -44,7 +45,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         if(savedInstanceState != null ){
             categoryId = savedInstanceState.getInt("categoryIdFrag");
         }
-        Log.e("jeff-waswa",String.valueOf(categoryId));
+
 
         //todo remember to save categoryId on screen rotation
         //todo initialize cursor loader after categoryId has been set.

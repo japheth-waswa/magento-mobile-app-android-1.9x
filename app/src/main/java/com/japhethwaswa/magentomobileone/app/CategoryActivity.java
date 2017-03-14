@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -95,10 +96,19 @@ public class CategoryActivity extends AppCompatActivity
         navMenuManager = new NavMenuManager(this);
         //navMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
 
-        //start fragment
-        startCatFragment();
+        if(savedInstanceState == null){
+            //start fragment
+            startCatFragment();
+        }
 
 
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putInt("savedInstance",1);
     }
 
     @Override
@@ -152,7 +162,7 @@ public class CategoryActivity extends AppCompatActivity
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        //todo perfom query to fetch categories
+        //todo perform query to fetch categories
         String[] projection = {
                 JumboContract.MainEntry.COLUMN_CATEGORY_ID,
                 JumboContract.MainEntry.COLUMN_PRODUCT_ID,
