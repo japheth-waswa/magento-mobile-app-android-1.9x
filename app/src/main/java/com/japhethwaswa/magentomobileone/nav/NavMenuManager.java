@@ -51,7 +51,7 @@ public class NavMenuManager extends ContextWrapper{
         JumboQueryHandler handler = new JumboQueryHandler(getContentResolver()) {
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                updateMenuDeal(cursor);
+                updateMenuDeal(cursor,navView);
                 cursor.close();
             }
 
@@ -61,15 +61,16 @@ public class NavMenuManager extends ContextWrapper{
 
     }
 
-    private void updateMenuDeal(Cursor cursor) {
+    public void updateMenuDeal(Cursor cursor, NavigationView navView) {
         this.cursor = cursor;
+        this.navView = navView;
 
         //TODO loop through the category cursor updating the menu
         //TODO take care of the parent who will be the main sub menu.
         //TODO initiate background job to get 5 items in each category(should be done by the home activity only the rest should fetch real time)
 
         //get the current menu to append data
-         menu = navView.getMenu();
+         menu = this.navView.getMenu();
 
         //clear the menu
         menu.clear();
@@ -94,8 +95,8 @@ public class NavMenuManager extends ContextWrapper{
         subMenu.setGroupCheckable(178,true,true);
 
 
-        for (int i = 0, count = navView.getChildCount(); i < count; i++) {
-            final View child = navView.getChildAt(i);
+        for (int i = 0, count = this.navView.getChildCount(); i < count; i++) {
+            final View child = this.navView.getChildAt(i);
             if (child != null && child instanceof ListView) {
                 final ListView menuView = (ListView) child;
                 final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();

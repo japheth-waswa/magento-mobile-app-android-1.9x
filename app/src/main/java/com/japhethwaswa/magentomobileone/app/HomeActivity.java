@@ -8,6 +8,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -28,6 +29,7 @@ import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.HomeTextTabsAdapter;
 import com.japhethwaswa.magentomobileone.databinding.ActivityHomeBinding;
 import com.japhethwaswa.magentomobileone.databinding.ContentActivityHomeBinding;
+import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.fragment.CategoriesFramentPager;
 import com.japhethwaswa.magentomobileone.fragment.HomeFragmentPager;
 import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
@@ -36,12 +38,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private List<Fragment> fragmentList = new ArrayList<>();
     private List<String> titleList = new ArrayList<>();
     private ActivityHomeBinding activityHomeBinding;
     private NavMenuManager navMenuManager;
+    private static final int URL_LOADER = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +58,14 @@ public class HomeActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
 
+        //TODO start background job to fetch categories
         activityHomeBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
-        //initialise();
+
+        //prepare the ViewPager fragments
         prepareDataSource();
+
+        //initialize loader
+        getSupportLoaderManager().initLoader(URL_LOADER,null,this);
 
         /**Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
          setSupportActionBar(toolbar);**/
@@ -96,7 +104,7 @@ public class HomeActivity extends AppCompatActivity
 
         //TODO on load manager finish activate menu update
         navMenuManager = new NavMenuManager(this);
-        navMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
+        //navMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
 
 
     }
@@ -155,6 +163,32 @@ public class HomeActivity extends AppCompatActivity
          drawer.closeDrawer(GravityCompat.START);**/
         activityHomeBinding.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        //todo perfom query to fetch categories
+       String[] projection = {
+                JumboContract.MainEntry.COLUMN_CATEGORY_ID,
+                JumboContract.MainEntry.COLUMN_PRODUCT_ID,
+                JumboContract.MainEntry.COLUMN_UPDATED_AT,
+                JumboContract.MainEntry.COLUMN_KEY_HOME,
+                JumboContract.MainEntry.COLUMN_IMAGE_URL,
+                JumboContract.MainEntry.COLUMN_SECTION
+        };
+
+        return new CursorLoader(this, JumboContract.MainEntry.CONTENT_URI, projection, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        //initiate categories menu update
+        navMenuManager.updateMenuDeal(data,activityHomeBinding.layoutNavViewMain.navView);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        //do nothing
     }
 
 }
