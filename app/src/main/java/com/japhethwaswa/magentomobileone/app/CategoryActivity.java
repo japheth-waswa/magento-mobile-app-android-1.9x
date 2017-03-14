@@ -38,7 +38,7 @@ import java.util.List;
 public class CategoryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    private ActivityCategoryBinding activityCategoryBinding;
+    public ActivityCategoryBinding activityCategoryBinding;
     private NavMenuManager navMenuManager;
     private static final int URL_LOADER = 0;
     private int categoryId;
@@ -96,11 +96,10 @@ public class CategoryActivity extends AppCompatActivity
         navMenuManager = new NavMenuManager(this);
         //navMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
 
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             //start fragment
             startCatFragment();
         }
-
 
 
     }
@@ -108,7 +107,7 @@ public class CategoryActivity extends AppCompatActivity
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-        outState.putInt("savedInstance",1);
+        outState.putInt("savedInstance", 1);
     }
 
     @Override
@@ -149,7 +148,6 @@ public class CategoryActivity extends AppCompatActivity
         int id = item.getItemId();
 
         categoryId = id;
-        //todo use the cursor to get the category name and update in toolbar-use background thread
 
         //start a fragment to load items in this category
         startCatFragment();
@@ -189,8 +187,10 @@ public class CategoryActivity extends AppCompatActivity
 
     public void startCatFragment() {
 
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         CategoryProductListFragment categoryProductListFragment = new CategoryProductListFragment();
+
         Bundle bundle = new Bundle();
         bundle.putInt("categoryIdFrag", categoryId);
         categoryProductListFragment.setArguments(bundle);

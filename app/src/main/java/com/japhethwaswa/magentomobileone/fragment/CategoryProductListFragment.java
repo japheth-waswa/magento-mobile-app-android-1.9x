@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.recyclerview.CategoriesRecyclerViewAdapter;
+import com.japhethwaswa.magentomobileone.app.CategoryActivity;
 import com.japhethwaswa.magentomobileone.databinding.ActivityCategoryBinding;
 import com.japhethwaswa.magentomobileone.databinding.FragmentCategoryProductListBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
@@ -29,12 +30,12 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     int categoryId;
     private CategoriesRecyclerViewAdapter categoriesRecyclerViewAdapter;
     private FragmentCategoryProductListBinding fragmentCategoryProductListBinding;
-
+    ActivityCategoryBinding activityCategoryBinding;
+    public CategoryActivity catActivity;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         //TODO start background job to fetch this category products from magento api
         fragmentCategoryProductListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_category_product_list,container,false);
 
@@ -46,6 +47,11 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             categoryId = savedInstanceState.getInt("categoryIdFrag");
         }
 
+        //todo use the cursor to get the category name and update in toolbar-use background thread
+        //set toolbar title
+        catActivity = (CategoryActivity) getActivity();
+        activityCategoryBinding = catActivity.activityCategoryBinding;
+        activityCategoryBinding.btnNavToolbarTitle.setText("Jeff Lilcot");
 
         //todo remember to save categoryId on screen rotation
         //todo initialize cursor loader after categoryId has been set.
@@ -134,4 +140,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     }
 
 
+    public void setActivityLayout(ActivityCategoryBinding activityCategoryBinding) {
+        this.activityCategoryBinding = activityCategoryBinding;
+    }
 }
