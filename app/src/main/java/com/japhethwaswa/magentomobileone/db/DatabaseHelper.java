@@ -10,6 +10,7 @@ import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.app.SplashActivity;
 import com.japhethwaswa.magentomobileone.db.JumboContract.PagerEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.MainEntry;
+import com.japhethwaswa.magentomobileone.db.JumboContract.CategoryEntry;
 
 import static java.security.AccessController.getContext;
 
@@ -38,6 +39,17 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                     PagerEntry.COLUMN_UPDATED_AT + " TEXT " +
                     ")";
 
+    private static final String TABLE_CATEGORY_CREATE=
+            "CREATE TABLE " + CategoryEntry.TABLE_NAME + " (" +
+                    CategoryEntry._ID + " INTEGER PRIMARY KEY, " +
+                    CategoryEntry.COLUMN_ENTITY_ID + " TEXT, " +
+                    CategoryEntry.COLUMN_CONTENT_TYPE + " TEXT, " +
+                    CategoryEntry.COLUMN_PARENT_ID + " TEXT, " +
+                    CategoryEntry.COLUMN_MY_PARENT_ID + " TEXT, " +
+                    CategoryEntry.COLUMN_ICON + " TEXT, " +
+                    CategoryEntry.COLUMN_MODIFICATION_TIME + " TEXT " +
+                    ")";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -46,19 +58,15 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db) {
     db.execSQL(TABLE_PAGERS_CREATE);
     db.execSQL(TABLE_MAIN_CREATE);
+    db.execSQL(TABLE_CATEGORY_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + PagerEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MainEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CategoryEntry.TABLE_NAME);
         onCreate(db);
     }
 
-
-   /** public static String uriString(Context context) {
-        Resources res = context.getResources();
-        String baseUri = res.getString(R.string.apiBaseUrl);
-        return baseUri;
-    }**/
 }

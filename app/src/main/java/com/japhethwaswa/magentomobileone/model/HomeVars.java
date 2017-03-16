@@ -5,6 +5,7 @@ import android.databinding.Bindable;
 
 import com.japhethwaswa.magentomobileone.BR;
 
+
 public class HomeVars extends BaseObservable{
     private String sectionTwoOne;
     private String sectionTwoTwo;

@@ -21,8 +21,13 @@ import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -195,8 +200,8 @@ public class JumboWebService {
     }
 
             //service-retrive all categories
-    public static void retrieveCategories(Context context) {
-        Log.e("jeff-started","started");
+    public static void retrieveCategories(final Context context) {
+
         Resources res = context.getResources();
         String relativeUrl = res.getString(R.string.jumbo_top_categories);
 
@@ -208,7 +213,7 @@ public class JumboWebService {
                 .getAsString(new StringRequestListener(){
                     @Override
                     public void onResponse(String response) {
-                            Log.e("jeff-response",response);
+                           parseCategoriesUpdate(response,context,"0");
                     }
 
                     @Override
@@ -216,5 +221,39 @@ public class JumboWebService {
                         Log.e("jeff-error",anError.toString());
                     }
                 });
+    }
+
+    //updaete categories table
+    private static void parseCategoriesUpdate(String response, Context context,String myParentId) {
+
+        InputStream xmlStresm = new ByteArrayInputStream(response.getBytes());
+
+        try {
+            XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
+            XmlPullParser myParser = xmlPullParserFactory.newPullParser();
+            myParser.setInput(xmlStresm,null);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        }
+        Log.e("jeff-waswa","inside people");
+
+       /** final ContentValues values = new ContentValues();
+        values.put("","");
+
+        String selection = JumboContract.CategoryEntry.COLUMN_ENTITY_ID + "=?";
+        String selectionArgs[] = {"1"};
+
+        JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver()){
+            @Override
+            protected void onUpdateComplete(int token, Object cookie, int result) {
+                //if no update then insert
+               if(result == -1){
+                    this.startInsert(98,null,JumboContract.CategoryEntry.CONTENT_URI,values);
+               }
+            }
+        };
+
+        handler.startUpdate(99,null,JumboContract.CategoryEntry.CONTENT_URI,values,selection,selectionArgs);**/
+
     }
 }

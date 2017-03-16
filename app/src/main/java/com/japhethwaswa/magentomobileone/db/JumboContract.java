@@ -39,4 +39,18 @@ public final class JumboContract {
         public static final String COLUMN_UPDATED_AT = "updated_at";
     }
 
+    public static final class CategoryEntry implements BaseColumns{
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI,PATH_MAIN);
+        //Table name
+        public static final String TABLE_NAME = "category";
+        //column field names
+        public static final String _ID = BaseColumns._ID;
+        public static final String COLUMN_ENTITY_ID = "entity_id";
+        public static final String COLUMN_CONTENT_TYPE = "content_type";
+        public static final String COLUMN_PARENT_ID = "parent_id";
+        public static final String COLUMN_MY_PARENT_ID = "my_parent_id";
+        public static final String COLUMN_ICON = "icon";
+        public static final String COLUMN_MODIFICATION_TIME = "modification_time";
+    }
+
 }
