@@ -17,6 +17,7 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
+import com.japhethwaswa.magentomobileone.model.Category;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +28,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -124,10 +126,10 @@ public class JumboWebService {
                 values.put(JumboContract.MainEntry.COLUMN_IMAGE_URL, mainObject.getString("image_url"));
                 values.put(JumboContract.MainEntry.COLUMN_SECTION, mainObject.getString("section"));
                 String title = null;
-                if(mainObject.has("categoryTitle")){
+                if (mainObject.has("categoryTitle")) {
                     title = mainObject.getString("categoryTitle");
                 }
-                values.put(JumboContract.MainEntry.COLUMN_TITLE,title);
+                values.put(JumboContract.MainEntry.COLUMN_TITLE, title);
                 values.put(JumboContract.MainEntry.COLUMN_UPDATED_AT, mainObject.getString("updated_at"));
 
                 String selection = JumboContract.MainEntry.COLUMN_KEY_HOME + "=?";
@@ -139,7 +141,7 @@ public class JumboWebService {
 
                         //no data therefore insert
                         if (result == -1) {
-                            this.startInsert(5,null,JumboContract.MainEntry.CONTENT_URI,values);
+                            this.startInsert(5, null, JumboContract.MainEntry.CONTENT_URI, values);
                         }
 
                     }
@@ -192,14 +194,14 @@ public class JumboWebService {
     }
 
     //retrive cookie for accessing remote resource
-    private static String getCookie(Context context){
+    private static String getCookie(Context context) {
         Resources res = context.getResources();
         String appCode = res.getString(R.string.app_xmlconnect_code);
         String appDefaultScreenSize = res.getString(R.string.app_xmlconnect_screen_size);
         return "app_code=" + appCode + ";screen_size=" + appDefaultScreenSize;
     }
 
-            //service-retrive all categories
+    //service-retrive all categories
     public static void retrieveCategories(final Context context) {
 
         Resources res = context.getResources();
@@ -208,52 +210,100 @@ public class JumboWebService {
         AndroidNetworking.get(getAbsoluteUrl(context, relativeUrl))
                 .setTag("jumboCategories")
                 .setPriority(Priority.HIGH)
-                .addHeaders("Cookie",getCookie(context))
+                .addHeaders("Cookie", getCookie(context))
                 .build()
-                .getAsString(new StringRequestListener(){
+                .getAsString(new StringRequestListener() {
                     @Override
                     public void onResponse(String response) {
-                           parseCategoriesUpdate(response,context,"0");
+                        try {
+                            parseCategoriesUpdate(response, context, "0");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
                     public void onError(ANError anError) {
-                        Log.e("jeff-error",anError.toString());
+                        Log.e("jeff-error", anError.toString());
                     }
                 });
     }
 
     //updaete categories table
-    private static void parseCategoriesUpdate(String response, Context context,String myParentId) {
+    private static void parseCategoriesUpdate(String response, Context context, String myParentId) throws IOException {
 
-        InputStream xmlStresm = new ByteArrayInputStream(response.getBytes());
+        InputStream xmlStream = new ByteArrayInputStream(response.getBytes());
+        Boolean isCat = true;
+        Category category = null;
 
         try {
             XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
             XmlPullParser myParser = xmlPullParserFactory.newPullParser();
-            myParser.setInput(xmlStresm,null);
+            myParser.setInput(xmlStream, null);
+
+            int eventType = myParser.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+
+                String name;
+
+                switch (eventType) {
+                    case XmlPullParser.START_TAG:
+                        name = myParser.getName();
+                        if (name.equalsIgnoreCase("products")) {
+                            //if products have been reached then set the val to false ie not category now
+                            isCat = false;
+                        }
+
+                        if (name.equalsIgnoreCase("item") && isCat == true) {
+                            category = new Category();
+                        } else if (category != null) {
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_LABEL)) {
+                                category.setLabel(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_ENTITY_ID)) {
+                                category.setEntity_id(myParser.nextText());
+                            }
+                            //todo get the remainig data
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        name = myParser.getName();
+                        if (name.equalsIgnoreCase("item") && category != null) {
+                            //todo save to db in another method by passing the category object
+                            Log.e("jeff-label", category.getLabel());
+                            Log.e("jeff-entity_id", category.getEntity_id());
+
+                            //set null
+                            category = null;
+                        }
+                        break;
+
+                }
+
+                eventType = myParser.next();
+            }
+
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         }
-        Log.e("jeff-waswa","inside people");
 
-       /** final ContentValues values = new ContentValues();
-        values.put("","");
+        /** final ContentValues values = new ContentValues();
+         values.put("","");
 
-        String selection = JumboContract.CategoryEntry.COLUMN_ENTITY_ID + "=?";
-        String selectionArgs[] = {"1"};
+         String selection = JumboContract.CategoryEntry.COLUMN_ENTITY_ID + "=?";
+         String selectionArgs[] = {"1"};
 
-        JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver()){
-            @Override
-            protected void onUpdateComplete(int token, Object cookie, int result) {
-                //if no update then insert
-               if(result == -1){
-                    this.startInsert(98,null,JumboContract.CategoryEntry.CONTENT_URI,values);
-               }
-            }
+         JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver()){
+        @Override protected void onUpdateComplete(int token, Object cookie, int result) {
+        //if no update then insert
+        if(result == -1){
+        this.startInsert(98,null,JumboContract.CategoryEntry.CONTENT_URI,values);
+        }
+        }
         };
 
-        handler.startUpdate(99,null,JumboContract.CategoryEntry.CONTENT_URI,values,selection,selectionArgs);**/
+         handler.startUpdate(99,null,JumboContract.CategoryEntry.CONTENT_URI,values,selection,selectionArgs);**/
 
     }
 }

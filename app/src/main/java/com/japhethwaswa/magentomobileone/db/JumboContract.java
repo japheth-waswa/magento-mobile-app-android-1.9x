@@ -48,6 +48,7 @@ public final class JumboContract {
         public static final String COLUMN_ENTITY_ID = "entity_id";
         public static final String COLUMN_CONTENT_TYPE = "content_type";
         public static final String COLUMN_PARENT_ID = "parent_id";
+        public static final String COLUMN_LABEL = "label";
         public static final String COLUMN_MY_PARENT_ID = "my_parent_id";
         public static final String COLUMN_ICON = "icon";
         public static final String COLUMN_MODIFICATION_TIME = "modification_time";

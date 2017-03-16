@@ -44,6 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                     CategoryEntry._ID + " INTEGER PRIMARY KEY, " +
                     CategoryEntry.COLUMN_ENTITY_ID + " TEXT, " +
                     CategoryEntry.COLUMN_CONTENT_TYPE + " TEXT, " +
+                    CategoryEntry.COLUMN_LABEL + " TEXT, " +
                     CategoryEntry.COLUMN_PARENT_ID + " TEXT, " +
                     CategoryEntry.COLUMN_MY_PARENT_ID + " TEXT, " +
                     CategoryEntry.COLUMN_ICON + " TEXT, " +
