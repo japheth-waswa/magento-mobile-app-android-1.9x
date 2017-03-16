@@ -30,6 +30,7 @@ import java.net.URL;
 public class JumboWebService {
 
 
+    //service-one request that retrieves both pager and maindata items
     public static void retrieveMainData(final Context context) {
         //get relative url for this service
         Resources res = context.getResources();
@@ -102,6 +103,7 @@ public class JumboWebService {
          return null;**/
     }
 
+    //update the home items
     private static void updateMain(JSONArray mainArray, Context context) {
 
         //foreach item update
@@ -145,6 +147,8 @@ public class JumboWebService {
         }
     }
 
+
+    //insert to db pager items
     private static void insertPager(JSONArray pagerArray, Context context) {
 
         JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
@@ -180,5 +184,37 @@ public class JumboWebService {
         Resources res = context.getResources();
         String baseUrl = res.getString(R.string.apiBaseUrl);
         return baseUrl + relativeUrl;
+    }
+
+    //retrive cookie for accessing remote resource
+    private static String getCookie(Context context){
+        Resources res = context.getResources();
+        String appCode = res.getString(R.string.app_xmlconnect_code);
+        String appDefaultScreenSize = res.getString(R.string.app_xmlconnect_screen_size);
+        return "app_code=" + appCode + ";screen_size=" + appDefaultScreenSize;
+    }
+
+            //service-retrive all categories
+    public static void retrieveCategories(Context context) {
+        Log.e("jeff-started","started");
+        Resources res = context.getResources();
+        String relativeUrl = res.getString(R.string.jumbo_top_categories);
+
+        AndroidNetworking.get(getAbsoluteUrl(context, relativeUrl))
+                .setTag("jumboCategories")
+                .setPriority(Priority.HIGH)
+                .addHeaders("Cookie",getCookie(context))
+                .build()
+                .getAsString(new StringRequestListener(){
+                    @Override
+                    public void onResponse(String response) {
+                            Log.e("jeff-response",response);
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.e("jeff-error",anError.toString());
+                    }
+                });
     }
 }

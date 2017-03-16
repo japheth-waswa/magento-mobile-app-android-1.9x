@@ -42,7 +42,7 @@ public class CategoryActivity extends AppCompatActivity
     private NavMenuManager navMenuManager;
     private static final int URL_LOADER = 0;
     private int categoryId;
-    private Cursor cursor;
+    Cursor cursor;
 
 
     @Override
@@ -73,9 +73,6 @@ public class CategoryActivity extends AppCompatActivity
 
         //initialize loader
         getSupportLoaderManager().initLoader(URL_LOADER, null, this);
-
-        /**Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-         setSupportActionBar(toolbar);**/
 
         setSupportActionBar(activityCategoryBinding.toolbar);
 

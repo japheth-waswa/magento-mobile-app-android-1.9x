@@ -23,6 +23,7 @@ import com.japhethwaswa.magentomobileone.app.CategoryActivity;
 import com.japhethwaswa.magentomobileone.databinding.ActivityCategoryBinding;
 import com.japhethwaswa.magentomobileone.databinding.FragmentCategoryProductListBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
+import com.japhethwaswa.magentomobileone.service.JumboWebService;
 
 public class CategoryProductListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     Cursor cursor;
@@ -36,6 +37,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         //TODO start background job to fetch this category products from magento api
         fragmentCategoryProductListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_category_product_list,container,false);
 
@@ -84,7 +86,15 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         //set layout manager for the recyclerview
         fragmentCategoryProductListBinding.categoryProductRecycler.setLayoutManager(layoutMgr);
 
+        //perfom xmlconnect tests
+        xmlTests();
+
     return fragmentCategoryProductListBinding.getRoot();
+    }
+
+    private void xmlTests() {
+        //Log.e("jeff-waswa","xml tests come here");
+        JumboWebService.retrieveCategories(getContext());
     }
 
     @Override
