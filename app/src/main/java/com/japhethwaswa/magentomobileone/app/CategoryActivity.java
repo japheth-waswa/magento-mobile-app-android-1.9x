@@ -41,7 +41,7 @@ public class CategoryActivity extends AppCompatActivity
     public ActivityCategoryBinding activityCategoryBinding;
     private NavMenuManager navMenuManager;
     private static final int URL_LOADER = 0;
-    private int categoryId;
+    int categoryId;
     Cursor cursor;
 
 
@@ -61,18 +61,21 @@ public class CategoryActivity extends AppCompatActivity
         Intent intent = getIntent();
         categoryId = intent.getIntExtra("categoryId", 0);
 
+
         //if categoryId =0 return to the previous activity
-        if (categoryId == 0) {
+       /** if (categoryId == 0) {
             Intent homeIntent = new Intent(this, HomeActivity.class);
             startActivity(homeIntent);
             finish();
-        }
+        }**/
 
 
         activityCategoryBinding = DataBindingUtil.setContentView(this, R.layout.activity_category);
 
-        //initialize loader
-        getSupportLoaderManager().initLoader(URL_LOADER, null, this);
+        if (savedInstanceState == null) {
+            //initialize loader
+            getSupportLoaderManager().initLoader(URL_LOADER, null, this);
+        }
 
         setSupportActionBar(activityCategoryBinding.toolbar);
 
@@ -89,7 +92,7 @@ public class CategoryActivity extends AppCompatActivity
         activityCategoryBinding.layoutNavViewMain.navView.setNavigationItemSelectedListener(this);
 
 
-        //TODO on load manager finish activate menu update
+        //load manager finish activate menu update
         navMenuManager = new NavMenuManager(this);
         //navMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
 
@@ -101,11 +104,6 @@ public class CategoryActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
-        outState.putInt("savedInstance", 1);
-    }
 
     @Override
     public void onBackPressed() {
@@ -149,6 +147,9 @@ public class CategoryActivity extends AppCompatActivity
         //start a fragment to load items in this category
         startCatFragment();
 
+        //restart loader
+        getSupportLoaderManager().restartLoader(URL_LOADER,null,this);
+
         /**DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
          drawer.closeDrawer(GravityCompat.START);**/
         activityCategoryBinding.drawerLayout.closeDrawer(GravityCompat.START);
@@ -157,29 +158,33 @@ public class CategoryActivity extends AppCompatActivity
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        //todo perform query to fetch categories
+        //perfom query to fetch categories with value of my_parent_id=0
         String[] projection = {
-                JumboContract.MainEntry.COLUMN_CATEGORY_ID,
-                JumboContract.MainEntry.COLUMN_PRODUCT_ID,
-                JumboContract.MainEntry.COLUMN_UPDATED_AT,
-                JumboContract.MainEntry.COLUMN_KEY_HOME,
-                JumboContract.MainEntry.COLUMN_IMAGE_URL,
-                JumboContract.MainEntry.COLUMN_SECTION
+                JumboContract.CategoryEntry.COLUMN_LABEL,
+                JumboContract.CategoryEntry.COLUMN_ENTITY_ID,
+                JumboContract.CategoryEntry.COLUMN_CONTENT_TYPE,
+                JumboContract.CategoryEntry.COLUMN_PARENT_ID,
+                JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID,
+                JumboContract.CategoryEntry.COLUMN_ICON,
+                JumboContract.CategoryEntry.COLUMN_MODIFICATION_TIME
         };
 
-        return new CursorLoader(this, JumboContract.MainEntry.CONTENT_URI, projection, null, null, null);
+        String selection = JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID + "=?";
+        String[] selectionArgs = {"0"};
+
+        return new CursorLoader(this, JumboContract.CategoryEntry.CONTENT_URI, projection, selection, selectionArgs, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         this.cursor = data;
         //initiate categories menu update
-        navMenuManager.updateMenuDeal(data, activityCategoryBinding.layoutNavViewMain.navView);
+        navMenuManager.updateMenuDeal(data, activityCategoryBinding.layoutNavViewMain.navView,categoryId);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        //todo reset the cursor or do nothing
+        //do nothing
     }
 
     public void startCatFragment() {

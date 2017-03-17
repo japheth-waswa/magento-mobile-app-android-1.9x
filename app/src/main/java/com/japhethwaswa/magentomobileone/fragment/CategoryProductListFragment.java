@@ -23,6 +23,8 @@ import com.japhethwaswa.magentomobileone.app.CategoryActivity;
 import com.japhethwaswa.magentomobileone.databinding.ActivityCategoryBinding;
 import com.japhethwaswa.magentomobileone.databinding.FragmentCategoryProductListBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
+import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
+import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
 import com.japhethwaswa.magentomobileone.service.JumboWebService;
 
 public class CategoryProductListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
@@ -33,6 +35,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     private FragmentCategoryProductListBinding fragmentCategoryProductListBinding;
     ActivityCategoryBinding activityCategoryBinding;
     public CategoryActivity catActivity;
+    private NavMenuManager navMenuManager;
 
     @Nullable
     @Override
@@ -49,20 +52,20 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             categoryId = savedInstanceState.getInt("categoryIdFrag");
         }
 
-        //todo use the cursor to get the category name and update in toolbar-use background thread
-        //set toolbar title
+        //get the categoryactivity
         catActivity = (CategoryActivity) getActivity();
+        //set toolbar title
         activityCategoryBinding = catActivity.activityCategoryBinding;
-        activityCategoryBinding.btnNavToolbarTitle.setText("Jeff Lilcot");
+        setToolBarCategoryTitle(categoryId);
+
 
         //todo remember to save categoryId on screen rotation
         //todo initialize cursor loader after categoryId has been set.
 
 
         //todo create custom adapter for the recyclerview
+        //todo cursor to fetch filters for spinner ie sub-categories
 
-        //todo set the category name in toolbar appropriate after fetching from db(note on screen rotation)
-        //activityCategoryBinding.btnNavToolbar.setTitle("jeff lilcot");
 
         //setup the adapter
         categoriesRecyclerViewAdapter = new CategoriesRecyclerViewAdapter(cursor);
@@ -70,6 +73,10 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
         //initialize cursor loader
         getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
+
+        //update nav menu
+        navMenuManager = new NavMenuManager(getActivity());
+        navMenuManager.updateMenu(activityCategoryBinding.layoutNavViewMain.navView,categoryId);
 
         //get screen width
         int  scrWidth = getScreenDimensions();
@@ -86,16 +93,36 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         //set layout manager for the recyclerview
         fragmentCategoryProductListBinding.categoryProductRecycler.setLayoutManager(layoutMgr);
 
-        //perfom xmlconnect tests
-        xmlTests();
-
     return fragmentCategoryProductListBinding.getRoot();
     }
 
-    private void xmlTests() {
-        //Log.e("jeff-waswa","xml tests come here");
-        JumboWebService.serviceRetrieveCategories(getContext());
+    private void setToolBarCategoryTitle(int categoryId) {
+
+        final String[] toolbarTitle = new String[1];
+
+        String[] projection = {
+                JumboContract.CategoryEntry.COLUMN_LABEL
+        };
+
+        String selection = JumboContract.CategoryEntry.COLUMN_ENTITY_ID + "=?";
+        String[] selectionArgs = {String.valueOf(categoryId)};
+
+        JumboQueryHandler handler = new JumboQueryHandler(getActivity().getContentResolver()) {
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                while(cursor.moveToNext()){
+                    toolbarTitle[0] = cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_LABEL)).toUpperCase();
+                }
+                activityCategoryBinding.btnNavToolbarTitle.setText(toolbarTitle[0]);
+                cursor.close();
+            }
+
+        };
+
+        handler.startQuery(17, null, JumboContract.CategoryEntry.CONTENT_URI, projection, selection, selectionArgs,null);
+
     }
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -150,7 +177,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     }
 
 
-    public void setActivityLayout(ActivityCategoryBinding activityCategoryBinding) {
+   /** public void setActivityLayout(ActivityCategoryBinding activityCategoryBinding) {
         this.activityCategoryBinding = activityCategoryBinding;
-    }
+    }**/
 }

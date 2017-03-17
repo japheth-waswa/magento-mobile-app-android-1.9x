@@ -6,10 +6,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.List;
 
-/**
- * Created by jefflilcot on 2/14/2017.
- */
-
 public class HomeTextTabsAdapter extends FragmentStatePagerAdapter {
 
     private List<Fragment> fragmentList;

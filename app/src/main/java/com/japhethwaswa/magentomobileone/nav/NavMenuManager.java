@@ -16,7 +16,7 @@ import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 
-public class NavMenuManager extends ContextWrapper{
+public class NavMenuManager extends ContextWrapper {
     private Cursor cursor;
     private NavigationView navView;
     private Menu menu;
@@ -26,83 +26,97 @@ public class NavMenuManager extends ContextWrapper{
         super(base);
     }
 
-    public void updateMenu(NavigationView navView){
+    public void updateMenu(NavigationView navView,int activeCategory) {
         //get categories cursor and do your magic here
-        this.navView =  navView;
-        getCategories();
+        this.navView = navView;
+        setMenuCategory(activeCategory);
 
     }
 
-    private void getCategories(){
+    private void setMenuCategory(final int activeCategory) {
 
-        //TODO order fetch in ascending order of category id
         String[] projection = {
-                JumboContract.MainEntry.COLUMN_CATEGORY_ID,
-                JumboContract.MainEntry.COLUMN_PRODUCT_ID,
-                JumboContract.MainEntry.COLUMN_UPDATED_AT,
-                JumboContract.MainEntry.COLUMN_KEY_HOME,
-                JumboContract.MainEntry.COLUMN_IMAGE_URL,
-                JumboContract.MainEntry.COLUMN_SECTION
+                JumboContract.CategoryEntry.COLUMN_LABEL,
+                JumboContract.CategoryEntry.COLUMN_ENTITY_ID,
+                JumboContract.CategoryEntry.COLUMN_CONTENT_TYPE,
+                JumboContract.CategoryEntry.COLUMN_PARENT_ID,
+                JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID,
+                JumboContract.CategoryEntry.COLUMN_ICON,
+                JumboContract.CategoryEntry.COLUMN_MODIFICATION_TIME
         };
 
-        String selection = JumboContract.MainEntry.COLUMN_SECTION + "=?";
-        String[] selectionArgs = {"1"};
+        String selection = JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID + "=?";
+        String[] selectionArgs = {"0"};
 
         JumboQueryHandler handler = new JumboQueryHandler(getContentResolver()) {
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                updateMenuDeal(cursor,navView);
+                updateMenuDeal(cursor, navView,activeCategory);
                 cursor.close();
             }
 
         };
 
-        handler.startQuery(17, null, JumboContract.MainEntry.CONTENT_URI, projection, null, null, JumboContract.MainEntry.COLUMN_KEY_HOME);
+        handler.startQuery(17, null, JumboContract.CategoryEntry.CONTENT_URI, projection, selection, selectionArgs,null);
 
     }
 
-    public void updateMenuDeal(Cursor cursor, NavigationView navView) {
+    public void updateMenuDeal(Cursor cursor, NavigationView navView,int activeCategory) {
         this.cursor = cursor;
         this.navView = navView;
 
-        //TODO loop through the category cursor updating the menu
-        //TODO take care of the parent who will be the main sub menu.
-        //TODO initiate background job to get 5 items in each category(should be done by the home activity only the rest should fetch real time)
+        //TODO initiate background job to get 100 items in each category(should be done by the home activity only the rest should fetch real time)
 
-        //get the current menu to append data
-         menu = this.navView.getMenu();
+        if (cursor.getCount() > 0 ) {
+            //get the current menu to append data
+            menu = this.navView.getMenu();
 
-        //clear the menu
-        menu.clear();
+            //clear the menu
+            menu.clear();
 
-        //place submenu
-        subMenu = menu.addSubMenu(78,Menu.NONE,Menu.NONE,"jean");
+            //place submenu
+            subMenu = menu.addSubMenu(78, Menu.NONE, Menu.NONE, "SHOP BY CATEGORIES");
 
-        for (int i = 1; i <= 3; i++) {
-            // menu.add("runtime item "+ i);
-            subMenu.add(78, i, i, "runtime item " + i).setIcon(R.drawable.ic_cart);
-        }
-        //make submenu items checkable
-        subMenu.setGroupCheckable(78,true,true);
+            while (cursor.moveToNext()) {
+                String label = cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_LABEL)).toUpperCase();
+                int entityId = Integer.parseInt(cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_ENTITY_ID)));
+                //add submenu
+                if(entityId == activeCategory){
+                    subMenu.add(78, entityId, entityId, label).setChecked(true);
+                }else{
+                    subMenu.add(78, entityId, entityId, label);
+                }
 
-        //place submenu
-        subMenu = menu.addSubMenu(178,Menu.NONE,Menu.NONE,"jean");
-        for (int i = 11; i <= 13; i++) {
-            // menu.add("runtime item "+ i);
-            subMenu.add(178, i, i, "runtime item again " + i).setIcon(R.drawable.ic_search_store);
-        }
-        //make submenu items checkable
-        subMenu.setGroupCheckable(178,true,true);
-
-
-        for (int i = 0, count = this.navView.getChildCount(); i < count; i++) {
-            final View child = this.navView.getChildAt(i);
-            if (child != null && child instanceof ListView) {
-                final ListView menuView = (ListView) child;
-                final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
-                final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
-                wrapped.notifyDataSetChanged();
             }
+            cursor.close();
+
+            /**for (int i = 1; i <= 3; i++) {
+                // menu.add("runtime item "+ i);
+                subMenu.add(78, i, i, "runtime item " + i).setIcon(R.drawable.ic_cart);
+            }**/
+            //make submenu items checkable
+            subMenu.setGroupCheckable(78, true, true);
+
+            //place submenu
+            /** subMenu = menu.addSubMenu(178,Menu.NONE,Menu.NONE,"jean");
+             for (int i = 11; i <= 13; i++) {
+             // menu.add("runtime item "+ i);
+             subMenu.add(178, i, i, "runtime item again " + i).setIcon(R.drawable.ic_search_store);
+             }
+             //make submenu items checkable
+             subMenu.setGroupCheckable(178,true,true);**/
+
+
+            for (int i = 0, count = this.navView.getChildCount(); i < count; i++) {
+                final View child = this.navView.getChildAt(i);
+                if (child != null && child instanceof ListView) {
+                    final ListView menuView = (ListView) child;
+                    final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
+                    final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
+                    wrapped.notifyDataSetChanged();
+                }
+            }
+
         }
 
 

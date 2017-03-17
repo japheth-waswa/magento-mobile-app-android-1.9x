@@ -3,6 +3,7 @@ package com.japhethwaswa.magentomobileone.app;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.os.PersistableBundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -64,8 +65,14 @@ public class HomeActivity extends AppCompatActivity
         //prepare the ViewPager fragments
         prepareDataSource();
 
-        //initialize loader
-        getSupportLoaderManager().initLoader(URL_LOADER,null,this);
+
+        if (savedInstanceState == null) {
+            //initialize loader
+            getSupportLoaderManager().initLoader(URL_LOADER, null, this);
+        }else{
+            //restart loader
+            getSupportLoaderManager().restartLoader(URL_LOADER,null,this);
+        }
 
         /**Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
          setSupportActionBar(toolbar);**/
@@ -107,6 +114,12 @@ public class HomeActivity extends AppCompatActivity
         //navMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
 
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putInt("savedInstance", 1);
     }
 
 
@@ -159,7 +172,7 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
         //TODO start the CategoryActivity and load fragment into it
         Intent intent = new Intent(this, CategoryActivity.class);
-        intent.putExtra("categoryId",id);
+        intent.putExtra("categoryId", id);
         startActivity(intent);
 
         /**DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -170,23 +183,27 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        //todo perfom query to fetch categories
-       String[] projection = {
-                JumboContract.MainEntry.COLUMN_CATEGORY_ID,
-                JumboContract.MainEntry.COLUMN_PRODUCT_ID,
-                JumboContract.MainEntry.COLUMN_UPDATED_AT,
-                JumboContract.MainEntry.COLUMN_KEY_HOME,
-                JumboContract.MainEntry.COLUMN_IMAGE_URL,
-                JumboContract.MainEntry.COLUMN_SECTION
+        //perfom query to fetch categories with value of my_parent_id=0
+        String[] projection = {
+                JumboContract.CategoryEntry.COLUMN_LABEL,
+                JumboContract.CategoryEntry.COLUMN_ENTITY_ID,
+                JumboContract.CategoryEntry.COLUMN_CONTENT_TYPE,
+                JumboContract.CategoryEntry.COLUMN_PARENT_ID,
+                JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID,
+                JumboContract.CategoryEntry.COLUMN_ICON,
+                JumboContract.CategoryEntry.COLUMN_MODIFICATION_TIME
         };
 
-        return new CursorLoader(this, JumboContract.MainEntry.CONTENT_URI, projection, null, null, null);
+        String selection = JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID + "=?";
+        String[] selectionArgs = {"0"};
+
+        return new CursorLoader(this, JumboContract.CategoryEntry.CONTENT_URI, projection, selection, selectionArgs,null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         //initiate categories menu update
-        navMenuManager.updateMenuDeal(data,activityHomeBinding.layoutNavViewMain.navView);
+        navMenuManager.updateMenuDeal(data, activityHomeBinding.layoutNavViewMain.navView,0);
     }
 
     @Override

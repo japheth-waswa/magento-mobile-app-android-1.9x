@@ -54,7 +54,7 @@ public class SplashActivity extends AppCompatActivity {
         jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
         //job retrieve main data
         jobManager.addJobInBackground(new RetrieveMainData());
-        //TODO start background job to fetch categories from magento api
+        //TODO job should retrieve both top categories,subcategories and 100 products for each category
         //job retrieve categories
         jobManager.addJobInBackground(new RetrieveCategories());
 
