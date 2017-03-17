@@ -59,7 +59,6 @@ public class HomeActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
 
-        //TODO start background job to fetch categories from magento api
         activityHomeBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
 
         //prepare the ViewPager fragments

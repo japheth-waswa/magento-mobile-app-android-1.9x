@@ -6,20 +6,16 @@ import android.support.annotation.Nullable;
 import com.birbit.android.jobqueue.Job;
 import com.birbit.android.jobqueue.Params;
 import com.birbit.android.jobqueue.RetryConstraint;
-import com.japhethwaswa.magentomobileone.service.MagentoWebService;
+import com.japhethwaswa.magentomobileone.service.JumboWebService;
 
-
-// A job to retrieve products.
-public class RetrieveProducts extends Job {
+public class RetrieveCategories extends Job {
 
     public static final int PRIORITY = 1;
-    private String url;
-    public RetrieveProducts(String url) {
+
+    public RetrieveCategories() {
         // This job requires network connectivity,
         // and should be persisted in case the application exits before job is completed.
         super(new Params(PRIORITY).requireNetwork().persist());
-
-        this.url = url;
     }
     @Override
     public void onAdded() {
@@ -33,7 +29,7 @@ public class RetrieveProducts extends Job {
         // Job logic goes here. In this example, the network call to post to Twitter is done here.
         // All work done here should be synchronous, a job is removed from the queue once
         // onRun() finishes.
-        MagentoWebService.retrieveAlpesa(url);
+        JumboWebService.serviceRetrieveCategories(getApplicationContext());
     }
 
     @Override

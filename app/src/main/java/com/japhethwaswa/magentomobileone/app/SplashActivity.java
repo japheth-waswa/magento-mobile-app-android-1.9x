@@ -15,9 +15,9 @@ import com.japhethwaswa.magentomobileone.db.JumboContract.PagerEntry;
 
 import com.japhethwaswa.magentomobileone.db.DatabaseHelper;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
+import com.japhethwaswa.magentomobileone.job.RetrieveCategories;
 import com.japhethwaswa.magentomobileone.job.RetrieveMainData;
 import com.japhethwaswa.magentomobileone.job.builder.MyJobsBuilder;
-import com.japhethwaswa.magentomobileone.job.RetrieveProducts;
 
 public class SplashActivity extends AppCompatActivity {
     private JobManager jobManager;
@@ -52,8 +52,12 @@ public class SplashActivity extends AppCompatActivity {
 
         //initiate job to get both pager and main items
         jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
+        //job retrieve main data
         jobManager.addJobInBackground(new RetrieveMainData());
-        
+        //TODO start background job to fetch categories from magento api
+        //job retrieve categories
+        jobManager.addJobInBackground(new RetrieveCategories());
+
 
         if (pagerObsolete == true) {
             //load HomeActivity
