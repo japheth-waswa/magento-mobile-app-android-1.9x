@@ -53,8 +53,7 @@ public class SplashActivity extends AppCompatActivity {
         //initiate job to get both pager and main items
         jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
         jobManager.addJobInBackground(new RetrieveMainData());
-        //String baseUri = getString(R.string.apiBaseUrl);
-        //Log.e("baseUri",baseUri);
+        
 
         if (pagerObsolete == true) {
             //load HomeActivity

@@ -7,6 +7,7 @@ public final class JumboContract {
     public static final String CONTENT_AUTHORITY = "com.japhethwaswa.magentomobileone.db.jumboprovider";
     public static final String PATH_PAGER = "pager";
     public static final String PATH_MAIN = "main";
+    public static final String PATH_CATEGORY = "category";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
 
     public static final class PagerEntry implements BaseColumns{
@@ -40,7 +41,7 @@ public final class JumboContract {
     }
 
     public static final class CategoryEntry implements BaseColumns{
-        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI,PATH_MAIN);
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI,PATH_CATEGORY);
         //Table name
         public static final String TABLE_NAME = "category";
         //column field names

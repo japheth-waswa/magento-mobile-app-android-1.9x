@@ -94,7 +94,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
     private void xmlTests() {
         //Log.e("jeff-waswa","xml tests come here");
-        JumboWebService.retrieveCategories(getContext());
+        JumboWebService.serviceRetrieveCategories(getContext());
     }
 
     @Override

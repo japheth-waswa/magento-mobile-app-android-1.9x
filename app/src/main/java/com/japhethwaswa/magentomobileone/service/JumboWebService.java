@@ -202,7 +202,7 @@ public class JumboWebService {
     }
 
     //service-retrive all categories
-    public static void retrieveCategories(final Context context) {
+    public static void serviceRetrieveCategories(final Context context) {
 
         Resources res = context.getResources();
         String relativeUrl = res.getString(R.string.jumbo_top_categories);
@@ -216,7 +216,7 @@ public class JumboWebService {
                     @Override
                     public void onResponse(String response) {
                         try {
-                            parseCategoriesUpdate(response, context, "0");
+                            parseCategories(response, context, "0");
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -229,8 +229,8 @@ public class JumboWebService {
                 });
     }
 
-    //updaete categories table
-    private static void parseCategoriesUpdate(String response, Context context, String myParentId) throws IOException {
+    //parse categories from xml
+    private static void parseCategories(String response, Context context, String myParentId) throws IOException {
 
         InputStream xmlStream = new ByteArrayInputStream(response.getBytes());
         Boolean isCat = true;
@@ -264,15 +264,28 @@ public class JumboWebService {
                             if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_ENTITY_ID)) {
                                 category.setEntity_id(myParser.nextText());
                             }
-                            //todo get the remainig data
+
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_CONTENT_TYPE)) {
+                                category.setContent_type(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_PARENT_ID)) {
+                                category.setParent_id(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_ICON)) {
+                                category.setModification_time(myParser.getAttributeValue(null, JumboContract.CategoryEntry.COLUMN_MODIFICATION_TIME));
+                                category.setIcon(myParser.nextText());
+                            }
+                            //set category my_parent_id passed to the method
+                            category.setMy_parent_id(myParentId);
                         }
                         break;
                     case XmlPullParser.END_TAG:
                         name = myParser.getName();
                         if (name.equalsIgnoreCase("item") && category != null) {
-                            //todo save to db in another method by passing the category object
-                            Log.e("jeff-label", category.getLabel());
-                            Log.e("jeff-entity_id", category.getEntity_id());
+                            //update,insert db
+                            updateInsertCategories(context, category);
 
                             //set null
                             category = null;
@@ -288,22 +301,34 @@ public class JumboWebService {
             e.printStackTrace();
         }
 
-        /** final ContentValues values = new ContentValues();
-         values.put("","");
+    }
 
-         String selection = JumboContract.CategoryEntry.COLUMN_ENTITY_ID + "=?";
-         String selectionArgs[] = {"1"};
+    //db update,insert categories
+    private static void updateInsertCategories(Context context, Category category) {
 
-         JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver()){
-        @Override protected void onUpdateComplete(int token, Object cookie, int result) {
-        //if no update then insert
-        if(result == -1){
-        this.startInsert(98,null,JumboContract.CategoryEntry.CONTENT_URI,values);
-        }
-        }
+        final ContentValues values = new ContentValues();
+        values.put(JumboContract.CategoryEntry.COLUMN_LABEL,category.getLabel());
+        values.put(JumboContract.CategoryEntry.COLUMN_ENTITY_ID,category.getEntity_id());
+        values.put(JumboContract.CategoryEntry.COLUMN_CONTENT_TYPE,category.getContent_type());
+        values.put(JumboContract.CategoryEntry.COLUMN_PARENT_ID,category.getParent_id());
+        values.put(JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID,category.getMy_parent_id());
+        values.put(JumboContract.CategoryEntry.COLUMN_ICON,category.getIcon());
+        values.put(JumboContract.CategoryEntry.COLUMN_MODIFICATION_TIME,category.getModification_time());
+
+        String selection = JumboContract.CategoryEntry.COLUMN_ENTITY_ID + "=?";
+        String[] selectionArgs = {category.getEntity_id()};
+
+        JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver()) {
+            @Override
+            protected void onUpdateComplete(int token, Object cookie, int result) {
+                //if no update then insert
+                if (result == -1) {
+                    this.startInsert(7, null, JumboContract.CategoryEntry.CONTENT_URI, values);
+                }
+            }
         };
 
-         handler.startUpdate(99,null,JumboContract.CategoryEntry.CONTENT_URI,values,selection,selectionArgs);**/
+        handler.startUpdate(5, null, JumboContract.CategoryEntry.CONTENT_URI, values, selection, selectionArgs);
 
     }
 }
