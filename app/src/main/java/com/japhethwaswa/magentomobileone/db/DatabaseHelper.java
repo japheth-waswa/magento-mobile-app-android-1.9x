@@ -11,6 +11,7 @@ import com.japhethwaswa.magentomobileone.app.SplashActivity;
 import com.japhethwaswa.magentomobileone.db.JumboContract.PagerEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.MainEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.CategoryEntry;
+import com.japhethwaswa.magentomobileone.db.JumboContract.ProductEntry;
 
 import static java.security.AccessController.getContext;
 
@@ -51,6 +52,28 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                     CategoryEntry.COLUMN_MODIFICATION_TIME + " TEXT " +
                     ")";
 
+    private static final String TABLE_PRODUCT_CREATE=
+            "CREATE TABLE " + ProductEntry.TABLE_NAME + " (" +
+                    ProductEntry._ID + " INTEGER PRIMARY KEY, " +
+                    ProductEntry.COLUMN_NAME + " TEXT, " +
+                    ProductEntry.COLUMN_ENTITY_ID + " TEXT, " +
+                    ProductEntry.COLUMN_ENTITY_TYPE + " TEXT, " +
+                    ProductEntry.COLUMN_SHORT_DESCRIPTION + " TEXT, " +
+                    ProductEntry.COLUMN_DESCRIPTION + " TEXT, " +
+                    ProductEntry.COLUMN_LINK + " TEXT, " +
+                    ProductEntry.COLUMN_ICON + " TEXT, " +
+                    ProductEntry.COLUMN_MODIFICATION_TIME + " TEXT, " +
+                    ProductEntry.COLUMN_IN_STOCK + " TEXT, " +
+                    ProductEntry.COLUMN_IS_SALABLE + " TEXT, " +
+                    ProductEntry.COLUMN_HAS_GALLERY + " TEXT, " +
+                    ProductEntry.COLUMN_HAS_OPTIONS + " TEXT, " +
+                    ProductEntry.COLUMN_RATING_SUMMARY + " TEXT, " +
+                    ProductEntry.COLUMN_REVIEWS_COUNT + " TEXT, " +
+                    ProductEntry.COLUMN_PRICE_REGULAR + " TEXT, " +
+                    ProductEntry.COLUMN_PRICE_SPECIAL + " TEXT, " +
+                    ProductEntry.COLUMN_CATEGORY_IDS + " TEXT " +
+                    ")";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -60,6 +83,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     db.execSQL(TABLE_PAGERS_CREATE);
     db.execSQL(TABLE_MAIN_CREATE);
     db.execSQL(TABLE_CATEGORY_CREATE);
+    db.execSQL(TABLE_PRODUCT_CREATE);
     }
 
     @Override
@@ -67,6 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         db.execSQL("DROP TABLE IF EXISTS " + PagerEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MainEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + CategoryEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ProductEntry.TABLE_NAME);
         onCreate(db);
     }
 

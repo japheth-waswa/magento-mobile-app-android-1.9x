@@ -15,6 +15,7 @@ import static com.japhethwaswa.magentomobileone.db.JumboContract.CONTENT_AUTHORI
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_CATEGORY;
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_MAIN;
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PAGER;
+import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PRODUCT;
 
 public class JumboProvider extends ContentProvider {
 
@@ -27,6 +28,8 @@ public class JumboProvider extends ContentProvider {
     private static final int MAIN_ID = 4;
     private static final int CATEGORY = 5;
     private static final int CATEGORY_ID = 6;
+    private static final int PRODUCT = 7;
+    private static final int PRODUCT_ID = 8;
 
     //Uri matcher
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -44,6 +47,10 @@ public class JumboProvider extends ContentProvider {
         //category data uri
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_CATEGORY, CATEGORY);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_CATEGORY + "/#", CATEGORY_ID);
+
+        //product data uri
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT, PRODUCT);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT + "/#", PRODUCT_ID);
     }
 
     private DatabaseHelper helper;
@@ -87,6 +94,14 @@ public class JumboProvider extends ContentProvider {
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 cursor = db.query(JumboContract.CategoryEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
+            case PRODUCT:
+                cursor = db.query(JumboContract.ProductEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case PRODUCT_ID:
+                selection = JumboContract.ProductEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(JumboContract.ProductEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown Uri");
         }
@@ -112,6 +127,8 @@ public class JumboProvider extends ContentProvider {
                 return insertRecord(uri, values, JumboContract.MainEntry.TABLE_NAME);
             case CATEGORY:
                 return insertRecord(uri, values, JumboContract.CategoryEntry.TABLE_NAME);
+            case PRODUCT:
+                return insertRecord(uri, values, JumboContract.ProductEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Unkwown uri: " + uri);
 
@@ -146,6 +163,10 @@ public class JumboProvider extends ContentProvider {
                 return deleteRecord(uri, null, null, JumboContract.CategoryEntry.TABLE_NAME);
             case CATEGORY_ID:
                 return deleteRecord(uri, selection, selectionArgs, JumboContract.CategoryEntry.TABLE_NAME);
+            case PRODUCT:
+                return deleteRecord(uri, null, null, JumboContract.ProductEntry.TABLE_NAME);
+            case PRODUCT_ID:
+                return deleteRecord(uri, selection, selectionArgs, JumboContract.ProductEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Insert unknown URI: " + uri);
         }
@@ -176,6 +197,9 @@ public class JumboProvider extends ContentProvider {
 
             case CATEGORY:
                 return updateRecord(uri, values, selection, selectionArgs, JumboContract.CategoryEntry.TABLE_NAME);
+
+            case PRODUCT:
+                return updateRecord(uri, values, selection, selectionArgs, JumboContract.ProductEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Update unknown URI: " + uri);
         }

@@ -13,15 +13,27 @@ public class Product extends BaseObservable{
     private String description;
     private String link;
     private String icon;
-    private Boolean in_stock;
-    private Boolean is_salable;
-    private Boolean has_gallery;
-    private Boolean has_options;
+    private String modification_time;
+    private String in_stock;
+    private String is_salable;
+    private String has_gallery;
+    private String has_options;
     private String rating_summary;
     private String reviews_count;
     private String price_regular;
     private String price_special;
     private String category_ids;
+
+
+    @Bindable
+    public String getModification_time() {
+        return modification_time;
+    }
+
+    public void setModification_time(String modification_time) {
+        this.modification_time = modification_time;
+        notifyPropertyChanged(BR.modification_time);
+    }
 
     @Bindable
     public String getCategory_ids() {
@@ -105,41 +117,41 @@ public class Product extends BaseObservable{
     }
 
     @Bindable
-    public Boolean getIn_stock() {
+    public String getIn_stock() {
         return in_stock;
     }
 
-    public void setIn_stock(Boolean in_stock) {
+    public void setIn_stock(String in_stock) {
         this.in_stock = in_stock;
         notifyPropertyChanged(BR.in_stock);
     }
 
     @Bindable
-    public Boolean getIs_salable() {
+    public String getIs_salable() {
         return is_salable;
     }
 
-    public void setIs_salable(Boolean is_salable) {
+    public void setIs_salable(String is_salable) {
         this.is_salable = is_salable;
         notifyPropertyChanged(BR.is_salable);
     }
 
     @Bindable
-    public Boolean getHas_gallery() {
+    public String getHas_gallery() {
         return has_gallery;
     }
 
-    public void setHas_gallery(Boolean has_gallery) {
+    public void setHas_gallery(String has_gallery) {
         this.has_gallery = has_gallery;
         notifyPropertyChanged(BR.has_gallery);
     }
 
     @Bindable
-    public Boolean getHas_options() {
+    public String getHas_options() {
         return has_options;
     }
 
-    public void setHas_options(Boolean has_options) {
+    public void setHas_options(String has_options) {
         this.has_options = has_options;
         notifyPropertyChanged(BR.has_options);
     }

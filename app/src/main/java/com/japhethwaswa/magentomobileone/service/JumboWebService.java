@@ -310,6 +310,10 @@ public class JumboWebService {
     //db update,insert categories
     private static void updateInsertCategories(final Context context, final Category category) {
 
+        Resources res = context.getResources();
+        final String itemsCounted = res.getString(R.string.jumbo_product_count);
+        final String itemsOffsets = "0";
+
         final ContentValues values = new ContentValues();
         values.put(JumboContract.CategoryEntry.COLUMN_LABEL, category.getLabel());
         values.put(JumboContract.CategoryEntry.COLUMN_ENTITY_ID, category.getEntity_id());
@@ -329,6 +333,8 @@ public class JumboWebService {
                 if (result == -1) {
                     this.startInsert(7, null, JumboContract.CategoryEntry.CONTENT_URI, values);
                 }
+                //get sub category dataa and products
+                serviceSubCategoryData(context,category.getEntity_id(),category.getEntity_id(),itemsCounted,itemsOffsets);
             }
         };
 
@@ -459,28 +465,66 @@ public class JumboWebService {
                         if (name.equalsIgnoreCase("item") && isProd == true) {
                             product = new Product();
                         } else if (product != null) {
-                            if (name.equalsIgnoreCase("name")) {
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_ENTITY_ID)) {
+                                product.setEntity_id(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_NAME)) {
                                 product.setName(myParser.nextText());
                             }
 
-                            /**if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_ENTITY_ID)) {
-                                category.setEntity_id(myParser.nextText());
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_ENTITY_TYPE)) {
+                                product.setEntity_type(myParser.nextText());
                             }
 
-                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_CONTENT_TYPE)) {
-                                category.setContent_type(myParser.nextText());
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_SHORT_DESCRIPTION)) {
+                                product.setShort_description(myParser.nextText());
                             }
 
-                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_PARENT_ID)) {
-                                category.setParent_id(myParser.nextText());
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_DESCRIPTION)) {
+                                product.setDescription(myParser.nextText());
                             }
 
-                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_ICON)) {
-                                category.setModification_time(myParser.getAttributeValue(null, JumboContract.CategoryEntry.COLUMN_MODIFICATION_TIME));
-                                category.setIcon(myParser.nextText());
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_LINK)) {
+                                product.setLink(myParser.nextText());
                             }
-                            //set category my_parent_id passed to the method
-                            category.setMy_parent_id(parentCategory);**/
+
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_IN_STOCK)) {
+                                product.setIn_stock(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_IS_SALABLE)) {
+                                product.setIs_salable(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_HAS_GALLERY)) {
+                                product.setHas_gallery(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_HAS_OPTIONS)) {
+                                product.setHas_options(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_RATING_SUMMARY)) {
+                                product.setRating_summary(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_REVIEWS_COUNT)) {
+                                product.setReviews_count(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_PRICE_REGULAR)) {
+                                product.setPrice_regular(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL)) {
+                                product.setPrice_special(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_ICON)) {
+                                product.setModification_time(myParser.getAttributeValue(null, JumboContract.ProductEntry.COLUMN_MODIFICATION_TIME));
+                                product.setIcon(myParser.nextText());
+                            }
                         }
                         break;
                     case XmlPullParser.END_TAG:
@@ -514,33 +558,37 @@ public class JumboWebService {
 
     private static void updateInsertProduct(Context context, Product product, String parentCategory) {
 
-        /**DatabaseHelper helper = new DatabaseHelper(context);
+        DatabaseHelper helper = new DatabaseHelper(context);
         SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor;**/
+        Cursor cursor;
+        Boolean isUpdate = false;
 
         //todo use product table contract
-        Log.e("jeff-waswa","we are here now");
-
-        //since its first time just get configs from xml
-       /** Resources res = context.getResources();
-        String itemsCounted = res.getString(R.string.jumbo_product_count);
-        String itemsOffsets = "0";
+        //todo deal with the category id appropriately
+        //todo ensure the cursor fetched determines whether its an insert or update
+        Log.e("jeff-waswa",product.getName());
 
         String[] projection = {
-                JumboContract.CategoryEntry.COLUMN_ENTITY_ID,
+                JumboContract.ProductEntry.COLUMN_ENTITY_ID,
         };
-        String selection = JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID + "=?";
-        String[] selectionArgs = {"0"};
+        String selection = JumboContract.ProductEntry.COLUMN_ENTITY_ID + "=?";
+        String[] selectionArgs = {product.getEntity_id()};
 
-        cursor = db.query(JumboContract.CategoryEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+        cursor = db.query(JumboContract.ProductEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
 
-        while (cursor.moveToNext()) {
-            String entityId = cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_ENTITY_ID));
-            serviceSubCategoryData(context, entityId, entityId, itemsCounted, itemsOffsets);
+       if(cursor.getCount() > 0){
+           isUpdate = true;
+       }
+        cursor.close();
+        db.close();
+
+        if(isUpdate == true){
+            //perfom update
         }
 
-        cursor.close();
-        db.close();**/
+        if(isUpdate == false){
+            //perfom insert
+        }
 
     }
 

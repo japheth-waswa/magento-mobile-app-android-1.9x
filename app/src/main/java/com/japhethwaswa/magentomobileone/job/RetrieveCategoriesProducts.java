@@ -57,6 +57,8 @@ public class RetrieveCategoriesProducts extends Job {
         // Job has exceeded retry attempts or shouldReRunOnThrowable() has decided to cancel.
     }
 
+
+
     @Override
     protected RetryConstraint shouldReRunOnThrowable(@NonNull Throwable throwable, int runCount, int maxRunCount) {
         // An error occurred in onRun.

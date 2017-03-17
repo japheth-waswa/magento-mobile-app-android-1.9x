@@ -53,10 +53,15 @@ public class SplashActivity extends AppCompatActivity {
 
         //initiate job to get both pager and main items
         jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
+
         //job retrieve main data
         jobManager.addJobInBackground(new RetrieveMainData());
+
         //job retrieve categories
-        jobManager.addJobInBackground(new RetrieveCategoriesProducts(true,null,null,null,null));
+        jobManager.addJobInBackground(new RetrieveCategories());
+
+        //job retrieve categories and products
+        //jobManager.addJobInBackground(new RetrieveCategoriesProducts(true,null,null,null,null));
 
 
         if (pagerObsolete == true) {
