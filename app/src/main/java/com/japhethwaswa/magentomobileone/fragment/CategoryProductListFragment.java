@@ -71,12 +71,12 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         categoriesRecyclerViewAdapter = new CategoriesRecyclerViewAdapter(cursor);
         fragmentCategoryProductListBinding.categoryProductRecycler.setAdapter(categoriesRecyclerViewAdapter);
 
+        //update nav menu
+        navMenuManager = new NavMenuManager(getActivity());
+
         //initialize cursor loader
         getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
 
-        //update nav menu
-        navMenuManager = new NavMenuManager(getActivity());
-        navMenuManager.updateMenu(activityCategoryBinding.layoutNavViewMain.navView,categoryId);
 
         //get screen width
         int  scrWidth = getScreenDimensions();
@@ -154,6 +154,9 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             fragmentCategoryProductListBinding.categoryProdsFragPageLoader.stopProgress();
         }
         categoriesRecyclerViewAdapter.setCursor(data);
+
+        //update nav menu
+        navMenuManager.updateMenu(activityCategoryBinding.layoutNavViewMain.navView,categoryId);
     }
 
     @Override

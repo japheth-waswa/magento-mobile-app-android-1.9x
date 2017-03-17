@@ -2,6 +2,7 @@
     <string name="app_name">Magento Mobile One</string>
     <string name="app_xmlconnect_code">defand1</string>
     <string name="app_xmlconnect_screen_size">2400x1600</string>
+    <string name="jumbo_product_count">500</string>
     <string name="apiBaseUrl">http://magento-29325-63476-210388.cloudwaysapps.com/</string>
     <string name="jumbo_main_data_url">jumbomobile/jumbo/main</string>
     <string name="jumbo_top_categories">xmlconnect/Catalog/category</string>

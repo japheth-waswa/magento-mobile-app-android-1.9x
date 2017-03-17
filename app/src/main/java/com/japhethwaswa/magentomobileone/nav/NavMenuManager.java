@@ -65,7 +65,7 @@ public class NavMenuManager extends ContextWrapper {
         this.cursor = cursor;
         this.navView = navView;
 
-        //TODO initiate background job to get 100 items in each category(should be done by the home activity only the rest should fetch real time)
+        //TODO initiate background job to get 500 items in each category(should be done by the home activity only the rest should fetch real time)
 
         if (cursor.getCount() > 0 ) {
             //get the current menu to append data
