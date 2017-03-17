@@ -16,6 +16,7 @@ import com.japhethwaswa.magentomobileone.db.JumboContract.PagerEntry;
 import com.japhethwaswa.magentomobileone.db.DatabaseHelper;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 import com.japhethwaswa.magentomobileone.job.RetrieveCategories;
+import com.japhethwaswa.magentomobileone.job.RetrieveCategoriesProducts;
 import com.japhethwaswa.magentomobileone.job.RetrieveMainData;
 import com.japhethwaswa.magentomobileone.job.builder.MyJobsBuilder;
 
@@ -54,9 +55,8 @@ public class SplashActivity extends AppCompatActivity {
         jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
         //job retrieve main data
         jobManager.addJobInBackground(new RetrieveMainData());
-        //TODO job should retrieve both top categories,subcategories and 100 products for each category
         //job retrieve categories
-        jobManager.addJobInBackground(new RetrieveCategories());
+        jobManager.addJobInBackground(new RetrieveCategoriesProducts(true,null,null,null,null));
 
 
         if (pagerObsolete == true) {

@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
@@ -15,9 +16,12 @@ import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.androidnetworking.interfaces.StringRequestListener;
 import com.japhethwaswa.magentomobileone.R;
+import com.japhethwaswa.magentomobileone.db.DatabaseHelper;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
+import com.japhethwaswa.magentomobileone.event.CategoriesEventHandler;
 import com.japhethwaswa.magentomobileone.model.Category;
+import com.japhethwaswa.magentomobileone.model.Product;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -304,16 +308,16 @@ public class JumboWebService {
     }
 
     //db update,insert categories
-    private static void updateInsertCategories(Context context, Category category) {
+    private static void updateInsertCategories(final Context context, final Category category) {
 
         final ContentValues values = new ContentValues();
-        values.put(JumboContract.CategoryEntry.COLUMN_LABEL,category.getLabel());
-        values.put(JumboContract.CategoryEntry.COLUMN_ENTITY_ID,category.getEntity_id());
-        values.put(JumboContract.CategoryEntry.COLUMN_CONTENT_TYPE,category.getContent_type());
-        values.put(JumboContract.CategoryEntry.COLUMN_PARENT_ID,category.getParent_id());
-        values.put(JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID,category.getMy_parent_id());
-        values.put(JumboContract.CategoryEntry.COLUMN_ICON,category.getIcon());
-        values.put(JumboContract.CategoryEntry.COLUMN_MODIFICATION_TIME,category.getModification_time());
+        values.put(JumboContract.CategoryEntry.COLUMN_LABEL, category.getLabel());
+        values.put(JumboContract.CategoryEntry.COLUMN_ENTITY_ID, category.getEntity_id());
+        values.put(JumboContract.CategoryEntry.COLUMN_CONTENT_TYPE, category.getContent_type());
+        values.put(JumboContract.CategoryEntry.COLUMN_PARENT_ID, category.getParent_id());
+        values.put(JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID, category.getMy_parent_id());
+        values.put(JumboContract.CategoryEntry.COLUMN_ICON, category.getIcon());
+        values.put(JumboContract.CategoryEntry.COLUMN_MODIFICATION_TIME, category.getModification_time());
 
         String selection = JumboContract.CategoryEntry.COLUMN_ENTITY_ID + "=?";
         String[] selectionArgs = {category.getEntity_id()};
@@ -331,4 +335,214 @@ public class JumboWebService {
         handler.startUpdate(5, null, JumboContract.CategoryEntry.CONTENT_URI, values, selection, selectionArgs);
 
     }
+
+    //used if no category is not there
+    public static void retrieveMainCategories(final Context context, final String itemsCount, final String itemsOffset) {
+
+        DatabaseHelper helper = new DatabaseHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor;
+
+        //since its first time just get configs from xml
+        Resources res = context.getResources();
+        String itemsCounted = res.getString(R.string.jumbo_product_count);
+        String itemsOffsets = "0";
+
+        String[] projection = {
+                JumboContract.CategoryEntry.COLUMN_ENTITY_ID,
+        };
+        String selection = JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID + "=?";
+        String[] selectionArgs = {"0"};
+
+        cursor = db.query(JumboContract.CategoryEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+
+        while (cursor.moveToNext()) {
+            String entityId = cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_ENTITY_ID));
+            serviceSubCategoryData(context, entityId, entityId, itemsCounted, itemsOffsets);
+        }
+
+        cursor.close();
+        db.close();
+
+    }
+
+
+    //service retrieve sub-category products and mini-categories
+    public static void serviceSubCategoryData(final Context context, String categoryId, final String parentCategory, final String itemsCount, final String itemsOffset) {
+        //todo remember to save my_parent_id to category
+        //todo remember to save both id's with the product ie product_ids(4,2)
+
+        //fetch these categories/products
+        Resources res = context.getResources();
+        String relativeUrl = res.getString(R.string.jumbo_top_categories);
+        relativeUrl = relativeUrl + "/id/" + categoryId + "/offset/"+ itemsOffset +"/count/" + itemsCount;
+
+        AndroidNetworking.get(getAbsoluteUrl(context, relativeUrl))
+                .setTag("jumboCategoriesProducts")
+                .setPriority(Priority.HIGH)
+                .addHeaders("Cookie", getCookie(context))
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            parseCategoriesProducts(response, context, parentCategory);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.e("jeff-error", anError.toString());
+                    }
+                });
+    }
+
+    private static void parseCategoriesProducts(String response, Context context, String parentCategory) throws IOException {
+
+
+        InputStream xmlStream = new ByteArrayInputStream(response.getBytes());
+        Boolean isCat = true;
+        Boolean isProd = false;
+        Category category = null;
+        Product product = null;
+
+        try {
+            XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
+            XmlPullParser myParser = xmlPullParserFactory.newPullParser();
+            myParser.setInput(xmlStream, null);
+
+            int eventType = myParser.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+
+                String name;
+
+                switch (eventType) {
+                    case XmlPullParser.START_TAG:
+                        name = myParser.getName();
+                        if (name.equalsIgnoreCase("products")) {
+                            //if products have been reached then set the val to false ie not category now
+                            isCat = false;
+                            isProd = true;
+                        }
+
+                        //get categories
+                        if (name.equalsIgnoreCase("item") && isCat == true) {
+                            category = new Category();
+                        } else if (category != null) {
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_LABEL)) {
+                                category.setLabel(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_ENTITY_ID)) {
+                                category.setEntity_id(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_CONTENT_TYPE)) {
+                                category.setContent_type(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_PARENT_ID)) {
+                                category.setParent_id(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_ICON)) {
+                                category.setModification_time(myParser.getAttributeValue(null, JumboContract.CategoryEntry.COLUMN_MODIFICATION_TIME));
+                                category.setIcon(myParser.nextText());
+                            }
+                            //set category my_parent_id passed to the method
+                            category.setMy_parent_id(parentCategory);
+                        }
+
+                        //get products
+                        if (name.equalsIgnoreCase("item") && isProd == true) {
+                            product = new Product();
+                        } else if (product != null) {
+                            if (name.equalsIgnoreCase("name")) {
+                                product.setName(myParser.nextText());
+                            }
+
+                            /**if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_ENTITY_ID)) {
+                                category.setEntity_id(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_CONTENT_TYPE)) {
+                                category.setContent_type(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_PARENT_ID)) {
+                                category.setParent_id(myParser.nextText());
+                            }
+
+                            if (name.equalsIgnoreCase(JumboContract.CategoryEntry.COLUMN_ICON)) {
+                                category.setModification_time(myParser.getAttributeValue(null, JumboContract.CategoryEntry.COLUMN_MODIFICATION_TIME));
+                                category.setIcon(myParser.nextText());
+                            }
+                            //set category my_parent_id passed to the method
+                            category.setMy_parent_id(parentCategory);**/
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        name = myParser.getName();
+
+                        if (name.equalsIgnoreCase("item") && category != null) {
+                            //update,insert category
+                            //updateInsertCategories(context, category);
+                            //set null
+                            category = null;
+                        }
+                        if (name.equalsIgnoreCase("item") && product != null) {
+                            //update,insert category
+                            updateInsertProduct(context, product,parentCategory);
+                            
+                            //set null
+                            product = null;
+                        }
+                        break;
+
+                }
+
+                eventType = myParser.next();
+            }
+
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void updateInsertProduct(Context context, Product product, String parentCategory) {
+
+        /**DatabaseHelper helper = new DatabaseHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor;**/
+
+        //todo use product table contract
+        Log.e("jeff-waswa","we are here now");
+
+        //since its first time just get configs from xml
+       /** Resources res = context.getResources();
+        String itemsCounted = res.getString(R.string.jumbo_product_count);
+        String itemsOffsets = "0";
+
+        String[] projection = {
+                JumboContract.CategoryEntry.COLUMN_ENTITY_ID,
+        };
+        String selection = JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID + "=?";
+        String[] selectionArgs = {"0"};
+
+        cursor = db.query(JumboContract.CategoryEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+
+        while (cursor.moveToNext()) {
+            String entityId = cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_ENTITY_ID));
+            serviceSubCategoryData(context, entityId, entityId, itemsCounted, itemsOffsets);
+        }
+
+        cursor.close();
+        db.close();**/
+
+    }
+
+
 }

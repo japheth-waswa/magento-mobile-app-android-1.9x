@@ -65,6 +65,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
         //todo create custom adapter for the recyclerview
         //todo cursor to fetch filters for spinner ie sub-categories
+        //todo have a local variable to store the category filter id and retrieve in onsaveinsance
 
 
         //setup the adapter
