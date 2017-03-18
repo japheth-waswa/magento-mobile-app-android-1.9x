@@ -12,6 +12,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSnapHelper;
+import android.support.v7.widget.SnapHelper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -91,11 +93,23 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         if(scrWidth >= 1280 ){
             numItems = 3;
         }
-        GridLayoutManager layoutMgr = new GridLayoutManager(getActivity(),numItems);
-        //LinearLayoutManager layoutMgrr = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false);
 
-        //set layout manager for the recyclerview
-        fragmentCategoryProductListBinding.categoryProductRecycler.setLayoutManager(layoutMgr);
+        if(scrWidth >= 800 ){
+            GridLayoutManager layoutMgr = new GridLayoutManager(getActivity(),numItems);
+            //set Gridlayout manager for the recyclerview
+            fragmentCategoryProductListBinding.categoryProductRecycler.setLayoutManager(layoutMgr);
+        }else{
+            LinearLayoutManager layoutMgr = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+            //set Linearlayout manager for the recyclerview
+            fragmentCategoryProductListBinding.categoryProductRecycler.setLayoutManager(layoutMgr);
+
+            SnapHelper helper = new LinearSnapHelper();
+            helper.attachToRecyclerView(fragmentCategoryProductListBinding.categoryProductRecycler);
+
+        }
+
+
+
 
     return fragmentCategoryProductListBinding.getRoot();
     }
