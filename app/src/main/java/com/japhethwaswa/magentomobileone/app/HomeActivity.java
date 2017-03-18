@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -110,11 +111,11 @@ public class HomeActivity extends AppCompatActivity
          /**activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
          activityHomeBinding.homeTabs.setupWithViewPager(activityHomeBinding.viewPagerHome);**/
 
-        //TODO on load manager finish activate menu update
+        //load manager finish activate menu update
         navMenuManager = new NavMenuManager(this);
         //navMenuManager.updateMenu(activityHomeBinding.layoutNavViewMain.navView);
 
-
+//todo on item in fragment selected,kindly load the CategoryActivity passing the id of the category
     }
 
     @Override
@@ -171,13 +172,11 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        //TODO start the CategoryActivity and load fragment into it
+        //start the CategoryActivity and load fragment into it
         Intent intent = new Intent(this, CategoryActivity.class);
         intent.putExtra("categoryId", id);
         startActivity(intent);
 
-        /**DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-         drawer.closeDrawer(GravityCompat.START);**/
         activityHomeBinding.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -205,27 +204,8 @@ public class HomeActivity extends AppCompatActivity
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         //initiate categories menu update
         navMenuManager.updateMenuDeal(data, activityHomeBinding.layoutNavViewMain.navView,0);
-        doProdsCount();
     }
 
-    private void doProdsCount() {
-        String[] projection = {
-                JumboContract.ProductEntry.COLUMN_ENTITY_ID,
-        };
-        String selection = null;
-        String[] selectionArgs = null;
-        JumboQueryHandler handler = new JumboQueryHandler(getContentResolver()){
-            @Override
-            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                Log.e("jeff-prods",String.valueOf(cursor.getCount()));
-                while(cursor.moveToNext()){
-                    Log.e("jeff-entity",cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_ENTITY_ID)));
-                }
-                cursor.close();
-            }
-        };
-        handler.startQuery(34,null,JumboContract.ProductEntry.CONTENT_URI,projection,null,null,null);
-    }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {

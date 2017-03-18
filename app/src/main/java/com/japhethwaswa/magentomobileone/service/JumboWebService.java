@@ -336,6 +336,8 @@ public class JumboWebService {
                 if (result == -1) {
                     this.startInsert(7, null, JumboContract.CategoryEntry.CONTENT_URI, values);
                 }
+
+                //todo comment below line if cpu consumption is high
                 //get sub category dataa and products
                 serviceSubCategoryData(context, category.getEntity_id(), category.getEntity_id(), itemsCounted, itemsOffsets);
             }

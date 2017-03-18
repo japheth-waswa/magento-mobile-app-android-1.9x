@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.recyclerview.CategoriesRecyclerViewAdapter;
+import com.japhethwaswa.magentomobileone.adapter.recyclerview.CategoryProductsRecyclerViewAdapter;
 import com.japhethwaswa.magentomobileone.app.CategoryActivity;
 import com.japhethwaswa.magentomobileone.databinding.ActivityCategoryBinding;
 import com.japhethwaswa.magentomobileone.databinding.FragmentCategoryProductListBinding;
@@ -31,7 +32,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     Cursor cursor;
     private static final int URL_LOADER = 9;
     int categoryId;
-    private CategoriesRecyclerViewAdapter categoriesRecyclerViewAdapter;
+    private CategoryProductsRecyclerViewAdapter categoryProductsRecyclerViewAdapter;
     private FragmentCategoryProductListBinding fragmentCategoryProductListBinding;
     ActivityCategoryBinding activityCategoryBinding;
     public CategoryActivity catActivity;
@@ -69,8 +70,8 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
 
         //setup the adapter
-        categoriesRecyclerViewAdapter = new CategoriesRecyclerViewAdapter(cursor);
-        fragmentCategoryProductListBinding.categoryProductRecycler.setAdapter(categoriesRecyclerViewAdapter);
+        categoryProductsRecyclerViewAdapter = new CategoryProductsRecyclerViewAdapter(cursor);
+        fragmentCategoryProductListBinding.categoryProductRecycler.setAdapter(categoryProductsRecyclerViewAdapter);
 
         //update nav menu
         navMenuManager = new NavMenuManager(getActivity());
@@ -135,17 +136,17 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         //todo fetch products using the categoryId provided
         String[] projection = {
-                JumboContract.MainEntry.COLUMN_CATEGORY_ID,
-                JumboContract.MainEntry.COLUMN_TITLE,
-                JumboContract.MainEntry.COLUMN_IMAGE_URL
+                JumboContract.ProductEntry.COLUMN_ICON,
+                JumboContract.ProductEntry.COLUMN_NAME
         };
         //String selection = JumboContract.MainEntry.COLUMN_SECTION + "=?";
         String selection = null;
         //String[] selectionArgs = {"4"};
         String[] selectionArgs = null;
-        String orderBy = JumboContract.MainEntry.COLUMN_KEY_HOME;
+        String orderBy = null;
+        //String orderBy = JumboContract.MainEntry.COLUMN_KEY_HOME;
 
-        return new CursorLoader(this.getActivity(), JumboContract.MainEntry.CONTENT_URI, projection,selection,selectionArgs,orderBy);
+        return new CursorLoader(this.getActivity(), JumboContract.ProductEntry.CONTENT_URI, projection,selection,selectionArgs,orderBy);
     }
 
     @Override
@@ -154,7 +155,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         if(data.getCount() > 0){
             fragmentCategoryProductListBinding.categoryProdsFragPageLoader.stopProgress();
         }
-        categoriesRecyclerViewAdapter.setCursor(data);
+        categoryProductsRecyclerViewAdapter.setCursor(data);
 
         //update nav menu
         navMenuManager.updateMenu(activityCategoryBinding.layoutNavViewMain.navView,categoryId);
@@ -162,7 +163,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        categoriesRecyclerViewAdapter.setCursor(null);
+        categoryProductsRecyclerViewAdapter.setCursor(null);
     }
 
 
