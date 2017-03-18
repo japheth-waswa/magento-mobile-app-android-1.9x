@@ -32,6 +32,7 @@ import com.japhethwaswa.magentomobileone.adapter.HomeTextTabsAdapter;
 import com.japhethwaswa.magentomobileone.databinding.ActivityHomeBinding;
 import com.japhethwaswa.magentomobileone.databinding.ContentActivityHomeBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
+import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 import com.japhethwaswa.magentomobileone.fragment.CategoriesFramentPager;
 import com.japhethwaswa.magentomobileone.fragment.HomeFragmentPager;
 import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
@@ -204,6 +205,26 @@ public class HomeActivity extends AppCompatActivity
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         //initiate categories menu update
         navMenuManager.updateMenuDeal(data, activityHomeBinding.layoutNavViewMain.navView,0);
+        doProdsCount();
+    }
+
+    private void doProdsCount() {
+        String[] projection = {
+                JumboContract.ProductEntry.COLUMN_ENTITY_ID,
+        };
+        String selection = null;
+        String[] selectionArgs = null;
+        JumboQueryHandler handler = new JumboQueryHandler(getContentResolver()){
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                Log.e("jeff-prods",String.valueOf(cursor.getCount()));
+                while(cursor.moveToNext()){
+                    Log.e("jeff-entity",cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_ENTITY_ID)));
+                }
+                cursor.close();
+            }
+        };
+        handler.startQuery(34,null,JumboContract.ProductEntry.CONTENT_URI,projection,null,null,null);
     }
 
     @Override

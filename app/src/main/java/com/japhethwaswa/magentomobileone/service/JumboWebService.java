@@ -37,6 +37,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class JumboWebService {
 
@@ -334,7 +337,7 @@ public class JumboWebService {
                     this.startInsert(7, null, JumboContract.CategoryEntry.CONTENT_URI, values);
                 }
                 //get sub category dataa and products
-                serviceSubCategoryData(context,category.getEntity_id(),category.getEntity_id(),itemsCounted,itemsOffsets);
+                serviceSubCategoryData(context, category.getEntity_id(), category.getEntity_id(), itemsCounted, itemsOffsets);
             }
         };
 
@@ -381,7 +384,7 @@ public class JumboWebService {
         //fetch these categories/products
         Resources res = context.getResources();
         String relativeUrl = res.getString(R.string.jumbo_top_categories);
-        relativeUrl = relativeUrl + "/id/" + categoryId + "/offset/"+ itemsOffset +"/count/" + itemsCount;
+        relativeUrl = relativeUrl + "/id/" + categoryId + "/offset/" + itemsOffset + "/count/" + itemsCount;
 
         AndroidNetworking.get(getAbsoluteUrl(context, relativeUrl))
                 .setTag("jumboCategoriesProducts")
@@ -532,14 +535,14 @@ public class JumboWebService {
 
                         if (name.equalsIgnoreCase("item") && category != null) {
                             //update,insert category
-                            //updateInsertCategories(context, category);
+                            updateInsertCategories(context, category);
                             //set null
                             category = null;
                         }
                         if (name.equalsIgnoreCase("item") && product != null) {
                             //update,insert category
-                            updateInsertProduct(context, product,parentCategory);
-                            
+                            updateInsertProduct(context, product, parentCategory);
+
                             //set null
                             product = null;
                         }
@@ -562,33 +565,80 @@ public class JumboWebService {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor;
         Boolean isUpdate = false;
+        String previousCategories = null;
+        String allCategoryIds;
 
-        //todo use product table contract
-        //todo deal with the category id appropriately
-        //todo ensure the cursor fetched determines whether its an insert or update
-        Log.e("jeff-waswa",product.getName());
+        //use product table contract
+        //deal with the category id appropriately
+        //ensure the cursor fetched determines whether its an insert or update
 
         String[] projection = {
-                JumboContract.ProductEntry.COLUMN_ENTITY_ID,
+                JumboContract.ProductEntry.COLUMN_CATEGORY_IDS,
         };
         String selection = JumboContract.ProductEntry.COLUMN_ENTITY_ID + "=?";
         String[] selectionArgs = {product.getEntity_id()};
 
         cursor = db.query(JumboContract.ProductEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
 
-       if(cursor.getCount() > 0){
-           isUpdate = true;
-       }
+        if (cursor != null && cursor.getCount() > 0) {
+            isUpdate = true;
+            while (cursor.moveToNext()) {
+                previousCategories = cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_CATEGORY_IDS));
+            }
+        }
         cursor.close();
         db.close();
 
-        if(isUpdate == true){
-            //perfom update
+
+        //new category_ids field using the previous present values
+        if (previousCategories != null) {
+            List<String> categoryIdsArray = new ArrayList<>(Arrays.asList(previousCategories.split(",")));
+
+            if (!categoryIdsArray.contains(parentCategory)) {
+                //add if not available
+                categoryIdsArray.add(parentCategory);
+            }
+
+            allCategoryIds = android.text.TextUtils.join(",", categoryIdsArray);
+        } else {
+            allCategoryIds = parentCategory;
         }
 
-        if(isUpdate == false){
-            //perfom insert
-        }
+
+
+        JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
+
+         ContentValues valuesed = new ContentValues();
+         valuesed.put(JumboContract.ProductEntry.COLUMN_ENTITY_ID, product.getEntity_id());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_NAME, product.getName());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_ENTITY_TYPE, product.getEntity_type());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_SHORT_DESCRIPTION, product.getShort_description());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_DESCRIPTION, product.getDescription());//marked
+         valuesed.put(JumboContract.ProductEntry.COLUMN_LINK, product.getLink());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_IN_STOCK, product.getIn_stock());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_IS_SALABLE, product.getIs_salable());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_HAS_GALLERY, product.getHas_gallery());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_HAS_OPTIONS, product.getHas_options());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_RATING_SUMMARY, product.getRating_summary());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_REVIEWS_COUNT, product.getReviews_count());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_PRICE_REGULAR, product.getPrice_regular());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL, product.getPrice_special());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_ICON, product.getIcon());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_MODIFICATION_TIME, product.getModification_time());
+         valuesed.put(JumboContract.ProductEntry.COLUMN_CATEGORY_IDS,allCategoryIds);
+
+         if(isUpdate == true){
+         //perfom update
+         String selectioned = JumboContract.ProductEntry.COLUMN_ENTITY_ID + "=?";
+         String[] selectionArgsed = {product.getEntity_id()};
+             handler.startUpdate(87,null,JumboContract.ProductEntry.CONTENT_URI,valuesed,selectioned,selectionArgsed);
+
+         }
+
+         if(isUpdate == false){
+         //perfom insert
+            handler.startInsert(86,null,JumboContract.ProductEntry.CONTENT_URI,valuesed);
+         }
 
     }
 
