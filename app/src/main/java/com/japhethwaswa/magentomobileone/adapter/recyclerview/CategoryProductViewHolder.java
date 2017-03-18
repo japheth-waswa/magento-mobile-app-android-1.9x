@@ -3,6 +3,7 @@ package com.japhethwaswa.magentomobileone.adapter.recyclerview;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 import com.japhethwaswa.magentomobileone.databinding.CategoriesViewPagerItemBinding;
@@ -28,6 +29,8 @@ public class CategoryProductViewHolder extends RecyclerView.ViewHolder {
         //get title and image url
         product.setName(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_NAME)));
         product.setIcon(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_ICON)));
+        product.setPrice_regular(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_PRICE_REGULAR)));
+        product.setPrice_special(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL)));
         categoryProductItemBinding.setProduct(product);
 
     }

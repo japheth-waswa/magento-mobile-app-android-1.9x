@@ -518,12 +518,12 @@ public class JumboWebService {
                                 product.setReviews_count(myParser.nextText());
                             }
 
-                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_PRICE_REGULAR)) {
-                                product.setPrice_regular(myParser.nextText());
+                            if (name.equalsIgnoreCase("price")) {
+                                product.setPrice_regular(myParser.getAttributeValue(null,"regular"));
                             }
 
-                            if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL)) {
-                                product.setPrice_special(myParser.nextText());
+                            if (name.equalsIgnoreCase("price")) {
+                                product.setPrice_special(myParser.getAttributeValue(null,"special"));
                             }
 
                             if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_ICON)) {
@@ -582,7 +582,7 @@ public class JumboWebService {
 
         cursor = db.query(JumboContract.ProductEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
 
-        if (cursor != null && cursor.getCount() > 0) {
+        if (cursor.getCount() == 1) {
             isUpdate = true;
             while (cursor.moveToNext()) {
                 previousCategories = cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_CATEGORY_IDS));

@@ -11,6 +11,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -91,6 +92,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             numItems = 3;
         }
         GridLayoutManager layoutMgr = new GridLayoutManager(getActivity(),numItems);
+        //LinearLayoutManager layoutMgrr = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false);
 
         //set layout manager for the recyclerview
         fragmentCategoryProductListBinding.categoryProductRecycler.setLayoutManager(layoutMgr);
@@ -137,7 +139,11 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         //todo fetch products using the categoryId provided
         String[] projection = {
                 JumboContract.ProductEntry.COLUMN_ICON,
-                JumboContract.ProductEntry.COLUMN_NAME
+                JumboContract.ProductEntry.COLUMN_NAME,
+                JumboContract.ProductEntry.COLUMN_ENTITY_ID,
+                JumboContract.ProductEntry.COLUMN_PRICE_REGULAR,
+                JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL,
+                JumboContract.ProductEntry.COLUMN_ENTITY_TYPE
         };
         //String selection = JumboContract.MainEntry.COLUMN_SECTION + "=?";
         String selection = null;
@@ -156,6 +162,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             fragmentCategoryProductListBinding.categoryProdsFragPageLoader.stopProgress();
         }
         categoryProductsRecyclerViewAdapter.setCursor(data);
+
 
         //update nav menu
         navMenuManager.updateMenu(activityCategoryBinding.layoutNavViewMain.navView,categoryId);
