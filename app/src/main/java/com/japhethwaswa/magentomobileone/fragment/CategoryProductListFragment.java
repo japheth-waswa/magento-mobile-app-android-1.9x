@@ -2,6 +2,7 @@ package com.japhethwaswa.magentomobileone.fragment;
 
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -45,6 +46,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     ActivityCategoryBinding activityCategoryBinding;
     public CategoryActivity catActivity;
     private NavMenuManager navMenuManager;
+    private int recyclerViewLastItemPosition;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,7 +65,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        //TODO start background job to fetch this category products from magento api
+        //TODO start background job to fetch this category products from magento api(done)
         fragmentCategoryProductListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_category_product_list, container, false);
 
         //get the passed category id
@@ -73,6 +75,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
         if (savedInstanceState != null) {
             categoryId = savedInstanceState.getInt("categoryIdFrag");
+            recyclerViewLastItemPosition = savedInstanceState.getInt("recyclerViewLastItemPosition");
         }
 
         //get the categoryactivity
@@ -83,8 +86,13 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
 
         if (savedInstanceState == null) {
-            //send background job to fetch this category products and sub categories(100 products)-only if is first time
-            catActivity.jobManager.addJobInBackground(new RetrieveCategoriesProducts(false, String.valueOf(categoryId), String.valueOf(categoryId), "20", "0"));
+            Resources res = getActivity().getResources();
+            String offsetAtCategory = String.valueOf((Integer.valueOf(res.getString(R.string.jumbo_product_count))));
+            //send background job to fetch this category products and sub categories(20 products)-only if is first time
+            catActivity.jobManager.addJobInBackground(new RetrieveCategoriesProducts(false, String.valueOf(categoryId), String.valueOf(categoryId), "20", offsetAtCategory));
+
+            //set recyclerview expected last item position
+            recyclerViewLastItemPosition = Integer.valueOf(offsetAtCategory)-1;
         }
 
         //todo remember to save categoryId on screen rotation(done)
@@ -97,7 +105,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
 
         //setup the adapter
-        categoryProductsRecyclerViewAdapter = new CategoryProductsRecyclerViewAdapter(cursor);
+        categoryProductsRecyclerViewAdapter = new CategoryProductsRecyclerViewAdapter(cursor,this);
         fragmentCategoryProductListBinding.categoryProductRecycler.setAdapter(categoryProductsRecyclerViewAdapter);
 
         //update nav menu only once for each category load to prevent ui errors
@@ -174,6 +182,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("categoryIdFrag", categoryId);
+        outState.putInt("recyclerViewLastItemPosition", recyclerViewLastItemPosition);
     }
 
     @Override
@@ -204,6 +213,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         if (data.getCount() > 0) {
+            Log.e("jeff-waswa-count",String.valueOf(data.getCount()));
             fragmentCategoryProductListBinding.categoryProdsFragPageLoader.stopProgress();
         }
         categoryProductsRecyclerViewAdapter.setCursor(data);
@@ -234,4 +244,23 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     /** public void setActivityLayout(ActivityCategoryBinding activityCategoryBinding) {
      this.activityCategoryBinding = activityCategoryBinding;
      }**/
+
+    public void recyclerLastItem(int recyclerViewLastItemPositionCurrent){
+
+        //before setting ensure its larger than the current itemPosition and update
+        if(recyclerViewLastItemPositionCurrent >= recyclerViewLastItemPosition){
+
+            //set new offset
+            String currentItemsOffset = String.valueOf((recyclerViewLastItemPositionCurrent+1));
+
+            //set new expected recyclerview last item
+            recyclerViewLastItemPosition = recyclerViewLastItemPositionCurrent+20;
+
+            //then do bg job
+            //send background job to fetch this category products and sub categories(20 products)-only if is first time
+            catActivity.jobManager.addJobInBackground(new RetrieveCategoriesProducts(false, String.valueOf(categoryId), String.valueOf(categoryId), "20", currentItemsOffset));
+
+        }
+
+    }
 }

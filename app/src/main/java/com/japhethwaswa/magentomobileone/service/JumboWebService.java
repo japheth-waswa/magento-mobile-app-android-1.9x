@@ -381,7 +381,7 @@ public class JumboWebService {
     //service retrieve sub-category products and mini-categories
     public static void serviceSubCategoryData(final Context context, String categoryId, final String parentCategory, final String itemsCount, final String itemsOffset) {
         //todo remember to save my_parent_id to category
-        //todo remember to save both id's with the product ie product_ids(4,2)
+        //todo remember to save both id's with the product ie product_ids(-4-,-2-)
 
         //fetch these categories/products
         Resources res = context.getResources();

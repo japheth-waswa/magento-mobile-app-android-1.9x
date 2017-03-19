@@ -4,19 +4,23 @@ package com.japhethwaswa.magentomobileone.adapter.recyclerview;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.japhethwaswa.magentomobileone.R;
+import com.japhethwaswa.magentomobileone.fragment.CategoryProductListFragment;
 
 public class CategoryProductsRecyclerViewAdapter extends RecyclerView.Adapter<CategoryProductViewHolder> {
 
     private Cursor cursor;
+    private CategoryProductListFragment categoryProductListFragment;
 
-    public CategoryProductsRecyclerViewAdapter(Cursor cursor) {
+    public CategoryProductsRecyclerViewAdapter(Cursor cursor, CategoryProductListFragment categoryProductListFragment) {
 
         this.cursor = cursor;
+        this.categoryProductListFragment = categoryProductListFragment;
     }
 
     @Override
@@ -31,6 +35,18 @@ public class CategoryProductsRecyclerViewAdapter extends RecyclerView.Adapter<Ca
     public void onBindViewHolder(CategoryProductViewHolder holder, int position) {
         cursor.moveToPosition(position);
         holder.bind(cursor);
+
+        //official way wait for them to hit the end of items and send bg job
+        /**if(position == cursor.getCount()-1){
+            categoryProductListFragment.recyclerLastItem(position);
+
+        }**/
+
+        //sneaky way send bg job when they hit the 5th-last item
+        if(position == cursor.getCount()-6){
+            categoryProductListFragment.recyclerLastItem((cursor.getCount()-1));
+
+        }
     }
 
     @Override
