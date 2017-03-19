@@ -31,7 +31,7 @@ import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
 import com.japhethwaswa.magentomobileone.service.JumboWebService;
 
-public class CategoryProductListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class CategoryProductListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     Cursor cursor;
     private static final int URL_LOADER = 9;
     int categoryId;
@@ -46,13 +46,14 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         //TODO start background job to fetch this category products from magento api
-        fragmentCategoryProductListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_category_product_list,container,false);
+        fragmentCategoryProductListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_category_product_list, container, false);
 
         //get the passed category id
-        Bundle bundle =  getArguments();
+        Bundle bundle = getArguments();
         categoryId = bundle.getInt("categoryIdFrag");
+        int fromCatActivity = bundle.getInt("fromCatActivity");
 
-        if(savedInstanceState != null ){
+        if (savedInstanceState != null) {
             categoryId = savedInstanceState.getInt("categoryIdFrag");
         }
 
@@ -86,29 +87,29 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
         //initialize cursor loader
         getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
-
-        if(savedInstanceState == null ){
+        if (savedInstanceState == null) {
+            //restart loader
             getActivity().getSupportLoaderManager().restartLoader(URL_LOADER, null, this);
         }
 
 
         //get screen width
-        int  scrWidth = getScreenDimensions();
+        int scrWidth = getScreenDimensions();
         int numItems = 1;
 
-        if(scrWidth >= 800 ){
+        if (scrWidth >= 800) {
             numItems = 2;
         }
-        if(scrWidth >= 1280 ){
+        if (scrWidth >= 1280) {
             numItems = 3;
         }
 
-        if(scrWidth >= 800 ){
-            GridLayoutManager layoutMgr = new GridLayoutManager(getActivity(),numItems);
+        if (scrWidth >= 800) {
+            GridLayoutManager layoutMgr = new GridLayoutManager(getActivity(), numItems);
             //set Gridlayout manager for the recyclerview
             fragmentCategoryProductListBinding.categoryProductRecycler.setLayoutManager(layoutMgr);
-        }else{
-            LinearLayoutManager layoutMgr = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+        } else {
+            LinearLayoutManager layoutMgr = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
             //set Linearlayout manager for the recyclerview
             fragmentCategoryProductListBinding.categoryProductRecycler.setLayoutManager(layoutMgr);
 
@@ -118,9 +119,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         }
 
 
-
-
-    return fragmentCategoryProductListBinding.getRoot();
+        return fragmentCategoryProductListBinding.getRoot();
     }
 
     private void setToolBarCategoryTitle(int categoryId) {
@@ -137,7 +136,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         JumboQueryHandler handler = new JumboQueryHandler(getActivity().getContentResolver()) {
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                while(cursor.moveToNext()){
+                while (cursor.moveToNext()) {
                     toolbarTitle[0] = cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_LABEL)).toUpperCase();
                 }
                 activityCategoryBinding.btnNavToolbarTitle.setText(toolbarTitle[0]);
@@ -146,7 +145,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
         };
 
-        handler.startQuery(17, null, JumboContract.CategoryEntry.CONTENT_URI, projection, selection, selectionArgs,null);
+        handler.startQuery(17, null, JumboContract.CategoryEntry.CONTENT_URI, projection, selection, selectionArgs, null);
 
     }
 
@@ -154,7 +153,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("categoryIdFrag",categoryId);
+        outState.putInt("categoryIdFrag", categoryId);
     }
 
     @Override
@@ -173,26 +172,25 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         //String[] selectionArgs = {"4"};
 
         String dbCategoryId = String.valueOf(categoryId);
-        Log.e("jeff-waswa",dbCategoryId);
-        String[] selectionArgs = {"%"+dbCategoryId+"%"};
+        String[] selectionArgs = {"%-" + dbCategoryId + "-%"};
         String orderBy = null;
         //String orderBy = JumboContract.MainEntry.COLUMN_KEY_HOME;
 
 
-        return new CursorLoader(this.getActivity(), JumboContract.ProductEntry.CONTENT_URI, projection,selection,selectionArgs,orderBy);
+        return new CursorLoader(this.getActivity(), JumboContract.ProductEntry.CONTENT_URI, projection, selection, selectionArgs, orderBy);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        if(data.getCount() > 0){
+        if (data.getCount() > 0) {
             fragmentCategoryProductListBinding.categoryProdsFragPageLoader.stopProgress();
         }
         categoryProductsRecyclerViewAdapter.setCursor(data);
 
 
         //update nav menu
-        navMenuManager.updateMenu(activityCategoryBinding.layoutNavViewMain.navView,categoryId);
+        navMenuManager.updateMenu(activityCategoryBinding.layoutNavViewMain.navView, categoryId);
     }
 
     @Override
@@ -201,7 +199,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     }
 
 
-    public int getScreenDimensions(){
+    public int getScreenDimensions() {
         DisplayMetrics dm = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
         int width = dm.widthPixels;
@@ -216,7 +214,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     }
 
 
-   /** public void setActivityLayout(ActivityCategoryBinding activityCategoryBinding) {
-        this.activityCategoryBinding = activityCategoryBinding;
-    }**/
+    /** public void setActivityLayout(ActivityCategoryBinding activityCategoryBinding) {
+     this.activityCategoryBinding = activityCategoryBinding;
+     }**/
 }

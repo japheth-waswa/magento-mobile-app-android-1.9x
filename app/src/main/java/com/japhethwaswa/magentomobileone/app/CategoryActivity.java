@@ -195,6 +195,7 @@ public class CategoryActivity extends AppCompatActivity
 
         Bundle bundle = new Bundle();
         bundle.putInt("categoryIdFrag", categoryId);
+        bundle.putInt("fromCatActivity", 1);
         categoryProductListFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         //unique

@@ -596,14 +596,14 @@ public class JumboWebService {
         if (previousCategories != null) {
             List<String> categoryIdsArray = new ArrayList<>(Arrays.asList(previousCategories.split(",")));
 
-            if (!categoryIdsArray.contains(parentCategory)) {
+            if (!categoryIdsArray.contains("-"+parentCategory+"-")) {
                 //add if not available
-                categoryIdsArray.add(parentCategory);
+                categoryIdsArray.add("-"+parentCategory+"-");
             }
 
             allCategoryIds = android.text.TextUtils.join(",", categoryIdsArray);
         } else {
-            allCategoryIds = parentCategory;
+            allCategoryIds = "-"+parentCategory+"-";
         }
 
 
