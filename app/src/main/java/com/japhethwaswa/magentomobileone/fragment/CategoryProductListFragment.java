@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -20,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.recyclerview.CategoriesRecyclerViewAdapter;
 import com.japhethwaswa.magentomobileone.adapter.recyclerview.CategoryProductsRecyclerViewAdapter;
@@ -28,6 +30,9 @@ import com.japhethwaswa.magentomobileone.databinding.ActivityCategoryBinding;
 import com.japhethwaswa.magentomobileone.databinding.FragmentCategoryProductListBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
+import com.japhethwaswa.magentomobileone.job.RetrieveCategories;
+import com.japhethwaswa.magentomobileone.job.RetrieveCategoriesProducts;
+import com.japhethwaswa.magentomobileone.job.builder.MyJobsBuilder;
 import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
 import com.japhethwaswa.magentomobileone.service.JumboWebService;
 
@@ -40,6 +45,19 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     ActivityCategoryBinding activityCategoryBinding;
     public CategoryActivity catActivity;
     private NavMenuManager navMenuManager;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //StrictMode
+        StrictMode.VmPolicy vmPolicy = new StrictMode.VmPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build();
+        StrictMode.setVmPolicy(vmPolicy);
+        /**==============**/
+
+    }
 
     @Nullable
     @Override
@@ -64,12 +82,17 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         setToolBarCategoryTitle(categoryId);
 
 
-        //todo remember to save categoryId on screen rotation
-        //todo initialize cursor loader after categoryId has been set.
+        if (savedInstanceState == null) {
+            //send background job to fetch this category products and sub categories(100 products)-only if is first time
+            catActivity.jobManager.addJobInBackground(new RetrieveCategoriesProducts(false, String.valueOf(categoryId), String.valueOf(categoryId), "20", "0"));
+        }
+
+        //todo remember to save categoryId on screen rotation(done)
+        //todo initialize cursor loader after categoryId has been set(done)
 
 
-        //todo create custom adapter for the recyclerview
-        //todo cursor to fetch filters for spinner ie sub-categories
+        //todo create custom adapter for the recyclerview(done)
+        //todo cursor to fetch filters for spinners ie sub-categories
         //todo have a local variable to store the category filter id and retrieve in onsaveinsance
 
 
@@ -77,13 +100,9 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         categoryProductsRecyclerViewAdapter = new CategoryProductsRecyclerViewAdapter(cursor);
         fragmentCategoryProductListBinding.categoryProductRecycler.setAdapter(categoryProductsRecyclerViewAdapter);
 
-        //update nav menu
+        //update nav menu only once for each category load to prevent ui errors
         navMenuManager = new NavMenuManager(getActivity());
-
-
-        //send background job to fetch this category products and sub categories(100 products)
-        //jobManager.addJobInBackground(new RetrieveCategoriesProducts(true,null,null,null,null));
-
+        navMenuManager.updateMenu(activityCategoryBinding.layoutNavViewMain.navView, categoryId);
 
         //initialize cursor loader
         getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
@@ -117,6 +136,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             helper.attachToRecyclerView(fragmentCategoryProductListBinding.categoryProductRecycler);
 
         }
+
 
 
         return fragmentCategoryProductListBinding.getRoot();
@@ -188,9 +208,6 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         }
         categoryProductsRecyclerViewAdapter.setCursor(data);
 
-
-        //update nav menu
-        navMenuManager.updateMenu(activityCategoryBinding.layoutNavViewMain.navView, categoryId);
     }
 
     @Override

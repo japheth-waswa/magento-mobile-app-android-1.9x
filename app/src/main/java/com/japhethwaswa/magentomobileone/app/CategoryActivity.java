@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.HomeTextTabsAdapter;
 import com.japhethwaswa.magentomobileone.databinding.ActivityCategoryBinding;
@@ -30,6 +31,7 @@ import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.fragment.CategoriesFramentPager;
 import com.japhethwaswa.magentomobileone.fragment.CategoryProductListFragment;
 import com.japhethwaswa.magentomobileone.fragment.HomeFragmentPager;
+import com.japhethwaswa.magentomobileone.job.builder.MyJobsBuilder;
 import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
 
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ import java.util.List;
 public class CategoryActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
+    public JobManager jobManager;
     public ActivityCategoryBinding activityCategoryBinding;
     private NavMenuManager navMenuManager;
     private static final int URL_LOADER = 0;
@@ -68,8 +71,8 @@ public class CategoryActivity extends AppCompatActivity
             startActivity(homeIntent);
             finish();
         }**/
-
-
+//initialize job manager
+        jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
         activityCategoryBinding = DataBindingUtil.setContentView(this, R.layout.activity_category);
 
         if (savedInstanceState == null) {
