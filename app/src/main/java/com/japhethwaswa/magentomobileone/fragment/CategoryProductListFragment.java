@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
@@ -152,8 +153,23 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
         }
 
-        //set category filters
+        //set category filters spinner
         setFilterCategories();
+
+        /**set filter spinner**/
+        ArrayAdapter<CharSequence> filtersAdapter = ArrayAdapter.createFromResource(getContext(),R.array.product_filters,android.R.layout.simple_spinner_item);
+        //specify the layout to use when the list of choices appears
+        filtersAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //apply the adapter to the spinner
+        activityCategoryBinding.filterSpinner.setAdapter(filtersAdapter);
+
+        /**set sort spinner**/
+        ArrayAdapter<CharSequence> sortAdapter = ArrayAdapter.createFromResource(getContext(),R.array.sort_filters,android.R.layout.simple_spinner_item);
+        //specify the layout to use when the list of choices appears
+        sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //apply the adapter to the spinner
+        activityCategoryBinding.sortSpinner.setAdapter(sortAdapter);
+
 
         return fragmentCategoryProductListBinding.getRoot();
     }

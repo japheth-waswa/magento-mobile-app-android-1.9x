@@ -21,7 +21,7 @@
                     android:layout_margin="5dp"
                     android:text="@{category.label}"
                     android:tag="@{category.entity_id}"
-                    android:textSize="15sp"
+                    android:textSize="16sp"
                     android:textColor="@color/black"/>
     </LinearLayout>
 

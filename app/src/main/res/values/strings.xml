@@ -13,4 +13,16 @@
     <string name="action_settings">Settings</string>
     <string name="sign_in">Sign in</string>
     <string name="skip">SKIP</string>
+
+    <string-array name="product_filters">
+        <item>POSITION</item>
+        <item>NAME</item>
+        <item>PRICE</item>
+    </string-array>
+
+    <string-array name="sort_filters">
+        <item>DESC</item>
+        <item>ASC</item>
+    </string-array>
+
 </resources>
