@@ -79,8 +79,17 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         //update nav menu
         navMenuManager = new NavMenuManager(getActivity());
 
+
+        //send background job to fetch this category products and sub categories(100 products)
+        //jobManager.addJobInBackground(new RetrieveCategoriesProducts(true,null,null,null,null));
+
+
         //initialize cursor loader
         getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
+
+        if(savedInstanceState == null ){
+            getActivity().getSupportLoaderManager().restartLoader(URL_LOADER, null, this);
+        }
 
 
         //get screen width
@@ -160,11 +169,15 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
                 JumboContract.ProductEntry.COLUMN_ENTITY_TYPE
         };
         //String selection = JumboContract.MainEntry.COLUMN_SECTION + "=?";
-        String selection = null;
+        String selection = JumboContract.ProductEntry.COLUMN_CATEGORY_IDS + " LIKE ?";
         //String[] selectionArgs = {"4"};
-        String[] selectionArgs = null;
+
+        String dbCategoryId = String.valueOf(categoryId);
+        Log.e("jeff-waswa",dbCategoryId);
+        String[] selectionArgs = {"%"+dbCategoryId+"%"};
         String orderBy = null;
         //String orderBy = JumboContract.MainEntry.COLUMN_KEY_HOME;
+
 
         return new CursorLoader(this.getActivity(), JumboContract.ProductEntry.CONTENT_URI, projection,selection,selectionArgs,orderBy);
     }
