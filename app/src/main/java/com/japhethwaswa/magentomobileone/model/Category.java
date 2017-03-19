@@ -16,6 +16,14 @@ public class Category extends BaseObservable{
     private String icon;
     private String modification_time;
 
+    public Category() {
+    }
+
+    public Category(int entityid, String label) {
+        this.label = label;
+        this.entity_id = String.valueOf(entityid);
+    }
+
     @Bindable
     public String getModification_time() {
         return modification_time;

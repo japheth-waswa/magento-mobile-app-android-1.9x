@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 
 import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
+import com.japhethwaswa.magentomobileone.adapter.SpinnerCategoryListAdapter;
 import com.japhethwaswa.magentomobileone.adapter.recyclerview.CategoriesRecyclerViewAdapter;
 import com.japhethwaswa.magentomobileone.adapter.recyclerview.CategoryProductsRecyclerViewAdapter;
 import com.japhethwaswa.magentomobileone.app.CategoryActivity;
@@ -34,6 +35,8 @@ import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 import com.japhethwaswa.magentomobileone.job.RetrieveCategories;
 import com.japhethwaswa.magentomobileone.job.RetrieveCategoriesProducts;
 import com.japhethwaswa.magentomobileone.job.builder.MyJobsBuilder;
+import com.japhethwaswa.magentomobileone.model.Category;
+import com.japhethwaswa.magentomobileone.model.CategoryList;
 import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
 import com.japhethwaswa.magentomobileone.service.JumboWebService;
 
@@ -47,6 +50,9 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     public CategoryActivity catActivity;
     private NavMenuManager navMenuManager;
     private int recyclerViewLastItemPosition;
+    static final int ALL_CATEGORY_FILTERS = -1;
+    CategoryList categoryList = new CategoryList();
+    SpinnerCategoryListAdapter spinnerCategoryListAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,6 +92,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
 
         if (savedInstanceState == null) {
+
             Resources res = getActivity().getResources();
             String offsetAtCategory = String.valueOf((Integer.valueOf(res.getString(R.string.jumbo_product_count))));
             //send background job to fetch this category products and sub categories(20 products)-only if is first time
@@ -145,10 +152,57 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
         }
 
-
+        //set category filters
+        setFilterCategories();
 
         return fragmentCategoryProductListBinding.getRoot();
     }
+
+
+    //get categories for filter
+    private void setFilterCategories() {
+        //get cursor with all filter categories
+        final JumboQueryHandler handler = new JumboQueryHandler(getContext().getContentResolver()){
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+
+                if(cursor != null && cursor.getCount() > 0){
+                    activityCategoryBinding.categorySpinner.setVisibility(View.VISIBLE);
+                    int i = 0;
+                    categoryList.ItemList.add(i,new Category(ALL_CATEGORY_FILTERS,"All Categories"));
+                    i++;
+                    while(cursor.moveToNext()){
+                        int entityid = Integer.valueOf(cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_ENTITY_ID)));
+                        String  label = cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_LABEL));
+                        categoryList.ItemList.add(i,new Category(entityid,label));
+                        i++;
+                    }
+                }else{
+                    activityCategoryBinding.categorySpinner.setVisibility(View.INVISIBLE);
+                }
+                cursor.close();
+
+                if(categoryList.ItemList.size() >0){
+                    spinnerCategoryListAdapter =  null;
+                    spinnerCategoryListAdapter = new SpinnerCategoryListAdapter(categoryList.ItemList);
+                    activityCategoryBinding.categorySpinner.setAdapter(spinnerCategoryListAdapter);
+                }
+
+
+            }
+        };
+        String[] projection = {
+                JumboContract.CategoryEntry.COLUMN_LABEL,
+                JumboContract.CategoryEntry.COLUMN_ENTITY_ID
+        };
+
+        String selection = JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID + "=?";
+        String[] selectionArgs = {String.valueOf(categoryId)};
+
+        handler.startQuery(45,null,JumboContract.CategoryEntry.CONTENT_URI,projection,selection,selectionArgs,null);
+    }
+
+
 
     private void setToolBarCategoryTitle(int categoryId) {
 
