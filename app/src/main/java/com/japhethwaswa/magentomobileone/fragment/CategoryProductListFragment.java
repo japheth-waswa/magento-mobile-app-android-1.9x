@@ -98,16 +98,16 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         activityCategoryBinding = catActivity.activityCategoryBinding;
         setToolBarCategoryTitle(categoryId);
 
-
+        Resources res = getActivity().getResources();
+        final String offsetAtCategory = String.valueOf((Integer.valueOf(res.getString(R.string.jumbo_product_count))));
         if (savedInstanceState == null) {
 
-            Resources res = getActivity().getResources();
-            String offsetAtCategory = String.valueOf((Integer.valueOf(res.getString(R.string.jumbo_product_count))));
+
             //send background job to fetch this category products and sub categories(20 products)-only if is first time
             catActivity.jobManager.addJobInBackground(new RetrieveCategoriesProducts(false, String.valueOf(categoryId), String.valueOf(categoryId), "20", offsetAtCategory));
 
             //set recyclerview expected last item position
-            recyclerViewLastItemPosition = Integer.valueOf(offsetAtCategory)-1;
+            recyclerViewLastItemPosition = Integer.valueOf(offsetAtCategory) - 1;
         }
 
         //todo remember to save categoryId on screen rotation(done)
@@ -120,7 +120,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
 
         //setup the adapter
-        categoryProductsRecyclerViewAdapter = new CategoryProductsRecyclerViewAdapter(cursor,this);
+        categoryProductsRecyclerViewAdapter = new CategoryProductsRecyclerViewAdapter(cursor, this);
         fragmentCategoryProductListBinding.categoryProductRecycler.setAdapter(categoryProductsRecyclerViewAdapter);
 
         //update nav menu only once for each category load to prevent ui errors
@@ -168,19 +168,25 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 categoryFilterValuePosition = position;
+                //reset recyclerlastitem position to 0
+                recyclerViewLastItemPosition = 0;
 
-                if(activityCategoryBinding.categorySpinner.getSelectedItemId() >= 0){
+                if (position >= 0) {
 
-                    int categoryFilterId = (int)activityCategoryBinding.categorySpinner.getSelectedItemId();
+                    int categoryFilterId = (int) activityCategoryBinding.categorySpinner.getSelectedItemId();
 
-                            if(categoryFilterId != categoryFilterValue){
-                                categoryFilterValue = (int)activityCategoryBinding.categorySpinner.getSelectedItemId();
-                                //todo restart loader
-                                Log.e("jeff-category",String.valueOf(categoryFilterValue));
-                            }
+                    if (categoryFilterId != categoryFilterValue) {
+                        categoryFilterValue = (int) activityCategoryBinding.categorySpinner.getSelectedItemId();
+                        //send bg job to fetch categories in this filter
+                        catActivity.jobManager.addJobInBackground(new RetrieveCategoriesProducts(false, String.valueOf(categoryFilterValue), String.valueOf(categoryFilterValue), "20", "0"));
 
-
+                    }
+                } else {
+                    categoryFilterValue = -1;
                 }
+                //restart loader
+                getActivity().getSupportLoaderManager().restartLoader(URL_LOADER, null, CategoryProductListFragment.this);
+
             }
 
             @Override
@@ -190,7 +196,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         });
 
         /**set filter spinner**/
-        ArrayAdapter<CharSequence> filtersAdapter = ArrayAdapter.createFromResource(getContext(),R.array.product_filters,android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> filtersAdapter = ArrayAdapter.createFromResource(getContext(), R.array.product_filters, android.R.layout.simple_spinner_item);
         //specify the layout to use when the list of choices appears
         filtersAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //apply the adapter to the spinner
@@ -199,10 +205,10 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position > 0){
+                if (position > 0) {
                     genericFilterValue = position;
-                    Log.e("jeff-generic",String.valueOf(genericFilterValue));
-                    //todo restart loader
+                    //restart loader
+                    getActivity().getSupportLoaderManager().restartLoader(URL_LOADER, null, CategoryProductListFragment.this);
                 }
             }
 
@@ -213,7 +219,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         });
 
         /**set sort spinner**/
-        ArrayAdapter<CharSequence> sortAdapter = ArrayAdapter.createFromResource(getContext(),R.array.sort_filters,android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> sortAdapter = ArrayAdapter.createFromResource(getContext(), R.array.sort_filters, android.R.layout.simple_spinner_item);
         //specify the layout to use when the list of choices appears
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //apply the adapter to the spinner
@@ -221,11 +227,11 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         activityCategoryBinding.sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position > 0){
+                if (position > 0) {
 
-                    //todo restart loader and set the
                     sortFilterValue = position;
-                    Log.e("jeff-sort",String.valueOf(sortFilterValue));
+                    //restart loader
+                    getActivity().getSupportLoaderManager().restartLoader(URL_LOADER, null, CategoryProductListFragment.this);
                 }
             }
 
@@ -242,33 +248,33 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     //get categories for filter
     private void setFilterCategories() {
         //get cursor with all filter categories
-        final JumboQueryHandler handler = new JumboQueryHandler(getContext().getContentResolver()){
+        final JumboQueryHandler handler = new JumboQueryHandler(getContext().getContentResolver()) {
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 
-                if(cursor != null && cursor.getCount() > 0){
+                if (cursor != null && cursor.getCount() > 0) {
                     activityCategoryBinding.categorySpinner.setVisibility(View.VISIBLE);
                     int i = 0;
-                    categoryList.ItemList.add(i,new Category(ALL_CATEGORY_FILTERS,"All Categories"));
+                    categoryList.ItemList.add(i, new Category(ALL_CATEGORY_FILTERS, "CATEGORIES"));
                     i++;
-                    while(cursor.moveToNext()){
+                    while (cursor.moveToNext()) {
                         int entityid = Integer.valueOf(cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_ENTITY_ID)));
-                        String  label = cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_LABEL));
-                        categoryList.ItemList.add(i,new Category(entityid,label));
+                        String label = cursor.getString(cursor.getColumnIndex(JumboContract.CategoryEntry.COLUMN_LABEL));
+                        categoryList.ItemList.add(i, new Category(entityid, label));
                         i++;
                     }
-                }else{
+                } else {
                     activityCategoryBinding.categorySpinner.setVisibility(View.INVISIBLE);
                 }
                 cursor.close();
 
-                if(categoryList.ItemList.size() >0){
-                    spinnerCategoryListAdapter =  null;
+                if (categoryList.ItemList.size() > 0) {
+                    spinnerCategoryListAdapter = null;
                     spinnerCategoryListAdapter = new SpinnerCategoryListAdapter(categoryList.ItemList);
                     activityCategoryBinding.categorySpinner.setAdapter(spinnerCategoryListAdapter);
 
                     //set the previous value saved during state change
-                    if(categoryFilterValue != -1){
+                    if (categoryFilterValue != -1) {
                         activityCategoryBinding.categorySpinner.setSelection(categoryFilterValuePosition);
 
                     }
@@ -285,9 +291,8 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         String selection = JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID + "=?";
         String[] selectionArgs = {String.valueOf(categoryId)};
 
-        handler.startQuery(45,null,JumboContract.CategoryEntry.CONTENT_URI,projection,selection,selectionArgs,null);
+        handler.startQuery(45, null, JumboContract.CategoryEntry.CONTENT_URI, projection, selection, selectionArgs, null);
     }
-
 
 
     private void setToolBarCategoryTitle(int categoryId) {
@@ -343,6 +348,11 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         //String[] selectionArgs = {"4"};
 
         String dbCategoryId = String.valueOf(categoryId);
+        if (categoryFilterValue != -1) {
+            dbCategoryId = String.valueOf(categoryFilterValue);
+        }
+
+
         String[] selectionArgs = {"%-" + dbCategoryId + "-%"};
         String orderBy = null;
         //String orderBy = JumboContract.MainEntry.COLUMN_KEY_HOME;
@@ -355,10 +365,12 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         if (data.getCount() > 0) {
-            Log.e("jeff-waswa-count",String.valueOf(data.getCount()));
+            Log.e("jeff-waswa-count", String.valueOf(data.getCount()));
             fragmentCategoryProductListBinding.categoryProdsFragPageLoader.stopProgress();
         }
+
         categoryProductsRecyclerViewAdapter.setCursor(data);
+
 
     }
 
@@ -383,24 +395,30 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     }
 
 
-    /** public void setActivityLayout(ActivityCategoryBinding activityCategoryBinding) {
-     this.activityCategoryBinding = activityCategoryBinding;
-     }**/
+    /**
+     * public void setActivityLayout(ActivityCategoryBinding activityCategoryBinding) {
+     * this.activityCategoryBinding = activityCategoryBinding;
+     * }
+     **/
 
-    public void recyclerLastItem(int recyclerViewLastItemPositionCurrent){
-
+    public void recyclerLastItem(int recyclerViewLastItemPositionCurrent) {
         //before setting ensure its larger than the current itemPosition and update
-        if(recyclerViewLastItemPositionCurrent >= recyclerViewLastItemPosition){
+        if (recyclerViewLastItemPositionCurrent >= recyclerViewLastItemPosition) {
 
             //set new offset
-            String currentItemsOffset = String.valueOf((recyclerViewLastItemPositionCurrent+1));
+            String currentItemsOffset = String.valueOf((recyclerViewLastItemPositionCurrent + 1));
 
             //set new expected recyclerview last item
-            recyclerViewLastItemPosition = recyclerViewLastItemPositionCurrent+20;
+            recyclerViewLastItemPosition = recyclerViewLastItemPositionCurrent + 20;
 
+            //todo if category filter is not -1 then fetch categories in that filter
             //then do bg job
             //send background job to fetch this category products and sub categories(20 products)-only if is first time
-            catActivity.jobManager.addJobInBackground(new RetrieveCategoriesProducts(false, String.valueOf(categoryId), String.valueOf(categoryId), "20", currentItemsOffset));
+            if (categoryFilterValue == -1) {
+                catActivity.jobManager.addJobInBackground(new RetrieveCategoriesProducts(false, String.valueOf(categoryId), String.valueOf(categoryId), "20", currentItemsOffset));
+            } else {
+                catActivity.jobManager.addJobInBackground(new RetrieveCategoriesProducts(false, String.valueOf(categoryFilterValue), String.valueOf(categoryFilterValue), "20", currentItemsOffset));
+            }
 
         }
 

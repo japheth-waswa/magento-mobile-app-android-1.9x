@@ -46,6 +46,8 @@ public class CategoryProductsRecyclerViewAdapter extends RecyclerView.Adapter<Ca
         if(position == cursor.getCount()-6){
             categoryProductListFragment.recyclerLastItem((cursor.getCount()-1));
 
+        }else if(position == cursor.getCount()-1){
+            categoryProductListFragment.recyclerLastItem((cursor.getCount()-1));
         }
     }
 
@@ -59,6 +61,7 @@ public class CategoryProductsRecyclerViewAdapter extends RecyclerView.Adapter<Ca
 
     public void setCursor(Cursor cursor){
         this.cursor = cursor;
-        notifyDataSetChanged();
+        this.notifyDataSetChanged();
     }
+
 }
