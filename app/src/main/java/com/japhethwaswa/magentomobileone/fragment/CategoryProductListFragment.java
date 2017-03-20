@@ -2,6 +2,7 @@ package com.japhethwaswa.magentomobileone.fragment;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
@@ -31,6 +32,7 @@ import com.japhethwaswa.magentomobileone.adapter.SpinnerCategoryListAdapter;
 import com.japhethwaswa.magentomobileone.adapter.recyclerview.CategoriesRecyclerViewAdapter;
 import com.japhethwaswa.magentomobileone.adapter.recyclerview.CategoryProductsRecyclerViewAdapter;
 import com.japhethwaswa.magentomobileone.app.CategoryActivity;
+import com.japhethwaswa.magentomobileone.app.ProductDetailActivity;
 import com.japhethwaswa.magentomobileone.databinding.ActivityCategoryBinding;
 import com.japhethwaswa.magentomobileone.databinding.FragmentCategoryProductListBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
@@ -82,7 +84,6 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        //TODO start background job to fetch this category products from magento api(done)
         fragmentCategoryProductListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_category_product_list, container, false);
 
         //get the passed category id
@@ -114,15 +115,6 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             //set recyclerview expected last item position
             recyclerViewLastItemPosition = Integer.valueOf(offsetAtCategory) - 1;
         }
-
-        //todo remember to save categoryId on screen rotation(done)
-        //todo initialize cursor loader after categoryId has been set(done)
-
-
-        //todo create custom adapter for the recyclerview(done)
-        //todo cursor to fetch filters for spinners ie sub-categories
-        //todo have a local variable to store the category filter id and retrieve in onsaveinsance
-
 
         //setup the adapter
         categoryProductsRecyclerViewAdapter = new CategoryProductsRecyclerViewAdapter(cursor, this);
@@ -172,7 +164,11 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             public void onClick(View view, int position) {
                 Toast.makeText(getActivity(),"Single click on position :"+ position,Toast.LENGTH_SHORT).show();
                 cursor.moveToPosition(position);
-                //todo initiate product detail view
+                //todo initiate product detail view activity
+                Intent intent = new Intent(getContext(), ProductDetailActivity.class);
+                //intent.putExtra("categoryId", id);
+                startActivity(intent);
+
                 Toast.makeText(getActivity(),"Single click on name :"+ cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_NAME)),Toast.LENGTH_SHORT).show();
             }
 
@@ -382,7 +378,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        //todo fetch products using the categoryId provided
+        //fetch products using the categoryId provided
         String[] projection = {
                 JumboContract.ProductEntry.COLUMN_ICON,
                 JumboContract.ProductEntry.COLUMN_NAME,
@@ -421,7 +417,6 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
         cursor = data;
         if (data.getCount() > 0) {
-            Log.e("jeff-waswa-count", String.valueOf(data.getCount()));
             fragmentCategoryProductListBinding.categoryProdsFragPageLoader.stopProgress();
         }
 
@@ -460,9 +455,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
     public void recyclerLastItem(int recyclerViewLastItemPositionCurrent) {
         //before setting ensure its larger than the current itemPosition and update
-        Log.e("jean","you have been hit");
-        Log.e("jean-currentpos",String.valueOf(recyclerViewLastItemPositionCurrent));
-        Log.e("jean-recyclersaved",String.valueOf(recyclerViewLastItemPosition));
+
         if (recyclerViewLastItemPositionCurrent >= recyclerViewLastItemPosition) {
 
             //set new offset
@@ -471,7 +464,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             //set new expected recyclerview last item
             recyclerViewLastItemPosition = recyclerViewLastItemPositionCurrent + 20;
 
-            //todo if category filter is not -1 then fetch categories in that filter
+            //if category filter is not -1 then fetch categories in that filter
             //then do bg job
             //send background job to fetch this category products and sub categories(20 products)-only if is first time
             if (categoryFilterValue == -1) {

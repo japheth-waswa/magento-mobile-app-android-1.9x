@@ -337,7 +337,7 @@ public class JumboWebService {
                     this.startInsert(7, null, JumboContract.CategoryEntry.CONTENT_URI, values);
                 }
 
-                //todo comment below line if cpu consumption is high
+                //comment below line if cpu consumption is high
                 //get sub category dataa and products
                 serviceSubCategoryData(context, category.getEntity_id(), category.getEntity_id(), itemsCounted, itemsOffsets);
             }
@@ -380,8 +380,8 @@ public class JumboWebService {
 
     //service retrieve sub-category products and mini-categories
     public static void serviceSubCategoryData(final Context context, String categoryId, final String parentCategory, final String itemsCount, final String itemsOffset) {
-        //todo remember to save my_parent_id to category
-        //todo remember to save both id's with the product ie product_ids(-4-,-2-)
+        //remember to save my_parent_id to category
+        //remember to save both id's with the product ie product_ids(-4-,-2-)
 
         //fetch these categories/products
         Resources res = context.getResources();
