@@ -15,12 +15,14 @@
     <string name="skip">SKIP</string>
 
     <string-array name="product_filters">
+        <item>FILTER</item>
         <item>POSITION</item>
         <item>NAME</item>
         <item>PRICE</item>
     </string-array>
 
     <string-array name="sort_filters">
+        <item>SORT</item>
         <item>DESC</item>
         <item>ASC</item>
     </string-array>

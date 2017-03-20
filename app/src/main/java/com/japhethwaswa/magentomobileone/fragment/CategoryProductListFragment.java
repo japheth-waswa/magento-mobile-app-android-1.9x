@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import com.birbit.android.jobqueue.JobManager;
@@ -54,6 +55,10 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     static final int ALL_CATEGORY_FILTERS = -1;
     CategoryList categoryList = new CategoryList();
     SpinnerCategoryListAdapter spinnerCategoryListAdapter;
+    int categoryFilterValuePosition = 0;
+    int categoryFilterValue = -1;
+    int genericFilterValue = -1;
+    int sortFilterValue = -1;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,6 +88,8 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         if (savedInstanceState != null) {
             categoryId = savedInstanceState.getInt("categoryIdFrag");
             recyclerViewLastItemPosition = savedInstanceState.getInt("recyclerViewLastItemPosition");
+            categoryFilterValuePosition = savedInstanceState.getInt("categoryFilterValuePosition");
+            categoryFilterValue = savedInstanceState.getInt("categoryFilterValue");
         }
 
         //get the categoryactivity
@@ -153,8 +160,34 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
         }
 
-        //set category filters spinner
+        /**set category filters spinner**/
         setFilterCategories();
+
+        activityCategoryBinding.categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                categoryFilterValuePosition = position;
+
+                if(activityCategoryBinding.categorySpinner.getSelectedItemId() >= 0){
+
+                    int categoryFilterId = (int)activityCategoryBinding.categorySpinner.getSelectedItemId();
+
+                            if(categoryFilterId != categoryFilterValue){
+                                categoryFilterValue = (int)activityCategoryBinding.categorySpinner.getSelectedItemId();
+                                //todo restart loader
+                                Log.e("jeff-category",String.valueOf(categoryFilterValue));
+                            }
+
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         /**set filter spinner**/
         ArrayAdapter<CharSequence> filtersAdapter = ArrayAdapter.createFromResource(getContext(),R.array.product_filters,android.R.layout.simple_spinner_item);
@@ -162,6 +195,22 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         filtersAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //apply the adapter to the spinner
         activityCategoryBinding.filterSpinner.setAdapter(filtersAdapter);
+        activityCategoryBinding.filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position > 0){
+                    genericFilterValue = position;
+                    Log.e("jeff-generic",String.valueOf(genericFilterValue));
+                    //todo restart loader
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         /**set sort spinner**/
         ArrayAdapter<CharSequence> sortAdapter = ArrayAdapter.createFromResource(getContext(),R.array.sort_filters,android.R.layout.simple_spinner_item);
@@ -169,7 +218,22 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //apply the adapter to the spinner
         activityCategoryBinding.sortSpinner.setAdapter(sortAdapter);
+        activityCategoryBinding.sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position > 0){
 
+                    //todo restart loader and set the
+                    sortFilterValue = position;
+                    Log.e("jeff-sort",String.valueOf(sortFilterValue));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         return fragmentCategoryProductListBinding.getRoot();
     }
@@ -202,6 +266,12 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
                     spinnerCategoryListAdapter =  null;
                     spinnerCategoryListAdapter = new SpinnerCategoryListAdapter(categoryList.ItemList);
                     activityCategoryBinding.categorySpinner.setAdapter(spinnerCategoryListAdapter);
+
+                    //set the previous value saved during state change
+                    if(categoryFilterValue != -1){
+                        activityCategoryBinding.categorySpinner.setSelection(categoryFilterValuePosition);
+
+                    }
                 }
 
 
@@ -253,6 +323,8 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         super.onSaveInstanceState(outState);
         outState.putInt("categoryIdFrag", categoryId);
         outState.putInt("recyclerViewLastItemPosition", recyclerViewLastItemPosition);
+        outState.putInt("categoryFilterValue", categoryFilterValue);
+        outState.putInt("categoryFilterValuePosition", categoryFilterValuePosition);
     }
 
     @Override
