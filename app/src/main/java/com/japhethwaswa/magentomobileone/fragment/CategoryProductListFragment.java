@@ -184,6 +184,10 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
                 } else {
                     categoryFilterValue = -1;
                 }
+
+                //set the fragment to top(ensure it does not reset on orientation change)
+                //fragmentCategoryProductListBinding.categoryProductRecycler.smoothScrollToPosition(0);
+
                 //restart loader
                 getActivity().getSupportLoaderManager().restartLoader(URL_LOADER, null, CategoryProductListFragment.this);
 
@@ -372,6 +376,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         categoryProductsRecyclerViewAdapter.setCursor(data);
 
 
+
     }
 
     @Override
@@ -403,6 +408,9 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
     public void recyclerLastItem(int recyclerViewLastItemPositionCurrent) {
         //before setting ensure its larger than the current itemPosition and update
+        Log.e("jean","you have been hit");
+        Log.e("jean-currentpos",String.valueOf(recyclerViewLastItemPositionCurrent));
+        Log.e("jean-recyclersaved",String.valueOf(recyclerViewLastItemPosition));
         if (recyclerViewLastItemPositionCurrent >= recyclerViewLastItemPosition) {
 
             //set new offset
@@ -419,6 +427,8 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             } else {
                 catActivity.jobManager.addJobInBackground(new RetrieveCategoriesProducts(false, String.valueOf(categoryFilterValue), String.valueOf(categoryFilterValue), "20", currentItemsOffset));
             }
+            //restart loader
+            getActivity().getSupportLoaderManager().restartLoader(URL_LOADER, null, CategoryProductListFragment.this);
 
         }
 
