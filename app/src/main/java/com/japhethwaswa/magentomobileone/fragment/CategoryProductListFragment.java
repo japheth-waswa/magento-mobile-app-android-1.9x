@@ -59,6 +59,8 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     int categoryFilterValue = -1;
     int genericFilterValue = -1;
     int sortFilterValue = -1;
+    String sortingField = null;
+    String sortingOrder = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -199,7 +201,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             }
         });
 
-        /**set filter spinner**/
+        /**set generic filter spinner**/
         ArrayAdapter<CharSequence> filtersAdapter = ArrayAdapter.createFromResource(getContext(), R.array.product_filters, android.R.layout.simple_spinner_item);
         //specify the layout to use when the list of choices appears
         filtersAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -211,8 +213,21 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
 
                 if (position > 0) {
                     genericFilterValue = position;
-                    //restart loader
-                    getActivity().getSupportLoaderManager().restartLoader(URL_LOADER, null, CategoryProductListFragment.this);
+
+                    if(genericFilterValue == 1){
+                        sortingField = JumboContract.ProductEntry.COLUMN_ENTITY_ID;
+                    }else if(genericFilterValue == 2){
+                        sortingField = JumboContract.ProductEntry.COLUMN_NAME;
+                    }else if(genericFilterValue == 3){
+                        sortingField = JumboContract.ProductEntry.COLUMN_PRICE_REGULAR;
+                    }
+
+                    //ensure the sort value is set appropriately
+                    if(sortFilterValue != -1){
+                        //restart loader
+                        getActivity().getSupportLoaderManager().restartLoader(URL_LOADER, null, CategoryProductListFragment.this);
+                    }
+
                 }
             }
 
@@ -234,8 +249,17 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
                 if (position > 0) {
 
                     sortFilterValue = position;
-                    //restart loader
-                    getActivity().getSupportLoaderManager().restartLoader(URL_LOADER, null, CategoryProductListFragment.this);
+                    if(sortFilterValue ==1){
+                        sortingOrder = "DESC";
+                    }else if(sortFilterValue == 2){
+                        sortingOrder = "ASC";
+                    }
+
+                    //ensure the generic value is set appropriately
+                    if(genericFilterValue != -1){
+                        //restart loader
+                        getActivity().getSupportLoaderManager().restartLoader(URL_LOADER, null, CategoryProductListFragment.this);
+                    }
                 }
             }
 
@@ -352,13 +376,20 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         //String[] selectionArgs = {"4"};
 
         String dbCategoryId = String.valueOf(categoryId);
+
+        //category filter flag
         if (categoryFilterValue != -1) {
             dbCategoryId = String.valueOf(categoryFilterValue);
         }
 
-
         String[] selectionArgs = {"%-" + dbCategoryId + "-%"};
-        String orderBy = null;
+        String orderBy =  null;
+
+        //sort flag
+        if(genericFilterValue != -1 && sortFilterValue != -1){
+            orderBy = sortingField + " " + sortingOrder;
+        }
+
         //String orderBy = JumboContract.MainEntry.COLUMN_KEY_HOME;
 
 
