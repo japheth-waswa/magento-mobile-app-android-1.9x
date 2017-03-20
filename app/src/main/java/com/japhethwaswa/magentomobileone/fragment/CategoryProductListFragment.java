@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
@@ -34,6 +35,8 @@ import com.japhethwaswa.magentomobileone.databinding.ActivityCategoryBinding;
 import com.japhethwaswa.magentomobileone.databinding.FragmentCategoryProductListBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
+import com.japhethwaswa.magentomobileone.event.ClickListener;
+import com.japhethwaswa.magentomobileone.event.CustomRecyclerTouchListener;
 import com.japhethwaswa.magentomobileone.job.RetrieveCategories;
 import com.japhethwaswa.magentomobileone.job.RetrieveCategoriesProducts;
 import com.japhethwaswa.magentomobileone.job.builder.MyJobsBuilder;
@@ -161,6 +164,23 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             helper.attachToRecyclerView(fragmentCategoryProductListBinding.categoryProductRecycler);
 
         }
+
+        //recyclerview touch event
+        fragmentCategoryProductListBinding.categoryProductRecycler.addOnItemTouchListener(new CustomRecyclerTouchListener(
+                getContext(), fragmentCategoryProductListBinding.categoryProductRecycler, new ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Toast.makeText(getActivity(),"Single click on position :"+ position,Toast.LENGTH_SHORT).show();
+                cursor.moveToPosition(position);
+                //todo initiate product detail view
+                Toast.makeText(getActivity(),"Single click on name :"+ cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_NAME)),Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                //Toast.makeText(getActivity(),"Long press on position :"+ position,Toast.LENGTH_LONG).show();
+            }
+        }));
 
         /**set category filters spinner**/
         setFilterCategories();
@@ -399,6 +419,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
+        cursor = data;
         if (data.getCount() > 0) {
             Log.e("jeff-waswa-count", String.valueOf(data.getCount()));
             fragmentCategoryProductListBinding.categoryProdsFragPageLoader.stopProgress();
@@ -464,4 +485,6 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
         }
 
     }
+
+
 }

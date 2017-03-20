@@ -64,4 +64,5 @@ public class CategoryProductsRecyclerViewAdapter extends RecyclerView.Adapter<Ca
         this.notifyDataSetChanged();
     }
 
+
 }
