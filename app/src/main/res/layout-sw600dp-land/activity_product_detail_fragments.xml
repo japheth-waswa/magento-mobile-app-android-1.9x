@@ -10,7 +10,7 @@
         tools:showIn="@layout/activity_product_detail">
 
         <fragment
-            android:id="@+id/productDetailsImages"
+            android:id="@+id/fragProductDetailsImages"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
@@ -18,7 +18,7 @@
             tools:layout="@layout/fragment_product_detail_images" />
 
         <fragment
-            android:id="@+id/productDetailsInfo"
+            android:id="@+id/fragProductDetailsInfo"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

@@ -11,14 +11,14 @@
         tools:showIn="@layout/activity_product_detail">
 
         <fragment
-            android:id="@+id/productDetailsImages"
+            android:id="@+id/fragProductDetailsImages"
             android:name="com.japhethwaswa.magentomobileone.fragment.FragmentProductDetailsImages"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:layout="@layout/fragment_product_detail_images" />
 
         <fragment
-            android:id="@+id/productDetailsInfo"
+            android:id="@+id/fragProductDetailsInfo"
             android:name="com.japhethwaswa.magentomobileone.fragment.FragmentProductDetailsInfo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

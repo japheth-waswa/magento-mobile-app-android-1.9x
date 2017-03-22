@@ -28,7 +28,7 @@
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-                <include layout="@layout/activity_product_detail_fragments" />
+                <include android:id="@+id/prod_detail_fragment_holder" layout="@layout/activity_product_detail_fragments" />
 
             </android.support.v4.widget.NestedScrollView>
 

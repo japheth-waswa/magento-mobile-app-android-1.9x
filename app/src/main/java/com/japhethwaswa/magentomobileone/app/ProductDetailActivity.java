@@ -9,6 +9,7 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -25,6 +26,8 @@ import com.japhethwaswa.magentomobileone.databinding.ActivityHomeBinding;
 import com.japhethwaswa.magentomobileone.databinding.ActivityProductDetailBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.fragment.CategoriesFramentPager;
+import com.japhethwaswa.magentomobileone.fragment.FragmentProductDetailsImages;
+import com.japhethwaswa.magentomobileone.fragment.FragmentProductDetailsInfo;
 import com.japhethwaswa.magentomobileone.fragment.HomeFragmentPager;
 import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
 
@@ -34,10 +37,14 @@ import java.util.List;
 public class ProductDetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private ActivityProductDetailBinding activityProductDetailBinding;
+    private FragmentProductDetailsImages fragmentProductDetailsImages;
+    private FragmentProductDetailsInfo fragmentProductDetailsInfo;
+    /**delete below**/
     private List<Fragment> fragmentList = new ArrayList<>();
     private List<String> titleList = new ArrayList<>();
     //private ActivityHomeBinding activityHomeBinding;
-    private ActivityProductDetailBinding activityProductDetailBinding;
+
     private NavMenuManager navMenuManager;
     private static final int URL_LOADER = 0;
 //todo edit display of images in this activity
@@ -83,6 +90,14 @@ public class ProductDetailActivity extends AppCompatActivity
          /**activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
          activityHomeBinding.homeTabs.setupWithViewPager(activityHomeBinding.viewPagerHome);**/
         //todo pass data to the fragments ie product entity_id to load
+        //todo save product entity_id on screen rotation but do not pass it to the fragments since the fragments will have an instance of the saved entitry_id in their context on screen rotation
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        fragmentProductDetailsImages = (FragmentProductDetailsImages) fragmentManager.findFragmentById(R.id.fragProductDetailsImages);
+
+        fragmentProductDetailsImages.receiveEntityIdentifier(78);
+        
+        fragmentProductDetailsInfo = (FragmentProductDetailsInfo) fragmentManager.findFragmentById(R.id.fragProductDetailsInfo);
 
     }
 
