@@ -3,10 +3,5 @@
     <color name="colorPrimary">#F5F5F5</color>
     <color name="colorPrimaryDark">#9E9E9E</color>
     <color name="colorAccent">#FF5722</color>
-    <color name="textColorPrimary">#87000000</color>
-    <color name="textColorSecondary">#54000000</color>
-    <color name="textColorHint">#38000000</color>
-    <color name="windowBackground">#FAFAFA</color>
-    <color name="navigationBarColor">#000000</color>
     <color name="colorSplash">#FFFFFF</color>
 </resources>

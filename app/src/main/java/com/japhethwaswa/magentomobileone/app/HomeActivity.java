@@ -31,9 +31,7 @@ import android.widget.ListView;
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.HomeTextTabsAdapter;
 import com.japhethwaswa.magentomobileone.databinding.ActivityHomeBinding;
-import com.japhethwaswa.magentomobileone.databinding.ContentActivityHomeBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
-import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 import com.japhethwaswa.magentomobileone.fragment.CategoriesFramentPager;
 import com.japhethwaswa.magentomobileone.fragment.HomeFragmentPager;
 import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
@@ -161,9 +159,7 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+
 
         return super.onOptionsItemSelected(item);
     }

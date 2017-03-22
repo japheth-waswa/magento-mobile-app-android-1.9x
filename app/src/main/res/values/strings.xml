@@ -6,16 +6,10 @@
     <string name="apiBaseUrl">http://magento-29325-63476-210388.cloudwaysapps.com/</string>
     <string name="jumbo_main_data_url">jumbomobile/jumbo/main</string>
     <string name="jumbo_top_categories">xmlconnect/Catalog/category</string>
-    <string name="jumbo_product_options">xmlconnect/Catalog/productOptions/id/"entity_id"</string>
-    <string name="jumbo_product_images">xmlconnect/Catalog/productGallery/id/"entity_id"</string>
-    <string name="jumbo_product_reviews">xmlconnect/Catalog/productReviews/id/"entity_id"</string>
-    <string name="jumbo_products_search">xmlconnect/Catalog/search?query="green-ladies"</string>
-    <string name="jumbo_products_search_suggestion">xmlconnect/Catalog/searchSuggest?query="g"</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
     <string name="sign_in">Sign in</string>
     <string name="skip">SKIP</string>
 
