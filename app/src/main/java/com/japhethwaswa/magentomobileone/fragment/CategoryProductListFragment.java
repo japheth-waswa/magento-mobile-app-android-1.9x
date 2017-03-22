@@ -162,14 +162,11 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
                 getContext(), fragmentCategoryProductListBinding.categoryProductRecycler, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Toast.makeText(getActivity(),"Single click on position :"+ position,Toast.LENGTH_SHORT).show();
                 cursor.moveToPosition(position);
                 //todo initiate product detail view activity
                 Intent intent = new Intent(getContext(), ProductDetailActivity.class);
-                //intent.putExtra("categoryId", id);
+                intent.putExtra("entityId", Integer.valueOf(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_ENTITY_ID))));
                 startActivity(intent);
-
-                Toast.makeText(getActivity(),"Single click on name :"+ cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_NAME)),Toast.LENGTH_SHORT).show();
             }
 
             @Override

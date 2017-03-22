@@ -17,6 +17,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -34,20 +35,13 @@ import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductDetailActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ProductDetailActivity extends AppCompatActivity {
 
     private ActivityProductDetailBinding activityProductDetailBinding;
     private FragmentProductDetailsImages fragmentProductDetailsImages;
     private FragmentProductDetailsInfo fragmentProductDetailsInfo;
-    /**delete below**/
-    private List<Fragment> fragmentList = new ArrayList<>();
-    private List<String> titleList = new ArrayList<>();
-    //private ActivityHomeBinding activityHomeBinding;
+    private int entityId;
 
-    private NavMenuManager navMenuManager;
-    private static final int URL_LOADER = 0;
-//todo edit display of images in this activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //StrictMode
@@ -62,49 +56,45 @@ public class ProductDetailActivity extends AppCompatActivity
 
         activityProductDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_product_detail);
 
+        //get data from the CategoryActivity
+        Intent intent = getIntent();
+        entityId = intent.getIntExtra("entityId", 0);
 
-        if (savedInstanceState == null) {
-            //initialize loader
-            getSupportLoaderManager().initLoader(URL_LOADER, null, this);
-        }else{
-            //restart loader
-            getSupportLoaderManager().restartLoader(URL_LOADER,null,this);
+        if (savedInstanceState != null) {
+            entityId =  savedInstanceState.getInt("entityId");
         }
 
-        /**Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-         setSupportActionBar(toolbar);**/
-
+        //if entitiy id is 0
+        if(entityId == 0){
+            super.onBackPressed();
+            finish();
+        }
 
         setSupportActionBar(activityProductDetailBinding.toolbar);
 
         getSupportActionBar().setTitle("Product Details");
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        /** NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-         navigationView.setNavigationItemSelectedListener(this);**/
-
-        /**activityHomeBinding.layoutContentActivityHome.viewPagerHome.setAdapter(homeTextTabsAdapter);
-         activityHomeBinding.layoutContentActivityHome.homeTabs.setupWithViewPager(
-         activityHomeBinding.layoutContentActivityHome.viewPagerHome
-         );
-         /**activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
-         activityHomeBinding.homeTabs.setupWithViewPager(activityHomeBinding.viewPagerHome);**/
-        //todo pass data to the fragments ie product entity_id to load
-        //todo save product entity_id on screen rotation but do not pass it to the fragments since the fragments will have an instance of the saved entitry_id in their context on screen rotation
+        //fragments management
         FragmentManager fragmentManager = getSupportFragmentManager();
-
         fragmentProductDetailsImages = (FragmentProductDetailsImages) fragmentManager.findFragmentById(R.id.fragProductDetailsImages);
 
-        fragmentProductDetailsImages.receiveEntityIdentifier(78);
-        
         fragmentProductDetailsInfo = (FragmentProductDetailsInfo) fragmentManager.findFragmentById(R.id.fragProductDetailsInfo);
+
+        if (savedInstanceState == null) {
+           //send entity id if its the first time and not on orientation change
+            fragmentProductDetailsImages.receiveEntityIdentifier(entityId);
+            fragmentProductDetailsInfo.receiveEntityIdentifier(entityId);
+        }
+
 
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putInt("savedInstance", 1);
+        outState.putInt("entityId", entityId);
     }
 
     @Override
@@ -130,37 +120,5 @@ public class ProductDetailActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        //perfom query to fetch categories with value of my_parent_id=0
-        String[] projection = {
-                JumboContract.CategoryEntry.COLUMN_LABEL,
-                JumboContract.CategoryEntry.COLUMN_ENTITY_ID,
-                JumboContract.CategoryEntry.COLUMN_CONTENT_TYPE,
-                JumboContract.CategoryEntry.COLUMN_PARENT_ID,
-                JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID,
-                JumboContract.CategoryEntry.COLUMN_ICON,
-                JumboContract.CategoryEntry.COLUMN_MODIFICATION_TIME
-        };
-
-        String selection = JumboContract.CategoryEntry.COLUMN_MY_PARENT_ID + "=?";
-        String[] selectionArgs = {"0"};
-
-        return new CursorLoader(this, JumboContract.CategoryEntry.CONTENT_URI, projection, selection, selectionArgs,null);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        //initiate categories menu update
-        //todo i suggest we remove the loader coz i dont see its essence here
-        //todo i doubt if we need a loader
-    }
-
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        //do nothing
-    }
 
 }

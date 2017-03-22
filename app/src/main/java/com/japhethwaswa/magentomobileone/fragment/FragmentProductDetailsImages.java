@@ -16,6 +16,7 @@ public class FragmentProductDetailsImages extends Fragment{
 
     private FragmentProductDetailImagesBinding fragmentProductDetailImagesBinding;
     private int entityId;
+    private static final int URL_LOADER = 11;
     //todo we need a cursor loader to load these images for viewpager from database
     //todo initiate bg job to fetch product images and save their link to the database
 
@@ -25,19 +26,33 @@ public class FragmentProductDetailsImages extends Fragment{
 
         fragmentProductDetailImagesBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_product_detail_images,container,false);
 
+       if (savedInstanceState == null) {
+            //do something here
+        }else{
+           entityId =  savedInstanceState.getInt("entityId");
+            //restart loader
+            //getSupportLoaderManager().restartLoader(URL_LOADER,null,this);
+        }
+
+
         return fragmentProductDetailImagesBinding.getRoot();
     }
 
     public void receiveEntityIdentifier(int entityId){
         this.entityId =  entityId;
-        //todo start a bg job in another method to get product images
-        //todo restart loader here to get the necessary data
 
-        Log.e("jeff-entity id of -",String.valueOf(entityId));
+        //todo start a bg job in another method to get product images
+
+
+        //todo initialize loader here to get the necessary data
+        //initialize loader
+        //getSupportLoaderManager().initLoader(URL_LOADER, null, this);
+
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putInt("entityId", entityId);
     }
 }
