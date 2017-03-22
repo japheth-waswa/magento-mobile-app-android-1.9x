@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp"
+        tools:showIn="@layout/activity_product_detail">
+
+        <fragment
+            android:id="@+id/productDetailsImages"
+            android:name="com.japhethwaswa.magentomobileone.fragment.FragmentProductDetailsImages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_product_detail_images" />
+
+        <fragment
+            android:id="@+id/productDetailsInfo"
+            android:name="com.japhethwaswa.magentomobileone.fragment.FragmentProductDetailsInfo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_product_detail_info" />
+    </LinearLayout>
+</layout>

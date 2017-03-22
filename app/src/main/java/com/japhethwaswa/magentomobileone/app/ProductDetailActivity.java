@@ -82,7 +82,7 @@ public class ProductDetailActivity extends AppCompatActivity
          );
          /**activityHomeBinding.viewPagerHome.setAdapter(homeTextTabsAdapter);
          activityHomeBinding.homeTabs.setupWithViewPager(activityHomeBinding.viewPagerHome);**/
-
+        //todo pass data to the fragments ie product entity_id to load
 
     }
 
@@ -138,6 +138,7 @@ public class ProductDetailActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         //initiate categories menu update
+        //todo i suggest we remove the loader coz i dont see its essence here
         //todo i doubt if we need a loader
     }
 
