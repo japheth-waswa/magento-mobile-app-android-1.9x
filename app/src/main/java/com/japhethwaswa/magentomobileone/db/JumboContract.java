@@ -9,6 +9,7 @@ public final class JumboContract {
     public static final String PATH_MAIN = "main";
     public static final String PATH_CATEGORY = "category";
     public static final String PATH_PRODUCT = "product";
+    public static final String PATH_PRODUCT_IMAGES = "product_images";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
 
     public static final class PagerEntry implements BaseColumns{
@@ -78,6 +79,19 @@ public final class JumboContract {
         public static final String COLUMN_PRICE_REGULAR = "price_regular";
         public static final String COLUMN_PRICE_SPECIAL = "price_special";
         public static final String COLUMN_CATEGORY_IDS = "category_ids";
+    }
+    public static final class ProductImagesEntry implements BaseColumns{
+
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI,PATH_PRODUCT_IMAGES);
+        //Table name
+        public static final String TABLE_NAME = "product_images";
+        //column field names
+        public static final String _ID = BaseColumns._ID;
+        public static final String COLUMN_ENTITY_ID = "entity_id";
+        public static final String COLUMN_IMAGE_URL_BIG = "image_url_big";
+        public static final String COLUMN_IMAGE_URL_SMALL = "image_url_small";
+        public static final String COLUMN_IMAGE_ID = "image_id";
+        public static final String COLUMN_MODIFICATION_TIME = "modification_time";
     }
 
 }

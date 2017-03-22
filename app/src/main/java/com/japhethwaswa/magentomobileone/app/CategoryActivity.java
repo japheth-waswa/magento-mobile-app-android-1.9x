@@ -64,14 +64,7 @@ public class CategoryActivity extends AppCompatActivity
         Intent intent = getIntent();
         categoryId = intent.getIntExtra("categoryId", 0);
 
-
-        //if categoryId =0 return to the previous activity
-       /** if (categoryId == 0) {
-            Intent homeIntent = new Intent(this, HomeActivity.class);
-            startActivity(homeIntent);
-            finish();
-        }**/
-//initialize job manager
+        //initialize job manager
         jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
         activityCategoryBinding = DataBindingUtil.setContentView(this, R.layout.activity_category);
 

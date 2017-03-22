@@ -16,6 +16,7 @@ import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_CATEGORY;
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_MAIN;
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PAGER;
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PRODUCT;
+import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PRODUCT_IMAGES;
 
 public class JumboProvider extends ContentProvider {
 
@@ -30,6 +31,8 @@ public class JumboProvider extends ContentProvider {
     private static final int CATEGORY_ID = 6;
     private static final int PRODUCT = 7;
     private static final int PRODUCT_ID = 8;
+    private static final int PRODUCTIMAGES = 9;
+    private static final int PRODUCTIMAGES_ID = 10;
 
     //Uri matcher
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -51,6 +54,10 @@ public class JumboProvider extends ContentProvider {
         //product data uri
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT, PRODUCT);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT + "/#", PRODUCT_ID);
+
+        //product images data uri
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT_IMAGES, PRODUCTIMAGES);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT_IMAGES + "/#", PRODUCTIMAGES_ID);
     }
 
     private DatabaseHelper helper;
@@ -102,6 +109,14 @@ public class JumboProvider extends ContentProvider {
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 cursor = db.query(JumboContract.ProductEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
+            case PRODUCTIMAGES:
+                cursor = db.query(JumboContract.ProductImagesEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case PRODUCTIMAGES_ID:
+                selection = JumboContract.ProductImagesEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(JumboContract.ProductImagesEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown Uri");
         }
@@ -129,6 +144,8 @@ public class JumboProvider extends ContentProvider {
                 return insertRecord(uri, values, JumboContract.CategoryEntry.TABLE_NAME);
             case PRODUCT:
                 return insertRecord(uri, values, JumboContract.ProductEntry.TABLE_NAME);
+            case PRODUCTIMAGES:
+                return insertRecord(uri, values, JumboContract.ProductImagesEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Unkwown uri: " + uri);
 
@@ -167,6 +184,10 @@ public class JumboProvider extends ContentProvider {
                 return deleteRecord(uri, null, null, JumboContract.ProductEntry.TABLE_NAME);
             case PRODUCT_ID:
                 return deleteRecord(uri, selection, selectionArgs, JumboContract.ProductEntry.TABLE_NAME);
+            case PRODUCTIMAGES:
+                return deleteRecord(uri, null, null, JumboContract.ProductImagesEntry.TABLE_NAME);
+            case PRODUCTIMAGES_ID:
+                return deleteRecord(uri, selection, selectionArgs, JumboContract.ProductImagesEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Insert unknown URI: " + uri);
         }
@@ -200,6 +221,9 @@ public class JumboProvider extends ContentProvider {
 
             case PRODUCT:
                 return updateRecord(uri, values, selection, selectionArgs, JumboContract.ProductEntry.TABLE_NAME);
+
+            case PRODUCTIMAGES:
+                return updateRecord(uri, values, selection, selectionArgs, JumboContract.ProductImagesEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Update unknown URI: " + uri);
         }

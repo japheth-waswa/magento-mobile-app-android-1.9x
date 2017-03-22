@@ -519,11 +519,11 @@ public class JumboWebService {
                             }
 
                             if (name.equalsIgnoreCase("price")) {
-                                product.setPrice_regular(myParser.getAttributeValue(null,"regular"));
+                                product.setPrice_regular(myParser.getAttributeValue(null, "regular"));
                             }
 
                             if (name.equalsIgnoreCase("price")) {
-                                product.setPrice_special(myParser.getAttributeValue(null,"special"));
+                                product.setPrice_special(myParser.getAttributeValue(null, "special"));
                             }
 
                             if (name.equalsIgnoreCase(JumboContract.ProductEntry.COLUMN_ICON)) {
@@ -596,51 +596,170 @@ public class JumboWebService {
         if (previousCategories != null) {
             List<String> categoryIdsArray = new ArrayList<>(Arrays.asList(previousCategories.split(",")));
 
-            if (!categoryIdsArray.contains("-"+parentCategory+"-")) {
+            if (!categoryIdsArray.contains("-" + parentCategory + "-")) {
                 //add if not available
-                categoryIdsArray.add("-"+parentCategory+"-");
+                categoryIdsArray.add("-" + parentCategory + "-");
             }
 
             allCategoryIds = android.text.TextUtils.join(",", categoryIdsArray);
         } else {
-            allCategoryIds = "-"+parentCategory+"-";
+            allCategoryIds = "-" + parentCategory + "-";
         }
-
 
 
         JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
 
-         ContentValues valuesed = new ContentValues();
-         valuesed.put(JumboContract.ProductEntry.COLUMN_ENTITY_ID, product.getEntity_id());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_NAME, product.getName());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_ENTITY_TYPE, product.getEntity_type());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_SHORT_DESCRIPTION, product.getShort_description());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_DESCRIPTION, product.getDescription());//marked
-         valuesed.put(JumboContract.ProductEntry.COLUMN_LINK, product.getLink());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_IN_STOCK, product.getIn_stock());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_IS_SALABLE, product.getIs_salable());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_HAS_GALLERY, product.getHas_gallery());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_HAS_OPTIONS, product.getHas_options());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_RATING_SUMMARY, product.getRating_summary());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_REVIEWS_COUNT, product.getReviews_count());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_PRICE_REGULAR, product.getPrice_regular());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL, product.getPrice_special());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_ICON, product.getIcon());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_MODIFICATION_TIME, product.getModification_time());
-         valuesed.put(JumboContract.ProductEntry.COLUMN_CATEGORY_IDS,allCategoryIds);
+        ContentValues valuesed = new ContentValues();
+        valuesed.put(JumboContract.ProductEntry.COLUMN_ENTITY_ID, product.getEntity_id());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_NAME, product.getName());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_ENTITY_TYPE, product.getEntity_type());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_SHORT_DESCRIPTION, product.getShort_description());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_DESCRIPTION, product.getDescription());//marked
+        valuesed.put(JumboContract.ProductEntry.COLUMN_LINK, product.getLink());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_IN_STOCK, product.getIn_stock());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_IS_SALABLE, product.getIs_salable());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_HAS_GALLERY, product.getHas_gallery());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_HAS_OPTIONS, product.getHas_options());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_RATING_SUMMARY, product.getRating_summary());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_REVIEWS_COUNT, product.getReviews_count());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_PRICE_REGULAR, product.getPrice_regular());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL, product.getPrice_special());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_ICON, product.getIcon());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_MODIFICATION_TIME, product.getModification_time());
+        valuesed.put(JumboContract.ProductEntry.COLUMN_CATEGORY_IDS, allCategoryIds);
 
-         if(isUpdate == true){
-         //perfom update
-         String selectioned = JumboContract.ProductEntry.COLUMN_ENTITY_ID + "=?";
-         String[] selectionArgsed = {product.getEntity_id()};
-             handler.startUpdate(87,null,JumboContract.ProductEntry.CONTENT_URI,valuesed,selectioned,selectionArgsed);
+        if (isUpdate == true) {
+            //perfom update
+            String selectioned = JumboContract.ProductEntry.COLUMN_ENTITY_ID + "=?";
+            String[] selectionArgsed = {product.getEntity_id()};
+            handler.startUpdate(87, null, JumboContract.ProductEntry.CONTENT_URI, valuesed, selectioned, selectionArgsed);
 
-         }
+        }
 
-         if(isUpdate == false){
-         //perfom insert
-            handler.startInsert(86,null,JumboContract.ProductEntry.CONTENT_URI,valuesed);
-         }
+        if (isUpdate == false) {
+            //perfom insert
+            handler.startInsert(86, null, JumboContract.ProductEntry.CONTENT_URI, valuesed);
+        }
+
+    }
+
+
+    public static void serviceRetrieveProductGallery(final Context context, final String productEntityId) {
+
+        //fetch these categories/products
+        Resources res = context.getResources();
+        String relativeUrl = res.getString(R.string.jumbo_product_gallery);
+        relativeUrl = relativeUrl + "/" + productEntityId;
+
+        AndroidNetworking.get(getAbsoluteUrl(context, relativeUrl))
+                .setTag("jumboproductGallery")
+                .setPriority(Priority.HIGH)
+                .addHeaders("Cookie", getCookie(context))
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            parseProductGallery(response, context, productEntityId);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.e("jeff-error", anError.toString());
+                    }
+                });
+    }
+
+    private static void parseProductGallery(String response, Context context, String productEntityId) throws IOException {
+
+        InputStream xmlStream = new ByteArrayInputStream(response.getBytes());
+        Product product = null;
+        Boolean isImageObject = false;
+        //remember to set the isImageObject/isSmallImage to false when retrieved data
+
+        try {
+            XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
+            XmlPullParser myParser = xmlPullParserFactory.newPullParser();
+            myParser.setInput(xmlStream, null);
+
+            int eventType = myParser.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+
+                String name;
+
+                switch (eventType) {
+                    case XmlPullParser.START_TAG:
+                        name = myParser.getName();
+                        if (name.equalsIgnoreCase("image")) {
+                            //if image object
+                            isImageObject = true;
+                        }
+
+                        //get products
+                        if (name.equalsIgnoreCase("file") && isImageObject == true) {
+                            if (product == null) {
+                                product = new Product();
+                            }
+
+                        }
+                        if (product != null) {
+
+                            if (myParser.getAttributeValue(null, "type").equalsIgnoreCase("big")) {
+                                product.setEntity_id(productEntityId);
+                                product.setModification_time(myParser.getAttributeValue(null, JumboContract.ProductImagesEntry.COLUMN_MODIFICATION_TIME));
+                                product.setImage_url_big(myParser.getAttributeValue(null, "url"));
+                                product.setImage_id(myParser.getAttributeValue(null, "id"));
+                            } else {
+                                product.setImage_url_small(myParser.getAttributeValue(null, "url"));
+                            }
+
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        name = myParser.getName();
+
+                        if (name.equalsIgnoreCase("image") && product != null) {
+                            //update,insert product images
+                            insertProductGallery(context, product, productEntityId);
+                            //set null
+                            product = null;
+                            isImageObject = false;
+                        }
+                        break;
+
+                }
+
+                eventType = myParser.next();
+            }
+
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    //insert product gallery
+    private static void insertProductGallery(Context context, Product product, String productEntityId) {
+
+        JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
+
+        //delete all gallery images for this product id
+        String selection = JumboContract.ProductImagesEntry.COLUMN_ENTITY_ID + "=?";
+        String[] selectionArgs = {productEntityId};
+        handler.startDelete(77,null,JumboContract.ProductImagesEntry.CONTENT_URI,selection,selectionArgs);
+
+        ContentValues values = new ContentValues();
+        values.put(JumboContract.ProductImagesEntry.COLUMN_ENTITY_ID, product.getEntity_id());
+        values.put(JumboContract.ProductImagesEntry.COLUMN_IMAGE_URL_BIG, product.getImage_url_big());
+        values.put(JumboContract.ProductImagesEntry.COLUMN_IMAGE_URL_SMALL, product.getImage_url_small());
+        values.put(JumboContract.ProductImagesEntry.COLUMN_IMAGE_ID, product.getImage_id());
+        values.put(JumboContract.ProductImagesEntry.COLUMN_MODIFICATION_TIME, product.getModification_time());
+
+        //perfom insert
+        handler.startInsert(77, null, JumboContract.ProductImagesEntry.CONTENT_URI, values);
 
     }
 

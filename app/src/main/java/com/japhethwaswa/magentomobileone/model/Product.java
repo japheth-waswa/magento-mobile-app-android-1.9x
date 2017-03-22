@@ -23,7 +23,41 @@ public class Product extends BaseObservable{
     private String price_regular;
     private String price_special;
     private String category_ids;
+    private String image_url_big;
+    private String image_url_small;
+    private String image_id;
 
+
+
+    @Bindable
+    public String getImage_url_big() {
+        return image_url_big;
+    }
+
+    public void setImage_url_big(String image_url_big) {
+        this.image_url_big = image_url_big;
+        notifyPropertyChanged(BR.image_url_big);
+    }
+
+    @Bindable
+    public String getImage_url_small() {
+        return image_url_small;
+    }
+
+    public void setImage_url_small(String image_url_small) {
+        this.image_url_small = image_url_small;
+        notifyPropertyChanged(BR.image_url_small);
+    }
+
+    @Bindable
+    public String getImage_id() {
+        return image_id;
+    }
+
+    public void setImage_id(String image_id) {
+        this.image_id = image_id;
+        notifyPropertyChanged(BR.image_id);
+    }
 
     @Bindable
     public String getModification_time() {

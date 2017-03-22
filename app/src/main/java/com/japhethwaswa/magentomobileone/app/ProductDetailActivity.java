@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.adapter.HomeTextTabsAdapter;
 import com.japhethwaswa.magentomobileone.databinding.ActivityHomeBinding;
@@ -30,6 +31,7 @@ import com.japhethwaswa.magentomobileone.fragment.CategoriesFramentPager;
 import com.japhethwaswa.magentomobileone.fragment.FragmentProductDetailsImages;
 import com.japhethwaswa.magentomobileone.fragment.FragmentProductDetailsInfo;
 import com.japhethwaswa.magentomobileone.fragment.HomeFragmentPager;
+import com.japhethwaswa.magentomobileone.job.builder.MyJobsBuilder;
 import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
 
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private FragmentProductDetailsImages fragmentProductDetailsImages;
     private FragmentProductDetailsInfo fragmentProductDetailsInfo;
     private int entityId;
+    public JobManager jobManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +58,9 @@ public class ProductDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         activityProductDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_product_detail);
+
+        //initialize job manager
+        jobManager = new JobManager(MyJobsBuilder.getConfigBuilder(getApplicationContext()));
 
         //get data from the CategoryActivity
         Intent intent = getIntent();

@@ -2,18 +2,13 @@ package com.japhethwaswa.magentomobileone.db;
 
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import com.japhethwaswa.magentomobileone.R;
-import com.japhethwaswa.magentomobileone.app.SplashActivity;
 import com.japhethwaswa.magentomobileone.db.JumboContract.PagerEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.MainEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.CategoryEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.ProductEntry;
-
-import static java.security.AccessController.getContext;
+import com.japhethwaswa.magentomobileone.db.JumboContract.ProductImagesEntry;
 
 public class DatabaseHelper extends SQLiteOpenHelper{
 
@@ -74,6 +69,16 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                     ProductEntry.COLUMN_CATEGORY_IDS + " TEXT " +
                     ")";
 
+    private static final String TABLE_PRODUCT_IMAGES_CREATE=
+            "CREATE TABLE " + ProductImagesEntry.TABLE_NAME + " (" +
+                    ProductImagesEntry._ID + " INTEGER PRIMARY KEY, " +
+                    ProductImagesEntry.COLUMN_ENTITY_ID + " TEXT, " +
+                    ProductImagesEntry.COLUMN_IMAGE_URL_BIG + " TEXT, " +
+                    ProductImagesEntry.COLUMN_IMAGE_URL_SMALL + " TEXT, " +
+                    ProductImagesEntry.COLUMN_IMAGE_ID + " TEXT, " +
+                    ProductImagesEntry.COLUMN_MODIFICATION_TIME + " TEXT " +
+                    ")";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -84,6 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     db.execSQL(TABLE_MAIN_CREATE);
     db.execSQL(TABLE_CATEGORY_CREATE);
     db.execSQL(TABLE_PRODUCT_CREATE);
+    db.execSQL(TABLE_PRODUCT_IMAGES_CREATE);
     }
 
     @Override
@@ -92,6 +98,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         db.execSQL("DROP TABLE IF EXISTS " + MainEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + CategoryEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ProductEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ProductImagesEntry.TABLE_NAME);
         onCreate(db);
     }
 
