@@ -102,11 +102,18 @@ public class CategoryActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             //start fragment
             startCatFragment();
+        }else{
+            navMenuManager.updateMenu(activityCategoryBinding.layoutNavViewMain.navView,savedInstanceState.getInt("categoryId"));
         }
 
 
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("categoryId", categoryId);
+    }
 
     @Override
     public void onBackPressed() {
