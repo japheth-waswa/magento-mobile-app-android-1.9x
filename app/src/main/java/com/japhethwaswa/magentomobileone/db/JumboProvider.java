@@ -17,6 +17,7 @@ import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_MAIN;
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PAGER;
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PRODUCT;
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PRODUCT_IMAGES;
+import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PRODUCT_OPTIONS;
 
 public class JumboProvider extends ContentProvider {
 
@@ -33,6 +34,8 @@ public class JumboProvider extends ContentProvider {
     private static final int PRODUCT_ID = 8;
     private static final int PRODUCTIMAGES = 9;
     private static final int PRODUCTIMAGES_ID = 10;
+    private static final int PRODUCTOPTIONS = 11;
+    private static final int PRODUCTOPTIONS_ID = 12;
 
     //Uri matcher
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -58,6 +61,10 @@ public class JumboProvider extends ContentProvider {
         //product images data uri
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT_IMAGES, PRODUCTIMAGES);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT_IMAGES + "/#", PRODUCTIMAGES_ID);
+
+        //product options data uri
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT_OPTIONS, PRODUCTOPTIONS);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT_OPTIONS + "/#", PRODUCTOPTIONS_ID);
     }
 
     private DatabaseHelper helper;
@@ -117,6 +124,14 @@ public class JumboProvider extends ContentProvider {
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 cursor = db.query(JumboContract.ProductImagesEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
+            case PRODUCTOPTIONS:
+                cursor = db.query(JumboContract.ProductOptionsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case PRODUCTOPTIONS_ID:
+                selection = JumboContract.ProductOptionsEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(JumboContract.ProductOptionsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown Uri");
         }
@@ -146,6 +161,8 @@ public class JumboProvider extends ContentProvider {
                 return insertRecord(uri, values, JumboContract.ProductEntry.TABLE_NAME);
             case PRODUCTIMAGES:
                 return insertRecord(uri, values, JumboContract.ProductImagesEntry.TABLE_NAME);
+            case PRODUCTOPTIONS:
+                return insertRecord(uri, values, JumboContract.ProductOptionsEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Unkwown uri: " + uri);
 
@@ -188,6 +205,10 @@ public class JumboProvider extends ContentProvider {
                 return deleteRecord(uri, null, null, JumboContract.ProductImagesEntry.TABLE_NAME);
             case PRODUCTIMAGES_ID:
                 return deleteRecord(uri, selection, selectionArgs, JumboContract.ProductImagesEntry.TABLE_NAME);
+            case PRODUCTOPTIONS:
+                return deleteRecord(uri, null, null, JumboContract.ProductOptionsEntry.TABLE_NAME);
+            case PRODUCTOPTIONS_ID:
+                return deleteRecord(uri, selection, selectionArgs, JumboContract.ProductOptionsEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Insert unknown URI: " + uri);
         }
@@ -224,6 +245,9 @@ public class JumboProvider extends ContentProvider {
 
             case PRODUCTIMAGES:
                 return updateRecord(uri, values, selection, selectionArgs, JumboContract.ProductImagesEntry.TABLE_NAME);
+
+            case PRODUCTOPTIONS:
+                return updateRecord(uri, values, selection, selectionArgs, JumboContract.ProductOptionsEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Update unknown URI: " + uri);
         }

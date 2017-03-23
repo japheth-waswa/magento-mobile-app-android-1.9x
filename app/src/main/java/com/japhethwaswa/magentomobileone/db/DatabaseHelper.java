@@ -9,11 +9,13 @@ import com.japhethwaswa.magentomobileone.db.JumboContract.MainEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.CategoryEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.ProductEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.ProductImagesEntry;
+import com.japhethwaswa.magentomobileone.db.JumboContract.ProductOptionsEntry;
 
 public class DatabaseHelper extends SQLiteOpenHelper{
 
     private static final String DATABASE_NAME = "jumboapp.db";
     private static final int DATABASE_VERSION = 1;
+
     private static final String TABLE_MAIN_CREATE=
             "CREATE TABLE " + MainEntry.TABLE_NAME + " (" +
                     MainEntry._ID + " INTEGER PRIMARY KEY, " +
@@ -79,6 +81,20 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                     ProductImagesEntry.COLUMN_MODIFICATION_TIME + " TEXT " +
                     ")";
 
+    private static final String TABLE_PRODUCT_OPTIONS_CREATE=
+            "CREATE TABLE " + JumboContract.ProductOptionsEntry.TABLE_NAME + " (" +
+                    ProductOptionsEntry._ID + " INTEGER PRIMARY KEY, " +
+                    ProductOptionsEntry.COLUMN_ENTITY_ID + " TEXT, " +
+                    ProductOptionsEntry.COLUMN_IS_PARENT + " TEXT, " +
+                    ProductOptionsEntry.COLUMN_PARENT_CODE + " TEXT, " +
+                    ProductOptionsEntry.COLUMN_PARENT_LABEL + " TEXT, " +
+                    ProductOptionsEntry.COLUMN_PARENT_REQUIRED + " TEXT, " +
+                    ProductOptionsEntry.COLUMN_PARENT_TYPE + " TEXT, " +
+                    ProductOptionsEntry.COLUMN_CHILD_CODE + " TEXT, " +
+                    ProductOptionsEntry.COLUMN_CHILD_LABEL + " TEXT, " +
+                    ProductOptionsEntry.COLUMN_CHILD_TO_CODE + " TEXT " +
+                    ")";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -90,6 +106,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     db.execSQL(TABLE_CATEGORY_CREATE);
     db.execSQL(TABLE_PRODUCT_CREATE);
     db.execSQL(TABLE_PRODUCT_IMAGES_CREATE);
+    db.execSQL(TABLE_PRODUCT_OPTIONS_CREATE);
     }
 
     @Override
@@ -99,6 +116,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         db.execSQL("DROP TABLE IF EXISTS " + CategoryEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ProductEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ProductImagesEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ProductOptionsEntry.TABLE_NAME);
         onCreate(db);
     }
 

@@ -3,6 +3,7 @@ package com.japhethwaswa.magentomobileone.fragment;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -13,17 +14,21 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.japhethwaswa.magentomobileone.R;
+import com.japhethwaswa.magentomobileone.app.ProductDetailActivity;
 import com.japhethwaswa.magentomobileone.databinding.FragmentProductDetailImagesBinding;
 import com.japhethwaswa.magentomobileone.databinding.FragmentProductDetailInfoBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
+import com.japhethwaswa.magentomobileone.job.RetrieveProductGallery;
+import com.japhethwaswa.magentomobileone.job.RetrieveProductOptionsReviews;
 import com.japhethwaswa.magentomobileone.model.Product;
 
-public class FragmentProductDetailsInfo extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class FragmentProductDetailsInfo extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private FragmentProductDetailInfoBinding fragmentProductDetailInfoBinding;
     private int entityId;
     private static final int URL_LOADER = 13;
+    public ProductDetailActivity productDetailActivity;
     private Cursor cursor;
     private Product product;
 
@@ -31,13 +36,21 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //StrictMode
+        StrictMode.VmPolicy vmPolicy = new StrictMode.VmPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build();
+        StrictMode.setVmPolicy(vmPolicy);
+        /**==============**/
 
-        fragmentProductDetailInfoBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_product_detail_info,container,false);
+        fragmentProductDetailInfoBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_product_detail_info, container, false);
 
-
+        //get activity context
+        productDetailActivity = (ProductDetailActivity) getActivity();
 
         if (savedInstanceState != null) {
-            entityId =  savedInstanceState.getInt("entityId");
+            entityId = savedInstanceState.getInt("entityId");
             //get product detail from db
             getProductDetailsFromDb();
             //restart loader
@@ -59,9 +72,10 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     }
 
     public void receiveEntityIdentifier(int entityId) {
-        this.entityId =  entityId;
+        this.entityId = entityId;
 
-        //todo start bg job to fetch both product options,reviews,related products
+        //start bg job to fetch both product options,reviews,related products
+        productDetailActivity.jobManager.addJobInBackground(new RetrieveProductOptionsReviews(String.valueOf(this.entityId)));
 
 
         //fetch product data in database
@@ -75,34 +89,34 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     private void getProductDetailsFromDb() {
 
         //double number = 22.5;
-       /** double number = ((double)(regularPrice-specialPrice)*100);
-        int rounded = (int)Math.round(number);
-        Log.e("jeff-waswa-num",String.valueOf(number));
-        Log.e("jeff-waswa-round",String.valueOf(rounded));**/
+        /** double number = ((double)(regularPrice-specialPrice)*100);
+         int rounded = (int)Math.round(number);
+         Log.e("jeff-waswa-num",String.valueOf(number));
+         Log.e("jeff-waswa-round",String.valueOf(rounded));**/
 
-        JumboQueryHandler handler =  new JumboQueryHandler(getActivity().getContentResolver()){
+        JumboQueryHandler handler = new JumboQueryHandler(getActivity().getContentResolver()) {
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
                 //set data to the variable in the layout view
-                while(cursor.moveToNext()){
+                while (cursor.moveToNext()) {
                     String regularPrice = cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_PRICE_REGULAR));
                     String specialPrice = cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL));
                     product.setName(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_NAME)).toUpperCase());
                     product.setPrice_regular(regularPrice);
                     product.setPrice_special(specialPrice);
                     product.setPrice_special(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL)));
-                   if(specialPrice != null && !specialPrice.isEmpty()){
+                    if (specialPrice != null && !specialPrice.isEmpty()) {
 
-                       /**remove all non numeric characters**/
-                       regularPrice = regularPrice +"&*%$";
-                       String regularPriceFormatted = regularPrice.replaceAll("[^\\d.]","");
-                       String specialPriceFormatted = specialPrice.replaceAll("[^\\d.]","");
-                       double regularPriceFormattedNum = (Double.valueOf(regularPriceFormatted));
-                       double specialPriceFormattedNum = (Double.valueOf(specialPriceFormatted));
+                        /**remove all non numeric characters**/
+                        regularPrice = regularPrice + "&*%$";
+                        String regularPriceFormatted = regularPrice.replaceAll("[^\\d.]", "");
+                        String specialPriceFormatted = specialPrice.replaceAll("[^\\d.]", "");
+                        double regularPriceFormattedNum = (Double.valueOf(regularPriceFormatted));
+                        double specialPriceFormattedNum = (Double.valueOf(specialPriceFormatted));
 
-                       double number = (((regularPriceFormattedNum-specialPriceFormattedNum)/regularPriceFormattedNum)*100);
-                       int roundedDiscount = (int)Math.round(number);
-                       product.setDiscount_percentage(String.valueOf(roundedDiscount)+"% OFF");
+                        double number = (((regularPriceFormattedNum - specialPriceFormattedNum) / regularPriceFormattedNum) * 100);
+                        int roundedDiscount = (int) Math.round(number);
+                        product.setDiscount_percentage(String.valueOf(roundedDiscount) + "% OFF");
                     }
 
                 }
@@ -123,7 +137,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         String selection = JumboContract.ProductEntry.COLUMN_ENTITY_ID + "=?";
         String[] selectionArgs = {String.valueOf(this.entityId)};
 
-        handler.startQuery(URL_LOADER,null,JumboContract.ProductEntry.CONTENT_URI,projection,selection,selectionArgs,null);
+        handler.startQuery(URL_LOADER, null, JumboContract.ProductEntry.CONTENT_URI, projection, selection, selectionArgs, null);
 
     }
 

@@ -10,6 +10,7 @@ public final class JumboContract {
     public static final String PATH_CATEGORY = "category";
     public static final String PATH_PRODUCT = "product";
     public static final String PATH_PRODUCT_IMAGES = "product_images";
+    public static final String PATH_PRODUCT_OPTIONS = "product_options";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
 
     public static final class PagerEntry implements BaseColumns{
@@ -92,6 +93,23 @@ public final class JumboContract {
         public static final String COLUMN_IMAGE_URL_SMALL = "image_url_small";
         public static final String COLUMN_IMAGE_ID = "image_id";
         public static final String COLUMN_MODIFICATION_TIME = "modification_time";
+    }
+    public static final class ProductOptionsEntry implements BaseColumns{
+
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI,PATH_PRODUCT_OPTIONS);
+        //Table name
+        public static final String TABLE_NAME = "product_options";
+        //column field names
+        public static final String _ID = BaseColumns._ID;
+        public static final String COLUMN_ENTITY_ID = "entity_id";
+        public static final String COLUMN_IS_PARENT = "is_parent";
+        public static final String COLUMN_PARENT_CODE = "parent_code";
+        public static final String COLUMN_PARENT_LABEL = "parent_label";
+        public static final String COLUMN_PARENT_REQUIRED = "parent_required";
+        public static final String COLUMN_PARENT_TYPE = "parent_type";
+        public static final String COLUMN_CHILD_CODE = "child_code";
+        public static final String COLUMN_CHILD_LABEL = "child_label";
+        public static final String COLUMN_CHILD_TO_CODE = "child_to_code";
     }
 
 }

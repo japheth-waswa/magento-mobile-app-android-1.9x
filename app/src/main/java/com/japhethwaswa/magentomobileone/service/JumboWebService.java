@@ -646,7 +646,6 @@ public class JumboWebService {
 
     public static void serviceRetrieveProductGallery(final Context context, final String productEntityId) {
 
-        //fetch these categories/products
         Resources res = context.getResources();
         String relativeUrl = res.getString(R.string.jumbo_product_gallery);
         relativeUrl = relativeUrl + "/" + productEntityId;
@@ -681,7 +680,7 @@ public class JumboWebService {
         //delete all gallery images for this product id
         String selection = JumboContract.ProductImagesEntry.COLUMN_ENTITY_ID + "=?";
         String[] selectionArgs = {productEntityId};
-        handler.startDelete(77,null,JumboContract.ProductImagesEntry.CONTENT_URI,selection,selectionArgs);
+        handler.startDelete(77, null, JumboContract.ProductImagesEntry.CONTENT_URI, selection, selectionArgs);
 
 
         InputStream xmlStream = new ByteArrayInputStream(response.getBytes());
@@ -764,6 +763,63 @@ public class JumboWebService {
 
         //perfom insert
         handler.startInsert(75, null, JumboContract.ProductImagesEntry.CONTENT_URI, values);
+
+    }
+
+
+    public static void serviceRetrieveProductOptionsReviews(Context context, String productEntityId) {
+        Log.e("jeff-waswa", "we are ready to retrieve product options,reviews");
+
+
+        //todo fetch product options
+        Resources res = context.getResources();
+        String relativeUrlProdOptions = res.getString(R.string.jumbo_product_options);
+        relativeUrlProdOptions = relativeUrlProdOptions + "/" + productEntityId;
+        String relativeUrlProdReviews = res.getString(R.string.jumbo_product_reviews);
+        relativeUrlProdReviews = relativeUrlProdReviews + "/" + productEntityId;
+
+        AndroidNetworking.get(getAbsoluteUrl(context, relativeUrlProdOptions))
+                .setTag("jumboproductOptions")
+                .setPriority(Priority.HIGH)
+                .addHeaders("Cookie", getCookie(context))
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        /**try {
+                         parseProductGallery(response, context, productEntityId);
+                         } catch (IOException e) {
+                         e.printStackTrace();
+                         }**/
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.e("jeff-error", anError.toString());
+                    }
+                });
+
+        //todo fetch product reviews
+        AndroidNetworking.get(getAbsoluteUrl(context, relativeUrlProdReviews))
+                .setTag("jumboproductReviews")
+                .setPriority(Priority.HIGH)
+                .addHeaders("Cookie", getCookie(context))
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        /**try {
+                         parseProductGallery(response, context, productEntityId);
+                         } catch (IOException e) {
+                         e.printStackTrace();
+                         }**/
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.e("jeff-error", anError.toString());
+                    }
+                });
 
     }
 

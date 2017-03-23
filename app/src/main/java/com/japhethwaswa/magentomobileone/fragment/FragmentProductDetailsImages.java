@@ -3,6 +3,7 @@ package com.japhethwaswa.magentomobileone.fragment;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -35,6 +36,14 @@ public class FragmentProductDetailsImages extends Fragment implements LoaderMana
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //StrictMode
+        StrictMode.VmPolicy vmPolicy = new StrictMode.VmPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build();
+        StrictMode.setVmPolicy(vmPolicy);
+        /**==============**/
+
 
         fragmentProductDetailImagesBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_product_detail_images, container, false);
 

@@ -7,6 +7,8 @@
     <string name="jumbo_main_data_url">jumbomobile/jumbo/main</string>
     <string name="jumbo_top_categories">xmlconnect/Catalog/category</string>
     <string name="jumbo_product_gallery">xmlconnect/Catalog/productGallery/id</string>
+    <string name="jumbo_product_options">xmlconnect/Catalog/productOptions/id</string>
+    <string name="jumbo_product_reviews">xmlconnect/Catalog/productReviews/id</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

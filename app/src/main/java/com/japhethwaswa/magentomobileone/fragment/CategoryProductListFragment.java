@@ -163,7 +163,7 @@ public class CategoryProductListFragment extends Fragment implements LoaderManag
             @Override
             public void onClick(View view, int position) {
                 cursor.moveToPosition(position);
-                //todo initiate product detail view activity
+                //initiate product detail view activity
                 Intent intent = new Intent(getContext(), ProductDetailActivity.class);
                 intent.putExtra("entityId", Integer.valueOf(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_ENTITY_ID))));
                 startActivity(intent);
