@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.japhethwaswa.magentomobileone.R;
+import com.japhethwaswa.magentomobileone.databinding.FragmentProductDetailImagesBinding;
 import com.japhethwaswa.magentomobileone.databinding.MainViewPagerItemBinding;
 import com.japhethwaswa.magentomobileone.databinding.ProductViewPagerItemBinding;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
@@ -18,10 +19,12 @@ public class ProductViewPagerAdapter extends PagerAdapter {
 
     private LayoutInflater inflater;
     private Cursor cursor;
+    private FragmentProductDetailImagesBinding fragmentProductDetailImagesBinding;
 
 
-    public ProductViewPagerAdapter(Cursor cursor) {
+    public ProductViewPagerAdapter(Cursor cursor, FragmentProductDetailImagesBinding fragmentProductDetailImagesBinding) {
         this.cursor = cursor;
+        this.fragmentProductDetailImagesBinding = fragmentProductDetailImagesBinding;
     }
 
     @Override
@@ -57,9 +60,14 @@ public class ProductViewPagerAdapter extends PagerAdapter {
     public void destroyItem(ViewGroup container, int position, Object object) {
     }
 
-    public void setCursor(Cursor cursor) {
+    public void setCursor(Cursor cursor, int initialPosition) {
         this.cursor = cursor;
         notifyDataSetChanged();
+
+        //set the current item in the viewpager
+        if (initialPosition != -1) {
+            fragmentProductDetailImagesBinding.productImagesViewPager.setCurrentItem(initialPosition);
+        }
     }
 
 }

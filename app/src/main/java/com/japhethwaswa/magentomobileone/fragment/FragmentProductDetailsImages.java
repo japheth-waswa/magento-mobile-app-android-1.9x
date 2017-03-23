@@ -29,6 +29,7 @@ public class FragmentProductDetailsImages extends Fragment implements LoaderMana
     private static final int URL_LOADER = 11;
     public ProductDetailActivity productDetailActivity;
     private ProductViewPagerAdapter productViewpagerAdapter;
+    private int initialPosition = -1;
     Cursor cursor;
     //todo we need a cursor loader to load these images for viewpager from database
     //todo initiate bg job to fetch product images and save their link to the database
@@ -45,11 +46,12 @@ public class FragmentProductDetailsImages extends Fragment implements LoaderMana
 
         if (savedInstanceState != null) {
             entityId = savedInstanceState.getInt("entityId");
+            initialPosition = savedInstanceState.getInt("viwePagerCurrent");
             //restart loader
             getActivity().getSupportLoaderManager().restartLoader(URL_LOADER,null,this);
         }
 
-        productViewpagerAdapter = new ProductViewPagerAdapter(cursor);
+        productViewpagerAdapter = new ProductViewPagerAdapter(cursor,fragmentProductDetailImagesBinding);
 
         fragmentProductDetailImagesBinding.productImagesViewPager.setAdapter(productViewpagerAdapter);
 
@@ -72,6 +74,7 @@ public class FragmentProductDetailsImages extends Fragment implements LoaderMana
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("entityId", entityId);
+        outState.putInt("viwePagerCurrent",fragmentProductDetailImagesBinding.productImagesViewPager.getCurrentItem());
     }
 
     @Override
@@ -88,12 +91,16 @@ public class FragmentProductDetailsImages extends Fragment implements LoaderMana
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.e("jef-waswa-dt",String.valueOf(data.getCount()));
-        productViewpagerAdapter.setCursor(data);
+        productViewpagerAdapter.setCursor(data,initialPosition);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        productViewpagerAdapter.setCursor(null);
+        productViewpagerAdapter.setCursor(null,initialPosition);
+        resetInitPos();
+    }
+
+    private void resetInitPos(){
+        initialPosition = -1;
     }
 }
