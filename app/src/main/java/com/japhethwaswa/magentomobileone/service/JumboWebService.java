@@ -22,6 +22,7 @@ import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 import com.japhethwaswa.magentomobileone.event.CategoriesEventHandler;
 import com.japhethwaswa.magentomobileone.model.Category;
 import com.japhethwaswa.magentomobileone.model.Product;
+import com.japhethwaswa.magentomobileone.model.ProductOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -767,8 +768,7 @@ public class JumboWebService {
     }
 
 
-    public static void serviceRetrieveProductOptionsReviews(Context context, String productEntityId) {
-        Log.e("jeff-waswa", "we are ready to retrieve product options,reviews");
+    public static void serviceRetrieveProductOptionsReviews(final Context context, final String productEntityId) {
 
 
         //todo fetch product options
@@ -786,11 +786,11 @@ public class JumboWebService {
                 .getAsString(new StringRequestListener() {
                     @Override
                     public void onResponse(String response) {
-                        /**try {
-                         parseProductGallery(response, context, productEntityId);
-                         } catch (IOException e) {
-                         e.printStackTrace();
-                         }**/
+                        try {
+                            parseProductOptions(response, context, productEntityId);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
@@ -820,6 +820,190 @@ public class JumboWebService {
                         Log.e("jeff-error", anError.toString());
                     }
                 });
+    }
+
+    private static void parseProductOptions(String response, Context context, String productEntityId) throws IOException {
+
+        //delete all product options for this product
+        JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
+
+        //delete all gallery images for this product id
+        String selection = JumboContract.ProductOptionsEntry.COLUMN_ENTITY_ID + "=?";
+        String[] selectionArgs = {productEntityId};
+        handler.startDelete(73, null, JumboContract.ProductOptionsEntry.CONTENT_URI, selection, selectionArgs);
+
+
+        InputStream xmlStream = new ByteArrayInputStream(response.getBytes());
+        ProductOptions productOptionsParent = null;
+        ProductOptions productOptionsChild = null;
+        ProductOptions productOptionsChildLittle = null;
+        Boolean isOptionOrParent = false;
+        Boolean isTopValue = false;
+        Boolean isInnerValue = false;
+        Boolean navigatingInnerChildren = false;
+        String innerChildParent = null;
+
+
+        try {
+            XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
+            XmlPullParser myParser = xmlPullParserFactory.newPullParser();
+            myParser.setInput(xmlStream, null);
+
+            int eventType = myParser.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+
+                String name;
+
+                switch (eventType) {
+                    case XmlPullParser.START_TAG:
+                        name = myParser.getName();
+                        if (name.equalsIgnoreCase("option")) {
+                            //if option-ie parent
+                            isOptionOrParent = true;
+                        }
+
+                        //get option/parent data
+                        if (name.equalsIgnoreCase("option") && isOptionOrParent == true) {
+
+                            if (productOptionsParent == null) {
+                                productOptionsParent = new ProductOptions();
+                            }
+                            //get attribute values here
+                            productOptionsParent.setIs_parent("1");
+                            productOptionsParent.setParent_code(myParser.getAttributeValue(null, "code"));
+                            productOptionsParent.setParent_type(myParser.getAttributeValue(null, "type"));
+                            productOptionsParent.setParent_label(myParser.getAttributeValue(null, "label"));
+                            productOptionsParent.setParent_required(myParser.getAttributeValue(null, "is_required"));
+
+                        }
+
+                        //top child
+                        if (name.equalsIgnoreCase("value") && isTopValue == false) {
+                            //if top value
+                            isTopValue = true;
+                        }
+                        //get top child data
+                        if (name.equalsIgnoreCase("value") && isTopValue == true && navigatingInnerChildren == false) {
+
+                            if (productOptionsChild == null) {
+                                productOptionsChild = new ProductOptions();
+                            }
+                            //get attribute values here
+                            productOptionsChild.setIs_parent("0");
+                            productOptionsChild.setParent_code(productOptionsParent.getParent_code());
+                            productOptionsChild.setChild_label(myParser.getAttributeValue(null, "label"));
+                            productOptionsChild.setChild_code(myParser.getAttributeValue(null, "code"));
+
+
+                        }
+
+                        //inner children
+                        if (name.equalsIgnoreCase("relation")) {
+                            navigatingInnerChildren = true;
+                            innerChildParent = myParser.getAttributeValue(null, "to");
+                        }
+
+                        //top inner child
+                        if (name.equalsIgnoreCase("value") && isInnerValue == false && navigatingInnerChildren == true) {
+                            //if inner value
+                            isInnerValue = true;
+                        }
+                        //get inner child data
+                        if (name.equalsIgnoreCase("value") && isInnerValue == true && navigatingInnerChildren == true) {
+
+                            if (productOptionsChildLittle == null) {
+                                productOptionsChildLittle = new ProductOptions();
+                            }
+                            //get attribute values here
+                            productOptionsChildLittle.setIs_parent("0");
+                            //set parent code from relation
+                            productOptionsChildLittle.setParent_code(innerChildParent);
+                            //remember to set child_to_code
+                            productOptionsChildLittle.setChild_to_code(productOptionsChild.getChild_code());
+                            productOptionsChildLittle.setChild_label(myParser.getAttributeValue(null, "label"));
+                            productOptionsChildLittle.setChild_code(myParser.getAttributeValue(null, "code"));
+
+
+                        }
+
+                        break;
+                    case XmlPullParser.END_TAG:
+                        name = myParser.getName();
+
+                        if (name.equalsIgnoreCase("option") && isOptionOrParent == true && productOptionsParent != null) {
+                            //perform parent insert here
+                            //insert product options
+                            insertProductOptions(context, productOptionsParent, productEntityId, "1");
+                            //set null
+                            productOptionsParent = null;
+                            isOptionOrParent = false;
+                        }
+
+                        if (name.equalsIgnoreCase("relation")) {
+                            navigatingInnerChildren = false;
+                            innerChildParent = null;
+                        }
+
+
+                        if (name.equalsIgnoreCase("value") && isTopValue == true && productOptionsChild != null && navigatingInnerChildren == false) {
+                            //perform insert here for the top value
+                            //insert product options
+                            insertProductOptions(context, productOptionsChild, productEntityId, "0");
+                            //set null
+                            productOptionsChild = null;
+                            isTopValue = false;
+                        }
+
+                        if (name.equalsIgnoreCase("value") && isInnerValue == true && productOptionsChildLittle != null && navigatingInnerChildren == true) {
+                            //perform insert here for the inner value
+                            //insert product options
+                            insertProductOptions(context, productOptionsChildLittle, productEntityId, "0");
+                            //set null
+                            productOptionsChildLittle = null;
+                            isInnerValue = false;
+                        }
+                        break;
+
+                }
+
+                eventType = myParser.next();
+            }
+
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void insertProductOptions(Context context, ProductOptions productOptionsParent, String productEntityId, String isPrentOrChild) {
+
+        //delete all product options for this product
+        JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
+        ContentValues values = new ContentValues();
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_ENTITY_ID,productEntityId);
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE,productOptionsParent.getParent_code());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL,productOptionsParent.getParent_label());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_REQUIRED,productOptionsParent.getParent_required());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_TYPE,productOptionsParent.getParent_type());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE,productOptionsParent.getChild_code());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL,productOptionsParent.getChild_label());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE,productOptionsParent.getChild_to_code());
+
+
+        //isPrentOrChild(1-parent,0-child)
+        if (isPrentOrChild.equalsIgnoreCase("1")) {
+            //insert parent
+            values.put(JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT,"1");
+        }
+
+        if (isPrentOrChild.equalsIgnoreCase("0")) {
+            //insert child
+            values.put(JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT,"0");
+
+        }
+        //perfom insert
+        handler.startInsert(75, null, JumboContract.ProductOptionsEntry.CONTENT_URI, values);
+
 
     }
 
