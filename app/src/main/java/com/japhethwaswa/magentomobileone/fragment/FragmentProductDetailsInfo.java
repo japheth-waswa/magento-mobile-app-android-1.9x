@@ -7,11 +7,13 @@ import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.app.ProductDetailActivity;
@@ -23,6 +25,9 @@ import com.japhethwaswa.magentomobileone.job.RetrieveProductGallery;
 import com.japhethwaswa.magentomobileone.job.RetrieveProductOptionsReviews;
 import com.japhethwaswa.magentomobileone.model.Product;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class FragmentProductDetailsInfo extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private FragmentProductDetailInfoBinding fragmentProductDetailInfoBinding;
@@ -31,6 +36,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     public ProductDetailActivity productDetailActivity;
     private Cursor cursor;
     private Product product;
+    private ArrayList<String> prodOpsHm;
 
 
     @Nullable
@@ -58,6 +64,9 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         }
 
         product = new Product();
+
+        //instantiate hashmap
+        prodOpsHm =  new ArrayList<>();
         //todo hide spinner that will contain product options
         //todo add spinners dynamically at runtime
 
@@ -83,16 +92,10 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
         //todo initialize loader here to get the necessary data
         //initialize loader
-        //getSupportLoaderManager().initLoader(URL_LOADER, null, this);
+        getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
     }
 
     private void getProductDetailsFromDb() {
-
-        //double number = 22.5;
-        /** double number = ((double)(regularPrice-specialPrice)*100);
-         int rounded = (int)Math.round(number);
-         Log.e("jeff-waswa-num",String.valueOf(number));
-         Log.e("jeff-waswa-round",String.valueOf(rounded));**/
 
         JumboQueryHandler handler = new JumboQueryHandler(getActivity().getContentResolver()) {
             @Override
@@ -143,14 +146,78 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        //todo fetch product options from the database
-        return null;
+        //fetch product options from the database
+        String[] projection = {
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE,
+                JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT,
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL,
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_REQUIRED,
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_TYPE
+        };
+
+        String selection = JumboContract.ProductOptionsEntry.COLUMN_ENTITY_ID + "=? and " + JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT + "=? ";
+        String[] selectionArgs = {String.valueOf(entityId), "1"};
+
+        return new CursorLoader(getContext(), JumboContract.ProductOptionsEntry.CONTENT_URI, projection, selection, selectionArgs, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        Log.e("jeff-waswa-count", String.valueOf(data.getCount()));
+        //get parent children
+        getParentTopChildren(data);
         //todo update product options
         //todo fetch product reviews from the db
+    }
+
+    private void getParentTopChildren(Cursor cursor) {
+        if (cursor.getCount() > 0) {
+
+            while (cursor.moveToNext()) {
+
+                JumboQueryHandler handler = new JumboQueryHandler(getActivity().getContentResolver()){
+                    @Override
+                    protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                        if(cursor.getCount() >0){
+                            while(cursor.moveToNext()){
+                                /**prodOpsHm.add(Integer.valueOf(cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE))),
+                                        cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL)));**/
+                                prodOpsHm.add(cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL)));
+                            }
+
+                            //set adapter to the spinner
+                            ArrayAdapter<String> prodOpsHmAdapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_spinner_item,prodOpsHm);
+                            prodOpsHmAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            fragmentProductDetailInfoBinding.productOptions.setAdapter(prodOpsHmAdapter);
+                           // ArrayAdapter<HashMap> filtersAdapter = new ArrayAdapter<HashMap>(getContext(),android.R.layout.simple_spinner_item,prodOpsHm);
+
+                        }
+                        cursor.close();
+                    }
+                };
+
+                String[] projection = {
+                        JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE,
+                        JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT,
+                        JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL,
+                        JumboContract.ProductOptionsEntry.COLUMN_PARENT_REQUIRED,
+                        JumboContract.ProductOptionsEntry.COLUMN_PARENT_TYPE,
+                        JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE,
+                        JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL,
+                        JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE
+                };
+
+                String selection = JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE + "=? and " + JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT + "=?";
+                String[] selectionArgs = {cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE)), "0"};
+
+                handler.startQuery(23,null,JumboContract.ProductOptionsEntry.CONTENT_URI,projection,selection,selectionArgs,null);
+                //todo fetch children data
+                //todo fetch sub-children data
+            }
+
+        }
+
     }
 
     @Override
