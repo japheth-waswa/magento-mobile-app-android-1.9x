@@ -31,8 +31,6 @@ public class FragmentProductDetailsImages extends Fragment implements LoaderMana
     private ProductViewPagerAdapter productViewpagerAdapter;
     private int initialPosition = -1;
     Cursor cursor;
-    //todo we need a cursor loader to load these images for viewpager from database
-    //todo initiate bg job to fetch product images and save their link to the database
 
     @Nullable
     @Override

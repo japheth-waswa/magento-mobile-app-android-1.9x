@@ -26,7 +26,17 @@ public class Product extends BaseObservable{
     private String image_url_big;
     private String image_url_small;
     private String image_id;
+    private String discount_percentage;
 
+    @Bindable
+    public String getDiscount_percentage() {
+        return discount_percentage;
+    }
+
+    public void setDiscount_percentage(String discount_percentage) {
+        this.discount_percentage = discount_percentage;
+        notifyPropertyChanged(BR.discount_percentage);
+    }
 
 
     @Bindable

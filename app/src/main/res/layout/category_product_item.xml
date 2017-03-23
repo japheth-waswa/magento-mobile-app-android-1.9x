@@ -57,18 +57,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:orientation="horizontal">
-
-                <!--<TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/standardPadding"
-                    android:paddingRight="@dimen/standardPadding"
-                    android:text="@={product.price_regular}"
-                    android:background="@drawable/strike_through"
-                    android:textSize="13sp"
-                    android:textColor="@color/black"
-                    android:textStyle="italic|bold"/>-->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
