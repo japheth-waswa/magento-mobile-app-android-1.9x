@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide;
 import com.japhethwaswa.magentomobileone.R;
 
 
-public class CustomImageViewBindingAdapter {
+public class CustomPhotoViewBindingAdapter {
 
     @BindingAdapter("imageUrl")
     public static void setImage(ImageView view,String imageUrl){

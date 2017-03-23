@@ -8,11 +8,17 @@
 
     <FrameLayout
         android:layout_width="match_parent" android:layout_height="match_parent">
-        <ImageView
+        <com.github.chrisbanes.photoview.PhotoView
             android:id="@+id/product_view_pager_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
-            app:imageUrl="@{preData.imageUrl}"/>
+            android:src="@drawable/ic_search"/>
+        <!--<ImageView
+            android:id="@+id/product_view_pager_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            app:imageUrl="@{preData.imageUrl}"/>-->
     </FrameLayout>
 </layout>
