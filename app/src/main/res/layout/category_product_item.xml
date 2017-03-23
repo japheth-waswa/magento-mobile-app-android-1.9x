@@ -44,12 +44,17 @@
                     android:text="@{product.name}"
                     android:textSize="15sp"
                     android:textColor="@color/black"/>
-                <ImageButton
+                <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_wishlist"
-                    android:background="@android:color/transparent"/>
+                    android:gravity="center"
+                    android:paddingLeft="@dimen/standardPadding"
+                    android:paddingRight="@dimen/standardPadding"
+                    android:text="@={product.discount_percentage}"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="13sp"
+                    android:textStyle="italic|bold" />
             </LinearLayout>
 
             <LinearLayout

@@ -27,10 +27,26 @@ public class CategoryProductViewHolder extends RecyclerView.ViewHolder {
         Product product = new Product();
 
         //get title and image url
+        String regularPrice = cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_PRICE_REGULAR));
+        String specialPrice = cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL));
         product.setName(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_NAME)));
         product.setIcon(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_ICON)));
-        product.setPrice_regular(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_PRICE_REGULAR)));
-        product.setPrice_special(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL)));
+        product.setPrice_regular(regularPrice);
+        product.setPrice_special(specialPrice);
+
+        if(specialPrice != null && !specialPrice.isEmpty()){
+
+            /**remove all non numeric characters**/
+            regularPrice = regularPrice +"&*%$";
+            String regularPriceFormatted = regularPrice.replaceAll("[^\\d.]","");
+            String specialPriceFormatted = specialPrice.replaceAll("[^\\d.]","");
+            double regularPriceFormattedNum = (Double.valueOf(regularPriceFormatted));
+            double specialPriceFormattedNum = (Double.valueOf(specialPriceFormatted));
+
+            double number = (((regularPriceFormattedNum-specialPriceFormattedNum)/regularPriceFormattedNum)*100);
+            int roundedDiscount = (int)Math.round(number);
+            product.setDiscount_percentage(String.valueOf(roundedDiscount)+"% OFF");
+        }
         categoryProductItemBinding.setProduct(product);
 
     }
