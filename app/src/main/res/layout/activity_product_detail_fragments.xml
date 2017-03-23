@@ -15,6 +15,7 @@
             android:name="com.japhethwaswa.magentomobileone.fragment.FragmentProductDetailsImages"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
             tools:layout="@layout/fragment_product_detail_images" />
 
         <fragment

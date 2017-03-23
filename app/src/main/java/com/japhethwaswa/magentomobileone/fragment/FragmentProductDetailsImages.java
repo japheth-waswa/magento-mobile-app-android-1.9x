@@ -51,6 +51,9 @@ public class FragmentProductDetailsImages extends Fragment implements LoaderMana
             getActivity().getSupportLoaderManager().restartLoader(URL_LOADER,null,this);
         }
 
+        //show loader
+        fragmentProductDetailImagesBinding.prodImageLoader.startProgress();
+
         productViewpagerAdapter = new ProductViewPagerAdapter(cursor,fragmentProductDetailImagesBinding);
 
         fragmentProductDetailImagesBinding.productImagesViewPager.setAdapter(productViewpagerAdapter);
@@ -91,6 +94,11 @@ public class FragmentProductDetailsImages extends Fragment implements LoaderMana
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        if(data.getCount() > 0){
+            //hide loader
+            fragmentProductDetailImagesBinding.prodImageLoader.stopProgress();
+        }
         productViewpagerAdapter.setCursor(data,initialPosition);
     }
 
