@@ -753,7 +753,6 @@ public class JumboWebService {
     //insert product gallery
     private static void insertProductGallery(Context context, Product product, String productEntityId) {
 
-        Log.e("jeff-waswa","we are ready");
         JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
 
         ContentValues values = new ContentValues();

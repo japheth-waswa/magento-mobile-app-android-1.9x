@@ -9,8 +9,8 @@ import com.japhethwaswa.magentomobileone.R;
 
 public class CustomPhotoViewBindingAdapter {
 
-    @BindingAdapter("imageUrl")
-    public static void setImage(ImageView view,String imageUrl){
+    @BindingAdapter("imagePhotoViewUrl")
+    public static void setPhoto(ImageView view,String imageUrl){
         Glide
                 .with(view.getContext())
                 .load(imageUrl)
@@ -18,8 +18,8 @@ public class CustomPhotoViewBindingAdapter {
                 .error(R.drawable.ic_error_img)
                 .into(view);
     }
-    @BindingAdapter({"imageUrl","imagePlaceholder"})
-    public static void setImage(ImageView view,String imageUrl,int imagePlaceholder){
+    @BindingAdapter({"imagePhotoViewUrl","imagePlaceholder"})
+    public static void setPhoto(ImageView view,String imageUrl,int imagePlaceholder){
         Glide
                 .with(view.getContext())
                 .load(imageUrl)
@@ -27,8 +27,8 @@ public class CustomPhotoViewBindingAdapter {
                 .error(R.drawable.ic_broken_image_black_48dp)
                 .into(view);
     }
-    @BindingAdapter({"imageUrl","imagePlaceholder","imageError"})
-    public static void setImage(ImageView view,String imageUrl,int imagePlaceholder,int imageError){
+    @BindingAdapter({"imagePhotoViewUrl","imagePlaceholder","imageError"})
+    public static void setPhoto(ImageView view,String imageUrl,int imagePlaceholder,int imageError){
         Glide
                 .with(view.getContext())
                 .load(imageUrl)
