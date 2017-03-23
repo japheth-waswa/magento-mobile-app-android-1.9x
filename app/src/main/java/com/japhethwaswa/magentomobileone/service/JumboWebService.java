@@ -675,6 +675,15 @@ public class JumboWebService {
 
     private static void parseProductGallery(String response, Context context, String productEntityId) throws IOException {
 
+        //delete all galleryimages for this product
+        JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
+
+        //delete all gallery images for this product id
+        String selection = JumboContract.ProductImagesEntry.COLUMN_ENTITY_ID + "=?";
+        String[] selectionArgs = {productEntityId};
+        handler.startDelete(77,null,JumboContract.ProductImagesEntry.CONTENT_URI,selection,selectionArgs);
+
+
         InputStream xmlStream = new ByteArrayInputStream(response.getBytes());
         Product product = null;
         Boolean isImageObject = false;
@@ -744,12 +753,8 @@ public class JumboWebService {
     //insert product gallery
     private static void insertProductGallery(Context context, Product product, String productEntityId) {
 
+        Log.e("jeff-waswa","we are ready");
         JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
-
-        //delete all gallery images for this product id
-        String selection = JumboContract.ProductImagesEntry.COLUMN_ENTITY_ID + "=?";
-        String[] selectionArgs = {productEntityId};
-        handler.startDelete(77,null,JumboContract.ProductImagesEntry.CONTENT_URI,selection,selectionArgs);
 
         ContentValues values = new ContentValues();
         values.put(JumboContract.ProductImagesEntry.COLUMN_ENTITY_ID, product.getEntity_id());
@@ -759,7 +764,7 @@ public class JumboWebService {
         values.put(JumboContract.ProductImagesEntry.COLUMN_MODIFICATION_TIME, product.getModification_time());
 
         //perfom insert
-        handler.startInsert(77, null, JumboContract.ProductImagesEntry.CONTENT_URI, values);
+        handler.startInsert(75, null, JumboContract.ProductImagesEntry.CONTENT_URI, values);
 
     }
 

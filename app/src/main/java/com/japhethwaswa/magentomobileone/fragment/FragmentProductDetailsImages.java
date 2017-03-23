@@ -88,6 +88,7 @@ public class FragmentProductDetailsImages extends Fragment implements LoaderMana
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.e("jef-waswa-dt",String.valueOf(data.getCount()));
         productViewpagerAdapter.setCursor(data);
     }
 
