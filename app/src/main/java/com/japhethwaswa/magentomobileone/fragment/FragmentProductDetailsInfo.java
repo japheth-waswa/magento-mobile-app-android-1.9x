@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import com.japhethwaswa.magentomobileone.R;
@@ -37,6 +38,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     private Cursor cursor;
     private Product product;
     private ArrayList<String> prodOpsHm;
+    private HashMap<Integer,String> prodOpsHashMap;
 
 
     @Nullable
@@ -55,18 +57,28 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         //get activity context
         productDetailActivity = (ProductDetailActivity) getActivity();
 
+
+        product = new Product();
+
         if (savedInstanceState != null) {
             entityId = savedInstanceState.getInt("entityId");
             //get product detail from db
             getProductDetailsFromDb();
             //restart loader
-            //getSupportLoaderManager().restartLoader(URL_LOADER,null,this);
+            getActivity().getSupportLoaderManager().restartLoader(URL_LOADER,null,this);
         }
 
-        product = new Product();
+        fragmentProductDetailInfoBinding.productOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.e("jeff-item",String.valueOf(position));
+            }
 
-        //instantiate hashmap
-        prodOpsHm =  new ArrayList<>();
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         //todo hide spinner that will contain product options
         //todo add spinners dynamically at runtime
 
@@ -164,7 +176,6 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        Log.e("jeff-waswa-count", String.valueOf(data.getCount()));
         //get parent children
         getParentTopChildren(data);
         //todo update product options
@@ -179,18 +190,24 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                 JumboQueryHandler handler = new JumboQueryHandler(getActivity().getContentResolver()){
                     @Override
                     protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+
+                        prodOpsHm=null;
+                        prodOpsHm = new ArrayList<>();
+                        prodOpsHashMap=null;
+                        prodOpsHashMap= new HashMap<>();
+
                         if(cursor.getCount() >0){
+                            int i=0;
                             while(cursor.moveToNext()){
-                                /**prodOpsHm.add(Integer.valueOf(cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE))),
-                                        cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL)));**/
-                                prodOpsHm.add(cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL)));
+                                prodOpsHm.add(i,cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL)));
+                                prodOpsHashMap.put(i,cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE)));
+                                i++;
                             }
 
                             //set adapter to the spinner
                             ArrayAdapter<String> prodOpsHmAdapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_spinner_item,prodOpsHm);
                             prodOpsHmAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             fragmentProductDetailInfoBinding.productOptions.setAdapter(prodOpsHmAdapter);
-                           // ArrayAdapter<HashMap> filtersAdapter = new ArrayAdapter<HashMap>(getContext(),android.R.layout.simple_spinner_item,prodOpsHm);
 
                         }
                         cursor.close();
@@ -208,7 +225,8 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                         JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE
                 };
 
-                String selection = JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE + "=? and " + JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT + "=?";
+                String selection = JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE + "=? AND "
+                        + JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT + "=? AND " + JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE + " IS NULL";
                 String[] selectionArgs = {cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE)), "0"};
 
                 handler.startQuery(23,null,JumboContract.ProductOptionsEntry.CONTENT_URI,projection,selection,selectionArgs,null);
