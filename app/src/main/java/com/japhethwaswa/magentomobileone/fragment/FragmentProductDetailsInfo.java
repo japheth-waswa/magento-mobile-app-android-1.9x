@@ -46,8 +46,11 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     private HashMap<Integer,String> prodOpsHashMapLittle;
     private int prodOptionsMainPosition = -1;
     private int prodOptionsMainPositionLittle = -1;
+
     private String prodOptionsMainParentCode =  "-1";
+    String prodOptionsMainChildCode =  "-1";
     private String prodOptionsMainParentCodeLittle =  "-1";
+    String prodOptionsLittleChildCode =  "-1";
     SQLiteDatabase db;
 
 
@@ -91,16 +94,13 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
                 //store the position
                 prodOptionsMainPosition = position;
-                Log.e("jeff-item",String.valueOf(position));
 
                 String prodMainOpsCode = prodOpsHashMap.get(position);
-                Log.e("jeff-item-code",prodMainOpsCode);
-                Log.e("jeff-item-code",prodOptionsMainParentCode);
+                prodOptionsMainChildCode = prodMainOpsCode;
 
-                //todo fetch sub-children data
+
+                //fetch sub-children data
                 setSubChildrenWithSpinner(prodMainOpsCode);
-                //todo populate their spinner and label with data
-                //todo use the code to determine if it contains child_to_code where(is_parent=0,entityid=currentproductid,child_to_code=currentselected position)
             }
 
             @Override
@@ -115,11 +115,9 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
                 //store the position
                 prodOptionsMainPositionLittle = position;
-                Log.e("jeff-lit-item",String.valueOf(position));
 
                 String prodMainOpsLittleCode = prodOpsHashMapLittle.get(position);
-                Log.e("jeff-item-lit-code",prodMainOpsLittleCode);
-                Log.e("jeff-item-lit-code",prodOptionsMainParentCodeLittle);
+                prodOptionsLittleChildCode = prodMainOpsLittleCode;
             }
 
             @Override
@@ -343,7 +341,6 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
                     int i=0;
                     while(cursor.moveToNext()){
-                        Log.e("jeff-cursor",DatabaseUtils.dumpCursorToString(cursor));
                         prodOpsHmLittle.add(i,cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL)));
                         prodOpsHashMapLittle.put(i,cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE)));
                         prodOptionsMainParentCodeLittle = cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE));
