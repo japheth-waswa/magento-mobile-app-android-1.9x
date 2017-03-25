@@ -64,8 +64,10 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         //get activity context
         productDetailActivity = (ProductDetailActivity) getActivity();
 
-
         product = new Product();
+
+        //hide top values spinner
+        fragmentProductDetailInfoBinding.productOptions.setVisibility(View.INVISIBLE);
 
         if (savedInstanceState != null) {
             entityId = savedInstanceState.getInt("entityId");
@@ -76,6 +78,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
             getActivity().getSupportLoaderManager().restartLoader(URL_LOADER,null,this);
         }
 
+        //set on click listener
         fragmentProductDetailInfoBinding.productOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -222,13 +225,14 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
                         if(cursor != null && cursor.getCount() >0){
 
-                            //save parent code in variable
-
                             //initialize variables
                             prodOpsHm=null;
                             prodOpsHm = new ArrayList<>();
                             prodOpsHashMap=null;
                             prodOpsHashMap= new HashMap<>();
+
+                            //set spinner visible
+                            fragmentProductDetailInfoBinding.productOptions.setVisibility(View.VISIBLE);
 
                             int i=0;
                             while(cursor.moveToNext()){
@@ -308,9 +312,6 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         String[] selectionArgs = {prodOptionsMainParentCode, "1"};
 
         cursor = db.query(JumboContract.ProductOptionsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
-
-        //cursor.close();
-        //db.close();
 
         return cursor;
     }
