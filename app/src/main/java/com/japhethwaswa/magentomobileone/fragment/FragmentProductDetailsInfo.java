@@ -2,6 +2,7 @@ package com.japhethwaswa.magentomobileone.fragment;
 
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.database.sqlite.SQLiteDatabase;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -21,6 +22,7 @@ import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.app.ProductDetailActivity;
 import com.japhethwaswa.magentomobileone.databinding.FragmentProductDetailImagesBinding;
 import com.japhethwaswa.magentomobileone.databinding.FragmentProductDetailInfoBinding;
+import com.japhethwaswa.magentomobileone.db.DatabaseHelper;
 import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 import com.japhethwaswa.magentomobileone.job.RetrieveProductGallery;
@@ -40,7 +42,10 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     private Product product;
     private ArrayList<String> prodOpsHm;
     private HashMap<Integer,String> prodOpsHashMap;
+    //private Cursor parentCursor;
     private int prodOptionsMainPosition = -1;
+    private String prodOptionsMainParentCode =  "-1";
+    SQLiteDatabase db;
 
 
     @Nullable
@@ -78,8 +83,11 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                 //store the position
                 prodOptionsMainPosition = position;
                 Log.e("jeff-item",String.valueOf(position));
-                Log.e("jeff-item-code",String.valueOf(prodOpsHashMap.get(position)));
+
                 String prodMainOpsCode = prodOpsHashMap.get(position);
+                Log.e("jeff-item-code",prodMainOpsCode);
+                Log.e("jeff-item-code",prodOptionsMainParentCode);
+
                 //todo use the code to determine if it contains child_to_code where(is_parent=0,entityid=currentproductid,child_to_code=currentselected position)
             }
 
@@ -193,10 +201,18 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         //todo fetch product reviews from the db
     }
 
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+        //todo reset loader to null
+    }
+
     private void getParentTopChildren(Cursor cursor) {
         if (cursor.getCount() > 0) {
 
             while (cursor.moveToNext()) {
+
 
                 JumboQueryHandler handler = new JumboQueryHandler(getActivity().getContentResolver()){
                     @Override
@@ -204,7 +220,11 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
 
 
-                        if(cursor.getCount() >0){
+                        if(cursor != null && cursor.getCount() >0){
+
+                            //save parent code in variable
+
+                            //initialize variables
                             prodOpsHm=null;
                             prodOpsHm = new ArrayList<>();
                             prodOpsHashMap=null;
@@ -214,6 +234,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                             while(cursor.moveToNext()){
                                 prodOpsHm.add(i,cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL)));
                                 prodOpsHashMap.put(i,cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE)));
+                               prodOptionsMainParentCode = cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE));
                                 i++;
                             }
 
@@ -221,11 +242,23 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                             ArrayAdapter<String> prodOpsHmAdapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_spinner_item,prodOpsHm);
                             prodOpsHmAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             fragmentProductDetailInfoBinding.productOptions.setAdapter(prodOpsHmAdapter);
-                            //todo set label for this parent in UI
+
                             //set current item if screen rotated
                             if(prodOptionsMainPosition != -1){
                                 fragmentProductDetailInfoBinding.productOptions.setSelection(prodOptionsMainPosition);
                             }
+
+                            //todo set label for this parent in UI
+                            Cursor parentCursor = getSpecificParentCursor(prodOptionsMainParentCode);
+                            if(parentCursor != null && parentCursor.getCount() >0){
+                                parentCursor.moveToFirst();
+                                String parentLabel = parentCursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL));
+                                fragmentProductDetailInfoBinding.productOptionsLabel.setText(parentLabel.toUpperCase());
+
+                            }
+
+                            parentCursor.close();
+                            db.close();
 
                         }
                         cursor.close();
@@ -243,9 +276,10 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                         JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE
                 };
 
+                String localParentCode = cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE));
                 String selection = JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE + "=? AND "
                         + JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT + "=? AND " + JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE + " IS NULL";
-                String[] selectionArgs = {cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE)), "0"};
+                String[] selectionArgs = {localParentCode, "0"};
 
                 handler.startQuery(23,null,JumboContract.ProductOptionsEntry.CONTENT_URI,projection,selection,selectionArgs,null);
                 //todo fetch children data
@@ -256,9 +290,29 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
     }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    private Cursor getSpecificParentCursor(String prodOptionsMainParentCode) {
 
-        //todo reset loader to null
+        DatabaseHelper helper = new DatabaseHelper(getContext());
+        db = helper.getReadableDatabase();
+        Cursor cursor;
+        String[] projection = {
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE,
+                JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT,
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL,
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_REQUIRED,
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_TYPE
+        };
+
+        String selection = JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE + "=? AND "
+                + JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT + "=?";
+        String[] selectionArgs = {prodOptionsMainParentCode, "1"};
+
+        cursor = db.query(JumboContract.ProductOptionsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+
+        //cursor.close();
+        //db.close();
+
+        return cursor;
     }
+
 }
