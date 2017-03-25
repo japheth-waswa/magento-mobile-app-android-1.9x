@@ -28,6 +28,7 @@ import com.japhethwaswa.magentomobileone.db.JumboContract;
 import com.japhethwaswa.magentomobileone.db.JumboQueryHandler;
 import com.japhethwaswa.magentomobileone.job.RetrieveProductGallery;
 import com.japhethwaswa.magentomobileone.job.RetrieveProductOptionsReviews;
+import com.japhethwaswa.magentomobileone.job.SubmitCartItem;
 import com.japhethwaswa.magentomobileone.model.Product;
 
 import java.util.ArrayList;
@@ -428,17 +429,29 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         //get the options that the client chose and show them ie adding item to cart or error
 
         if(productHasOptions.equalsIgnoreCase("1") && prodOptionsMainParentCode.equalsIgnoreCase("-1")){
-            Toasty.error(getActivity(),"Please select options",Toast.LENGTH_SHORT,true).show();
+            Toasty.error(getActivity(),"Please wait options loading or select options",Toast.LENGTH_SHORT,true).show();
         }
 
         if(productHasOptions.equalsIgnoreCase("1") && !prodOptionsMainParentCode.equalsIgnoreCase("-1") || productHasOptions.equalsIgnoreCase("0")){
-            Toasty.info(getActivity(),"Adding to Bag", Toast.LENGTH_SHORT,true).show();
+            Toasty.info(getActivity(),"Adding to Bag Please Continue Shopping", Toast.LENGTH_SHORT,true).show();
             nowAddToCart();
         }
 
     }
 
     private void nowAddToCart() {
-        //todo start bg job to insert items in online cart and update local repository
+        //start bg job to insert items in online cart and update local repository
+        //build the hashMap
+        HashMap<String,String> optionsKeyValue = new HashMap<>();
+        String itemQuantity = "1";
+        String currentEntityId = String.valueOf(entityId);
+        if(!prodOptionsMainParentCode.equalsIgnoreCase("-1")){
+            optionsKeyValue.put(prodOptionsMainParentCode,prodOptionsMainChildCode);
+        }
+        if(!prodOptionsMainParentCodeLittle.equalsIgnoreCase("-1")){
+            optionsKeyValue.put(prodOptionsMainParentCodeLittle,prodOptionsLittleChildCode);
+        }
+
+        productDetailActivity.jobManager.addJobInBackground(new SubmitCartItem(currentEntityId,itemQuantity,optionsKeyValue));
     }
 }

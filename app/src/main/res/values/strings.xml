@@ -9,6 +9,8 @@
     <string name="jumbo_product_gallery">xmlconnect/Catalog/productGallery/id</string>
     <string name="jumbo_product_options">xmlconnect/Catalog/productOptions/id</string>
     <string name="jumbo_product_reviews">xmlconnect/Catalog/productReviews/id</string>
+    <string name="jumbo_cart_add_product">xmlconnect/Cart/add/product</string>
+    <string name="jumbo_cart_get_items">xmlconnect/Cart</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

@@ -40,6 +40,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class JumboWebService {
@@ -1007,4 +1008,37 @@ public class JumboWebService {
     }
 
 
+    //submit cart items
+    public static void serviceSubmitCartItems(Context context, String currentEntityId, String itemQuantity, HashMap<String, String> optionsKeyValue) {
+        //fetch product options
+        Resources res = context.getResources();
+        String relativeUrl = res.getString(R.string.jumbo_cart_add_product) + "/" + currentEntityId;
+
+
+        AndroidNetworking.post(getAbsoluteUrl(context, relativeUrl))
+                .setTag("JumboAddCartItems")
+                .setPriority(Priority.HIGH)
+                .addHeaders("Cookie", getCookie(context))
+                .addBodyParameter("[qty]",itemQuantity)
+                .addBodyParameter(optionsKeyValue)
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("jeff-response",response);
+
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+
+                    }
+                });
+
+
+        //todo submit cart item using post
+
+        //todo delete the current list of cart items and options,
+        //todo (new method ie retrieveCartItems) that retrieves cart items and updates the relevant repositories
+    }
 }
