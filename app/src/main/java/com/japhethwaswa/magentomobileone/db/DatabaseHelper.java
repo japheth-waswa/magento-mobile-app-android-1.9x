@@ -10,6 +10,8 @@ import com.japhethwaswa.magentomobileone.db.JumboContract.CategoryEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.ProductEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.ProductImagesEntry;
 import com.japhethwaswa.magentomobileone.db.JumboContract.ProductOptionsEntry;
+import com.japhethwaswa.magentomobileone.db.JumboContract.CartItemsEntry;
+import com.japhethwaswa.magentomobileone.db.JumboContract.CartItemOptionsEntry;
 
 public class DatabaseHelper extends SQLiteOpenHelper{
 
@@ -95,6 +97,31 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                     ProductOptionsEntry.COLUMN_CHILD_TO_CODE + " TEXT " +
                     ")";
 
+    private static final String TABLE_CART_ITEMS_CREATE=
+            "CREATE TABLE " + CartItemsEntry.TABLE_NAME + " (" +
+                    CartItemsEntry._ID + " INTEGER PRIMARY KEY, " +
+                    CartItemsEntry.COLUMN_NAME + " TEXT, " +
+                    CartItemsEntry.COLUMN_ENTITY_ID + " TEXT, " +
+                    CartItemsEntry.COLUMN_ENTITY_TYPE + " TEXT, " +
+                    CartItemsEntry.COLUMN_ICON + " TEXT, " +
+                    CartItemsEntry.COLUMN_MODIFICATION_TIME + " TEXT, " +
+                    CartItemsEntry.COLUMN_ITEM_ID + " TEXT, " +
+                    CartItemsEntry.COLUMN_CODE + " TEXT, " +
+                    CartItemsEntry.COLUMN_QTY + " TEXT, " +
+                    CartItemsEntry.COLUMN_REGULAR_PRICE + " TEXT, " +
+                    CartItemsEntry.COLUMN_FORMATTED_PRICE + " TEXT, " +
+                    CartItemsEntry.COLUMN_REGULAR_SUBTOTAL + " TEXT, " +
+                    CartItemsEntry.COLUMN_FORMATTED_SUBTOTAL + " TEXT " +
+                    ")";
+
+    private static final String TABLE_CART_ITEM_OPTIONS_CREATE=
+            "CREATE TABLE " + CartItemOptionsEntry.TABLE_NAME + " (" +
+                    CartItemOptionsEntry._ID + " INTEGER PRIMARY KEY, " +
+                    CartItemOptionsEntry.COLUMN_ITEM_ID + " TEXT, " +
+                    CartItemOptionsEntry.COLUMN_OPTION_LABEL + " TEXT, " +
+                    CartItemOptionsEntry.COLUMN_OPTION_TEXT + " TEXT " +
+                    ")";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -107,6 +134,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     db.execSQL(TABLE_PRODUCT_CREATE);
     db.execSQL(TABLE_PRODUCT_IMAGES_CREATE);
     db.execSQL(TABLE_PRODUCT_OPTIONS_CREATE);
+    db.execSQL(TABLE_CART_ITEMS_CREATE);
+    db.execSQL(TABLE_CART_ITEM_OPTIONS_CREATE);
     }
 
     @Override
@@ -117,6 +146,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         db.execSQL("DROP TABLE IF EXISTS " + ProductEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ProductImagesEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ProductOptionsEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CartItemsEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CartItemOptionsEntry.TABLE_NAME);
         onCreate(db);
     }
 

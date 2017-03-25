@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.app.ProductDetailActivity;
@@ -32,6 +33,8 @@ import com.japhethwaswa.magentomobileone.model.Product;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import es.dmoral.toasty.Toasty;
+
 public class FragmentProductDetailsInfo extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private FragmentProductDetailInfoBinding fragmentProductDetailInfoBinding;
@@ -46,6 +49,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     private HashMap<Integer,String> prodOpsHashMapLittle;
     private int prodOptionsMainPosition = -1;
     private int prodOptionsMainPositionLittle = -1;
+    String productHasOptions = "-1";
 
     private String prodOptionsMainParentCode =  "-1";
     String prodOptionsMainChildCode =  "-1";
@@ -166,6 +170,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                     product.setPrice_special(specialPrice);
                     product.setPrice_special(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL)));
                     product.setShort_description(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_SHORT_DESCRIPTION)));
+                    productHasOptions = cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_HAS_OPTIONS));
                     if (specialPrice != null && !specialPrice.isEmpty()) {
 
                         /**remove all non numeric characters**/
@@ -193,7 +198,8 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                 JumboContract.ProductEntry.COLUMN_ENTITY_ID,
                 JumboContract.ProductEntry.COLUMN_PRICE_REGULAR,
                 JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL,
-                JumboContract.ProductEntry.COLUMN_ENTITY_TYPE
+                JumboContract.ProductEntry.COLUMN_ENTITY_TYPE,
+                JumboContract.ProductEntry.COLUMN_HAS_OPTIONS
         };
 
         String selection = JumboContract.ProductEntry.COLUMN_ENTITY_ID + "=?";
@@ -418,4 +424,21 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         return cursor;
     }
 
+    public void addItemToCart() {
+        //get the options that the client chose and show them ie adding item to cart or error
+
+        if(productHasOptions.equalsIgnoreCase("1") && prodOptionsMainParentCode.equalsIgnoreCase("-1")){
+            Toasty.error(getActivity(),"Please select options",Toast.LENGTH_SHORT,true).show();
+        }
+
+        if(productHasOptions.equalsIgnoreCase("1") && !prodOptionsMainParentCode.equalsIgnoreCase("-1") || productHasOptions.equalsIgnoreCase("0")){
+            Toasty.info(getActivity(),"Adding to Bag", Toast.LENGTH_SHORT,true).show();
+            nowAddToCart();
+        }
+
+    }
+
+    private void nowAddToCart() {
+        //todo start bg job to insert items in online cart and update local repository
+    }
 }

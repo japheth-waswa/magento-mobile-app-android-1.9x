@@ -131,8 +131,8 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     public void addToCart(View view){
-        //todo pass this event to the fragment
-        Toasty.info(this,"You are adding to cart", Toast.LENGTH_LONG,true).show();
+        // pass this event to the fragment
+        fragmentProductDetailsInfo.addItemToCart();
     }
 
 

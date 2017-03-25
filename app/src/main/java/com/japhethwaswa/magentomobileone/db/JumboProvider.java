@@ -18,6 +18,8 @@ import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PAGER;
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PRODUCT;
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PRODUCT_IMAGES;
 import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_PRODUCT_OPTIONS;
+import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_CART_ITEMS;
+import static com.japhethwaswa.magentomobileone.db.JumboContract.PATH_CART_ITEM_OPTIONS;
 
 public class JumboProvider extends ContentProvider {
 
@@ -36,6 +38,10 @@ public class JumboProvider extends ContentProvider {
     private static final int PRODUCTIMAGES_ID = 10;
     private static final int PRODUCTOPTIONS = 11;
     private static final int PRODUCTOPTIONS_ID = 12;
+    private static final int CARTITEMS = 13;
+    private static final int CARTITEMS_ID = 14;
+    private static final int CARTITEMOPTIONS = 15;
+    private static final int CARTITEMOPTIONS_ID = 16;
 
     //Uri matcher
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -65,6 +71,14 @@ public class JumboProvider extends ContentProvider {
         //product options data uri
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT_OPTIONS, PRODUCTOPTIONS);
         uriMatcher.addURI(CONTENT_AUTHORITY, PATH_PRODUCT_OPTIONS + "/#", PRODUCTOPTIONS_ID);
+
+        //cart items data uri
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_CART_ITEMS, CARTITEMS);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_CART_ITEMS + "/#", CARTITEMS_ID);
+
+        //cart item options data uri
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_CART_ITEM_OPTIONS, CARTITEMOPTIONS);
+        uriMatcher.addURI(CONTENT_AUTHORITY, PATH_CART_ITEM_OPTIONS + "/#", CARTITEMOPTIONS_ID);
     }
 
     private DatabaseHelper helper;
@@ -132,6 +146,22 @@ public class JumboProvider extends ContentProvider {
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 cursor = db.query(JumboContract.ProductOptionsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
+            case CARTITEMS:
+                cursor = db.query(JumboContract.ProductOptionsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case CARTITEMS_ID:
+                selection = JumboContract.CartItemsEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(JumboContract.CartItemsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case CARTITEMOPTIONS:
+                cursor = db.query(JumboContract.ProductOptionsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case CARTITEMOPTIONS_ID:
+                selection = JumboContract.CartItemOptionsEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(JumboContract.CartItemOptionsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown Uri");
         }
@@ -163,6 +193,10 @@ public class JumboProvider extends ContentProvider {
                 return insertRecord(uri, values, JumboContract.ProductImagesEntry.TABLE_NAME);
             case PRODUCTOPTIONS:
                 return insertRecord(uri, values, JumboContract.ProductOptionsEntry.TABLE_NAME);
+            case CARTITEMS:
+                return insertRecord(uri, values, JumboContract.CartItemsEntry.TABLE_NAME);
+            case CARTITEMOPTIONS:
+                return insertRecord(uri, values, JumboContract.CartItemOptionsEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Unkwown uri: " + uri);
 
@@ -209,6 +243,14 @@ public class JumboProvider extends ContentProvider {
                 return deleteRecord(uri, null, null, JumboContract.ProductOptionsEntry.TABLE_NAME);
             case PRODUCTOPTIONS_ID:
                 return deleteRecord(uri, selection, selectionArgs, JumboContract.ProductOptionsEntry.TABLE_NAME);
+            case CARTITEMS:
+                return deleteRecord(uri, null, null, JumboContract.CartItemsEntry.TABLE_NAME);
+            case CARTITEMS_ID:
+                return deleteRecord(uri, selection, selectionArgs, JumboContract.CartItemsEntry.TABLE_NAME);
+            case CARTITEMOPTIONS:
+                return deleteRecord(uri, null, null, JumboContract.CartItemOptionsEntry.TABLE_NAME);
+            case CARTITEMOPTIONS_ID:
+                return deleteRecord(uri, selection, selectionArgs, JumboContract.CartItemOptionsEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Insert unknown URI: " + uri);
         }
@@ -248,6 +290,12 @@ public class JumboProvider extends ContentProvider {
 
             case PRODUCTOPTIONS:
                 return updateRecord(uri, values, selection, selectionArgs, JumboContract.ProductOptionsEntry.TABLE_NAME);
+
+            case CARTITEMS:
+                return updateRecord(uri, values, selection, selectionArgs, JumboContract.CartItemsEntry.TABLE_NAME);
+
+            case CARTITEMOPTIONS:
+                return updateRecord(uri, values, selection, selectionArgs, JumboContract.CartItemOptionsEntry.TABLE_NAME);
             default:
                 throw new IllegalArgumentException("Update unknown URI: " + uri);
         }

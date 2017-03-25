@@ -11,6 +11,8 @@ public final class JumboContract {
     public static final String PATH_PRODUCT = "product";
     public static final String PATH_PRODUCT_IMAGES = "product_images";
     public static final String PATH_PRODUCT_OPTIONS = "product_options";
+    public static final String PATH_CART_ITEMS = "cart_items";
+    public static final String PATH_CART_ITEM_OPTIONS = "cart_item_options";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
 
     public static final class PagerEntry implements BaseColumns{
@@ -110,6 +112,38 @@ public final class JumboContract {
         public static final String COLUMN_CHILD_CODE = "child_code";
         public static final String COLUMN_CHILD_LABEL = "child_label";
         public static final String COLUMN_CHILD_TO_CODE = "child_to_code";
+    }
+
+    public static final class CartItemsEntry implements BaseColumns{
+
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI,PATH_CART_ITEMS);
+        //Table name
+        public static final String TABLE_NAME = "cart_items";
+        //column field names
+        public static final String _ID = BaseColumns._ID;
+        public static final String COLUMN_ENTITY_ID = "entity_id";
+        public static final String COLUMN_ENTITY_TYPE = "entity_type";
+        public static final String COLUMN_ICON = "icon";
+        public static final String COLUMN_MODIFICATION_TIME = "modification_time";
+        public static final String COLUMN_ITEM_ID = "item_id";
+        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_CODE = "code";
+        public static final String COLUMN_QTY = "qty";
+        public static final String COLUMN_REGULAR_PRICE = "regular_price";
+        public static final String COLUMN_FORMATTED_PRICE = "formatted_price";
+        public static final String COLUMN_REGULAR_SUBTOTAL = "regular_subtotal";
+        public static final String COLUMN_FORMATTED_SUBTOTAL = "formatted_subtotal";
+    }
+    public static final class CartItemOptionsEntry implements BaseColumns{
+
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI,PATH_CART_ITEM_OPTIONS);
+        //Table name
+        public static final String TABLE_NAME = "cart_item_options";
+        //column field names
+        public static final String _ID = BaseColumns._ID;
+        public static final String COLUMN_ITEM_ID = "item_id";
+        public static final String COLUMN_OPTION_LABEL = "option_label";
+        public static final String COLUMN_OPTION_TEXT = "option_text";
     }
 
 }
