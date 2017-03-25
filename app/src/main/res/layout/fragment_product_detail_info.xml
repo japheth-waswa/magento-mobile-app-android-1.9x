@@ -126,11 +126,19 @@
             android:textSize="13sp"/>
 
         <Button
-            android:layout_width="match_parent"
+            android:id="@+id/addToCartButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:paddingLeft="35dp"
+            android:paddingRight="35dp"
+            android:gravity="center"
+            android:layout_gravity="center"
             android:layout_marginTop="@dimen/standardMargin"
-            android:text="Add to bag"/>
-
+            android:drawableLeft="@drawable/ic_cart"
+            android:text="Add to Bag"
+            android:onClick="addToCart"/>
     </LinearLayout>
 
 </layout>

@@ -20,6 +20,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import com.birbit.android.jobqueue.JobManager;
 import com.japhethwaswa.magentomobileone.R;
@@ -36,6 +38,8 @@ import com.japhethwaswa.magentomobileone.nav.NavMenuManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import es.dmoral.toasty.Toasty;
 
 public class ProductDetailActivity extends AppCompatActivity {
 
@@ -124,6 +128,11 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void addToCart(View view){
+        //todo pass this event to the fragment
+        Toasty.info(this,"You are adding to cart", Toast.LENGTH_LONG,true).show();
     }
 
 
