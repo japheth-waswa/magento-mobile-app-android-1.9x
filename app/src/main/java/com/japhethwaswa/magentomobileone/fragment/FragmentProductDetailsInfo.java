@@ -165,6 +165,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                     product.setPrice_regular(regularPrice);
                     product.setPrice_special(specialPrice);
                     product.setPrice_special(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL)));
+                    product.setShort_description(cursor.getString(cursor.getColumnIndex(JumboContract.ProductEntry.COLUMN_SHORT_DESCRIPTION)));
                     if (specialPrice != null && !specialPrice.isEmpty()) {
 
                         /**remove all non numeric characters**/
@@ -188,6 +189,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         String[] projection = {
                 JumboContract.ProductEntry.COLUMN_ICON,
                 JumboContract.ProductEntry.COLUMN_NAME,
+                JumboContract.ProductEntry.COLUMN_SHORT_DESCRIPTION,
                 JumboContract.ProductEntry.COLUMN_ENTITY_ID,
                 JumboContract.ProductEntry.COLUMN_PRICE_REGULAR,
                 JumboContract.ProductEntry.COLUMN_PRICE_SPECIAL,

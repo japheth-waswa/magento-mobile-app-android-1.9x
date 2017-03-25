@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="@dimen/standardMargin">
 
             <TextView
                 android:layout_width="0dp"
@@ -68,7 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="15dp">
+            android:layout_marginTop="@dimen/standardMargin">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -81,9 +81,8 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="@dimen/standardPadding"
                     android:paddingRight="@dimen/standardPadding"
-                    android:textColor="@color/black"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/colorAccent"
+                    android:textSize="13sp"/>
                 <android.support.v7.widget.AppCompatSpinner
                     android:id="@+id/productOptions"
                     android:layout_width="wrap_content"
@@ -101,9 +100,8 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="@dimen/standardPadding"
                     android:paddingRight="@dimen/standardPadding"
-                    android:textColor="@color/black"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/colorAccent"
+                    android:textSize="13sp" />
                 <android.support.v7.widget.AppCompatSpinner
                     android:id="@+id/productOptionsLittle"
                     android:layout_width="wrap_content"
@@ -113,6 +111,25 @@
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standardMargin"
+            android:text="DESCRIPTION"
+            android:textColor="@color/colorAccent"
+            android:textSize="13sp"/>
+        <TextView
+            android:id="@+id/product_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@={product.short_description}"
+            android:textSize="13sp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standardMargin"
+            android:text="Add to bag"/>
 
     </LinearLayout>
 
