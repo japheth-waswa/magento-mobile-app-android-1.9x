@@ -981,24 +981,24 @@ public class JumboWebService {
         //delete all product options for this product
         JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
         ContentValues values = new ContentValues();
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_ENTITY_ID,productEntityId);
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE,productOptions.getParent_code());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL,productOptions.getParent_label());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_REQUIRED,productOptions.getParent_required());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_TYPE,productOptions.getParent_type());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE,productOptions.getChild_code());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL,productOptions.getChild_label());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE,productOptions.getChild_to_code());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_ENTITY_ID, productEntityId);
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE, productOptions.getParent_code());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL, productOptions.getParent_label());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_REQUIRED, productOptions.getParent_required());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_TYPE, productOptions.getParent_type());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE, productOptions.getChild_code());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL, productOptions.getChild_label());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE, productOptions.getChild_to_code());
 
         //isPrentOrChild(1-parent,0-child)
         if (isPrentOrChild.equalsIgnoreCase("1")) {
             //insert parent
-            values.put(JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT,"1");
+            values.put(JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT, "1");
         }
 
         if (isPrentOrChild.equalsIgnoreCase("0")) {
             //insert child
-            values.put(JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT,"0");
+            values.put(JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT, "0");
 
         }
         //perfom insert
@@ -1009,23 +1009,24 @@ public class JumboWebService {
 
 
     //submit cart items
-    public static void serviceSubmitCartItems(Context context, String currentEntityId, String itemQuantity, HashMap<String, String> optionsKeyValue) {
-        //fetch product options
+    public static void serviceSubmitCartItems(final Context context, String currentEntityId, String itemQuantity, HashMap<String, String> optionsKeyValue) {
+
         Resources res = context.getResources();
         String relativeUrl = res.getString(R.string.jumbo_cart_add_product) + "/" + currentEntityId;
 
-
+//submit cart item using post
         AndroidNetworking.post(getAbsoluteUrl(context, relativeUrl))
                 .setTag("JumboAddCartItems")
                 .setPriority(Priority.HIGH)
                 .addHeaders("Cookie", getCookie(context))
-                .addBodyParameter("[qty]",itemQuantity)
+                .addBodyParameter("[qty]", itemQuantity)
                 .addBodyParameter(optionsKeyValue)
                 .build()
                 .getAsString(new StringRequestListener() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("jeff-response",response);
+                        Log.e("jeff-res",response);
+                        serviceRetrieveItemsInCart(context);
 
                     }
 
@@ -1036,9 +1037,37 @@ public class JumboWebService {
                 });
 
 
-        //todo submit cart item using post
+    }
 
+    //service to retrieve items in cart
+    private static void serviceRetrieveItemsInCart(Context context) {
         //todo delete the current list of cart items and options,
-        //todo (new method ie retrieveCartItems) that retrieves cart items and updates the relevant repositories
+
+        // retrieve cart items and updates the relevant repositories
+
+        Resources res = context.getResources();
+        String relativeUrl = res.getString(R.string.jumbo_cart_get_items);
+
+        AndroidNetworking.get(getAbsoluteUrl(context, relativeUrl))
+                .setTag("jumboGetCartItems")
+                .setPriority(Priority.HIGH)
+                .addHeaders("Cookie", getCookie(context))
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("jeff-cart-items", response);
+                        /**try {
+                         parseProductGallery(response, context, productEntityId);
+                         } catch (IOException e) {
+                         e.printStackTrace();
+                         }**/
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.e("jeff-error", anError.toString());
+                    }
+                });
     }
 }
