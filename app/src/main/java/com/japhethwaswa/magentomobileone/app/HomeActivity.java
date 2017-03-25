@@ -47,7 +47,7 @@ public class HomeActivity extends AppCompatActivity
     private ActivityHomeBinding activityHomeBinding;
     private NavMenuManager navMenuManager;
     private static final int URL_LOADER = 0;
-//todo edit display of images in this activity
+//todo edit display of images in this activity and enable onclick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //StrictMode

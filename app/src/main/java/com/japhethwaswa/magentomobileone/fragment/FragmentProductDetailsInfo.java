@@ -42,9 +42,12 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     private Product product;
     private ArrayList<String> prodOpsHm;
     private HashMap<Integer,String> prodOpsHashMap;
-    //private Cursor parentCursor;
+    private ArrayList<String> prodOpsHmLittle;
+    private HashMap<Integer,String> prodOpsHashMapLittle;
     private int prodOptionsMainPosition = -1;
+    private int prodOptionsMainPositionLittle = -1;
     private String prodOptionsMainParentCode =  "-1";
+    private String prodOptionsMainParentCodeLittle =  "-1";
     SQLiteDatabase db;
 
 
@@ -68,10 +71,13 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
         //hide top values spinner
         fragmentProductDetailInfoBinding.productOptions.setVisibility(View.INVISIBLE);
+        //hide little values spinner
+        fragmentProductDetailInfoBinding.productOptionsLittle.setVisibility(View.INVISIBLE);
 
         if (savedInstanceState != null) {
             entityId = savedInstanceState.getInt("entityId");
             prodOptionsMainPosition = savedInstanceState.getInt("prodOptionsMainPosition");
+            prodOptionsMainPositionLittle = savedInstanceState.getInt("prodOptionsMainPositionLittle");
             //get product detail from db
             getProductDetailsFromDb();
             //restart loader
@@ -91,6 +97,9 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                 Log.e("jeff-item-code",prodMainOpsCode);
                 Log.e("jeff-item-code",prodOptionsMainParentCode);
 
+                //todo fetch sub-children data
+                setSubChildrenWithSpinner(prodMainOpsCode);
+                //todo populate their spinner and label with data
                 //todo use the code to determine if it contains child_to_code where(is_parent=0,entityid=currentproductid,child_to_code=currentselected position)
             }
 
@@ -99,8 +108,25 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
             }
         });
-        //todo hide spinner that will contain product options
-        //todo add spinners dynamically at runtime
+        //set on click listener
+        fragmentProductDetailInfoBinding.productOptionsLittle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                //store the position
+                prodOptionsMainPositionLittle = position;
+                Log.e("jeff-lit-item",String.valueOf(position));
+
+                String prodMainOpsLittleCode = prodOpsHashMapLittle.get(position);
+                Log.e("jeff-item-lit-code",prodMainOpsLittleCode);
+                Log.e("jeff-item-lit-code",prodOptionsMainParentCodeLittle);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
 
         return fragmentProductDetailInfoBinding.getRoot();
@@ -111,7 +137,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         super.onSaveInstanceState(outState);
         outState.putInt("entityId", entityId);
         outState.putInt("prodOptionsMainPosition", prodOptionsMainPosition);
-        //todo save initial value of spinner items here and restore back
+        outState.putInt("prodOptionsMainPositionLittle", prodOptionsMainPositionLittle);
     }
 
     public void receiveEntityIdentifier(int entityId) {
@@ -124,7 +150,6 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         //fetch product data in database
         getProductDetailsFromDb();
 
-        //todo initialize loader here to get the necessary data
         //initialize loader
         getActivity().getSupportLoaderManager().initLoader(URL_LOADER, null, this);
     }
@@ -200,7 +225,6 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
         //get parent children
         getParentTopChildren(data);
-        //todo update product options
         //todo fetch product reviews from the db
     }
 
@@ -208,9 +232,10 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-        //todo reset loader to null
+        //reset loader to null
     }
 
+    //GET TOP CHILDREN
     private void getParentTopChildren(Cursor cursor) {
         if (cursor.getCount() > 0) {
 
@@ -252,12 +277,12 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                                 fragmentProductDetailInfoBinding.productOptions.setSelection(prodOptionsMainPosition);
                             }
 
-                            //todo set label for this parent in UI
+                            //set label for this parent in UI
                             Cursor parentCursor = getSpecificParentCursor(prodOptionsMainParentCode);
                             if(parentCursor != null && parentCursor.getCount() >0){
                                 parentCursor.moveToFirst();
-                                String parentLabel = parentCursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL));
-                                fragmentProductDetailInfoBinding.productOptionsLabel.setText(parentLabel.toUpperCase());
+                                String parentMainLabel = parentCursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL));
+                                fragmentProductDetailInfoBinding.productOptionsLabel.setText(parentMainLabel.toUpperCase());
 
                             }
 
@@ -286,14 +311,92 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                 String[] selectionArgs = {localParentCode, "0"};
 
                 handler.startQuery(23,null,JumboContract.ProductOptionsEntry.CONTENT_URI,projection,selection,selectionArgs,null);
-                //todo fetch children data
-                //todo fetch sub-children data
+
             }
 
         }
 
     }
 
+
+
+    //GET LITTLE CHILDREN
+    private void setSubChildrenWithSpinner(String prodMainOpsCode) {
+
+
+        JumboQueryHandler handler = new JumboQueryHandler(getActivity().getContentResolver()){
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+
+
+
+                if(cursor != null && cursor.getCount() >0){
+
+                    //initialize variables
+                   prodOpsHmLittle=null;
+                    prodOpsHmLittle = new ArrayList<>();
+                    prodOpsHashMapLittle=null;
+                    prodOpsHashMapLittle= new HashMap<>();
+
+                    //set spinner visible
+                    fragmentProductDetailInfoBinding.productOptionsLittle.setVisibility(View.VISIBLE);
+
+                    int i=0;
+                    while(cursor.moveToNext()){
+                        Log.e("jeff-cursor",DatabaseUtils.dumpCursorToString(cursor));
+                        prodOpsHmLittle.add(i,cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL)));
+                        prodOpsHashMapLittle.put(i,cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE)));
+                        prodOptionsMainParentCodeLittle = cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE));
+                        i++;
+                    }
+
+                    //set adapter to the spinner
+                    ArrayAdapter<String> prodOpsHmAdapterLittle = new ArrayAdapter<>(getContext(),android.R.layout.simple_spinner_item,prodOpsHmLittle);
+                    prodOpsHmAdapterLittle.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    fragmentProductDetailInfoBinding.productOptionsLittle.setAdapter(prodOpsHmAdapterLittle);
+
+                    //set current item if screen rotated
+                    if(prodOptionsMainPositionLittle != -1){
+                        fragmentProductDetailInfoBinding.productOptionsLittle.setSelection(prodOptionsMainPositionLittle);
+                    }
+
+                    //set label for this parent in UI
+                    Cursor parentCursor = getSpecificParentCursor(prodOptionsMainParentCodeLittle);
+                    if(parentCursor != null && parentCursor.getCount() >0){
+                        parentCursor.moveToFirst();
+                        String parentMainLabel = parentCursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL));
+                        fragmentProductDetailInfoBinding.productOptionsLabelLittle.setText(parentMainLabel.toUpperCase());
+
+                    }
+
+                    parentCursor.close();
+                    db.close();
+
+                }
+                cursor.close();
+            }
+        };
+
+        String[] projection = {
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE,
+                JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT,
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL,
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_REQUIRED,
+                JumboContract.ProductOptionsEntry.COLUMN_PARENT_TYPE,
+                JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE,
+                JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL,
+                JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE
+        };
+
+        String selection = JumboContract.ProductOptionsEntry.COLUMN_ENTITY_ID + "=? AND "
+                + JumboContract.ProductOptionsEntry.COLUMN_IS_PARENT + "=? AND " + JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE + "=?";
+        String[] selectionArgs = {String.valueOf(entityId), "0",prodMainOpsCode};
+
+        handler.startQuery(23,null,JumboContract.ProductOptionsEntry.CONTENT_URI,projection,selection,selectionArgs,null);
+    }
+
+
+    //GET SPECIFIC PARENT CURSOR
     private Cursor getSpecificParentCursor(String prodOptionsMainParentCode) {
 
         DatabaseHelper helper = new DatabaseHelper(getContext());

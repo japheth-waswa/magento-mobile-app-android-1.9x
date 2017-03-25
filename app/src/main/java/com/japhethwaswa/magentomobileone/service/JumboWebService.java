@@ -771,7 +771,7 @@ public class JumboWebService {
     public static void serviceRetrieveProductOptionsReviews(final Context context, final String productEntityId) {
 
 
-        //todo fetch product options
+        //fetch product options
         Resources res = context.getResources();
         String relativeUrlProdOptions = res.getString(R.string.jumbo_product_options);
         relativeUrlProdOptions = relativeUrlProdOptions + "/" + productEntityId;
@@ -799,7 +799,7 @@ public class JumboWebService {
                     }
                 });
 
-        //todo fetch product reviews
+        //todo fetch product reviews(not yet implemented)
         AndroidNetworking.get(getAbsoluteUrl(context, relativeUrlProdReviews))
                 .setTag("jumboproductReviews")
                 .setPriority(Priority.HIGH)
@@ -976,8 +976,6 @@ public class JumboWebService {
     }
 
     private static void insertProductOptions(Context context, ProductOptions productOptions, String productEntityId, String isPrentOrChild) {
-
-        //todo solve issue with top child not saving in situation where it contains little child
 
         //delete all product options for this product
         JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
