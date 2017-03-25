@@ -1,6 +1,7 @@
 package com.japhethwaswa.magentomobileone.fragment;
 
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -39,6 +40,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     private Product product;
     private ArrayList<String> prodOpsHm;
     private HashMap<Integer,String> prodOpsHashMap;
+    private int prodOptionsMainPosition = -1;
 
 
     @Nullable
@@ -62,6 +64,7 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
 
         if (savedInstanceState != null) {
             entityId = savedInstanceState.getInt("entityId");
+            prodOptionsMainPosition = savedInstanceState.getInt("prodOptionsMainPosition");
             //get product detail from db
             getProductDetailsFromDb();
             //restart loader
@@ -71,7 +74,13 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
         fragmentProductDetailInfoBinding.productOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                //store the position
+                prodOptionsMainPosition = position;
                 Log.e("jeff-item",String.valueOf(position));
+                Log.e("jeff-item-code",String.valueOf(prodOpsHashMap.get(position)));
+                String prodMainOpsCode = prodOpsHashMap.get(position);
+                //todo use the code to determine if it contains child_to_code where(is_parent=0,entityid=currentproductid,child_to_code=currentselected position)
             }
 
             @Override
@@ -90,6 +99,8 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("entityId", entityId);
+        outState.putInt("prodOptionsMainPosition", prodOptionsMainPosition);
+        //todo save initial value of spinner items here and restore back
     }
 
     public void receiveEntityIdentifier(int entityId) {
@@ -191,12 +202,14 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                     @Override
                     protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 
-                        prodOpsHm=null;
-                        prodOpsHm = new ArrayList<>();
-                        prodOpsHashMap=null;
-                        prodOpsHashMap= new HashMap<>();
+
 
                         if(cursor.getCount() >0){
+                            prodOpsHm=null;
+                            prodOpsHm = new ArrayList<>();
+                            prodOpsHashMap=null;
+                            prodOpsHashMap= new HashMap<>();
+
                             int i=0;
                             while(cursor.moveToNext()){
                                 prodOpsHm.add(i,cursor.getString(cursor.getColumnIndex(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL)));
@@ -208,6 +221,11 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
                             ArrayAdapter<String> prodOpsHmAdapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_spinner_item,prodOpsHm);
                             prodOpsHmAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             fragmentProductDetailInfoBinding.productOptions.setAdapter(prodOpsHmAdapter);
+                            //todo set label for this parent in UI
+                            //set current item if screen rotated
+                            if(prodOptionsMainPosition != -1){
+                                fragmentProductDetailInfoBinding.productOptions.setSelection(prodOptionsMainPosition);
+                            }
 
                         }
                         cursor.close();

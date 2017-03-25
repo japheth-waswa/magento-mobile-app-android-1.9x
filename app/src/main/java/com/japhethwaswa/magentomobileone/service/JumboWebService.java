@@ -975,20 +975,21 @@ public class JumboWebService {
 
     }
 
-    private static void insertProductOptions(Context context, ProductOptions productOptionsParent, String productEntityId, String isPrentOrChild) {
+    private static void insertProductOptions(Context context, ProductOptions productOptions, String productEntityId, String isPrentOrChild) {
+
+        //todo solve issue with top child not saving in situation where it contains little child
 
         //delete all product options for this product
         JumboQueryHandler handler = new JumboQueryHandler(context.getContentResolver());
         ContentValues values = new ContentValues();
         values.put(JumboContract.ProductOptionsEntry.COLUMN_ENTITY_ID,productEntityId);
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE,productOptionsParent.getParent_code());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL,productOptionsParent.getParent_label());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_REQUIRED,productOptionsParent.getParent_required());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_TYPE,productOptionsParent.getParent_type());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE,productOptionsParent.getChild_code());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL,productOptionsParent.getChild_label());
-        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE,productOptionsParent.getChild_to_code());
-
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_CODE,productOptions.getParent_code());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_LABEL,productOptions.getParent_label());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_REQUIRED,productOptions.getParent_required());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_PARENT_TYPE,productOptions.getParent_type());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_CODE,productOptions.getChild_code());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_LABEL,productOptions.getChild_label());
+        values.put(JumboContract.ProductOptionsEntry.COLUMN_CHILD_TO_CODE,productOptions.getChild_to_code());
 
         //isPrentOrChild(1-parent,0-child)
         if (isPrentOrChild.equalsIgnoreCase("1")) {
