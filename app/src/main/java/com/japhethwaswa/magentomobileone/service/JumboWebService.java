@@ -3,10 +3,12 @@ package com.japhethwaswa.magentomobileone.service;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.androidnetworking.AndroidNetworking;
@@ -14,6 +16,7 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.androidnetworking.interfaces.OkHttpResponseListener;
 import com.androidnetworking.interfaces.StringRequestListener;
 import com.japhethwaswa.magentomobileone.R;
 import com.japhethwaswa.magentomobileone.db.DatabaseHelper;
@@ -36,12 +39,20 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class JumboWebService {
 
@@ -202,12 +213,61 @@ public class JumboWebService {
         return baseUrl + relativeUrl;
     }
 
+    private static String strongRandomAlphaNumeric() {
+        SecureRandom random = new SecureRandom();
+        return new BigInteger(130, random).toString(32);
+    }
+
+    //update shared preferences
+    private static String updateCookieSharedPreferences(Context context) {
+        //save if it does not exist
+
+        /**List<String> frontendCookieArray = new ArrayList<>(Arrays.asList(cookieVal.split("=")));
+         String frontend = frontendCookieArray.get(1);**/
+
+        Resources res = context.getResources();
+        String preference_file_key = res.getString(R.string.preference_file_key);
+        SharedPreferences sharedPref = context.getSharedPreferences(preference_file_key, Context.MODE_PRIVATE);
+
+        //GET ITEM FIRST
+        String currentFrontend = sharedPref.getString("frontend", null);
+
+        if (currentFrontend == null) {
+            currentFrontend = strongRandomAlphaNumeric();
+            //THEN PUT IT
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("frontend", currentFrontend);
+            editor.commit();
+        }
+        return currentFrontend;
+    }
+
     //retrive cookie for accessing remote resource
     private static String getCookie(Context context) {
         Resources res = context.getResources();
         String appCode = res.getString(R.string.app_xmlconnect_code);
         String appDefaultScreenSize = res.getString(R.string.app_xmlconnect_screen_size);
-        return "app_code=" + appCode + ";screen_size=" + appDefaultScreenSize;
+
+        String frontendValue = retrieveFrontendValue(context);
+        Log.e("jeff-frontend", frontendValue);
+        return "app_code=" + appCode + ";screen_size=" + appDefaultScreenSize + ";frontend=" + frontendValue;
+
+    }
+
+    //retrieve frontend value from shared preferences
+    private static String retrieveFrontendValue(Context context) {
+        Resources res = context.getResources();
+        String preference_file_key = res.getString(R.string.preference_file_key);
+        SharedPreferences sharedPref = context.getSharedPreferences(preference_file_key, Context.MODE_PRIVATE);
+
+        //GET ITEM
+        String frontendVal = sharedPref.getString("frontend", null);
+
+        if (frontendVal == null) {
+            frontendVal = updateCookieSharedPreferences(context);
+        }
+
+        return frontendVal;
     }
 
     //service-retrive all categories
@@ -1012,22 +1072,41 @@ public class JumboWebService {
     public static void serviceSubmitCartItems(final Context context, String currentEntityId, String itemQuantity, HashMap<String, String> optionsKeyValue) {
 
         Resources res = context.getResources();
-        String relativeUrl = res.getString(R.string.jumbo_cart_add_product) + "/" + currentEntityId;
+        final String relativeUrl = res.getString(R.string.jumbo_cart_add_product) + "/" + currentEntityId;
 
 //submit cart item using post
+        /**AndroidNetworking.post(getAbsoluteUrl(context, relativeUrl))
+         .setTag("JumboAddCartItems")
+         .setPriority(Priority.HIGH)
+         .addHeaders("Cookie", getCookie(context))
+         .addBodyParameter("[qty]", itemQuantity)
+         .addBodyParameter(optionsKeyValue)
+         .build()
+         .getAsString(new StringRequestListener() {
+        @Override public void onResponse(String response) {
+        Log.e("jeff-res",response);
+        serviceRetrieveItemsInCart(context);
+
+        }
+
+        @Override public void onError(ANError anError) {
+
+        }
+        });**/
+
         AndroidNetworking.post(getAbsoluteUrl(context, relativeUrl))
                 .setTag("JumboAddCartItems")
                 .setPriority(Priority.HIGH)
                 .addHeaders("Cookie", getCookie(context))
                 .addBodyParameter("[qty]", itemQuantity)
                 .addBodyParameter(optionsKeyValue)
+                .doNotCacheResponse()
                 .build()
                 .getAsString(new StringRequestListener() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("jeff-res",response);
+                        //retrieve items in cart
                         serviceRetrieveItemsInCart(context);
-
                     }
 
                     @Override
@@ -1038,6 +1117,7 @@ public class JumboWebService {
 
 
     }
+
 
     //service to retrieve items in cart
     private static void serviceRetrieveItemsInCart(Context context) {
@@ -1045,29 +1125,89 @@ public class JumboWebService {
 
         // retrieve cart items and updates the relevant repositories
 
-        Resources res = context.getResources();
-        String relativeUrl = res.getString(R.string.jumbo_cart_get_items);
+        GetCartItems getCartitems = new GetCartItems(context);
+        getCartitems.execute();
 
-        AndroidNetworking.get(getAbsoluteUrl(context, relativeUrl))
-                .setTag("jumboGetCartItems")
-                .setPriority(Priority.HIGH)
-                .addHeaders("Cookie", getCookie(context))
-                .build()
-                .getAsString(new StringRequestListener() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.e("jeff-cart-items", response);
-                        /**try {
-                         parseProductGallery(response, context, productEntityId);
-                         } catch (IOException e) {
-                         e.printStackTrace();
-                         }**/
-                    }
+        /**AndroidNetworking.get(getAbsoluteUrl(context, relativeUrl))
+         .setTag("jumboGetCartItems")
+         .setPriority(Priority.HIGH)
+         .addHeaders("cookie", getCookie(context))
+         .getResponseOnlyFromNetwork()
+         .build()
+         .getAsString(new StringRequestListener() {
+        @Override public void onResponse(String response) {
+        Log.e("jeff-cart-items", response);
+        /**try {
+        parseProductGallery(response, context, productEntityId);
+        } catch (IOException e) {
+        e.printStackTrace();
+        }**/
+/**                  }
 
-                    @Override
-                    public void onError(ANError anError) {
-                        Log.e("jeff-error", anError.toString());
-                    }
-                });
+ @Override public void onError(ANError anError) {
+ Log.e("jeff-error", anError.toString());
+ }
+ });**/
+
     }
+
+    private static class GetCartItems extends AsyncTask<Void, Void, Void> {
+
+        private Context context;
+
+        public GetCartItems(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            Resources res = context.getResources();
+            String relativeUrl = res.getString(R.string.jumbo_cart_get_items);
+
+            Log.e("jeff-me-cookie", getCookie(context));
+
+            OkHttpClient client = new OkHttpClient();
+
+            String cookieValue = getCookie(context);
+            Request request = new Request.Builder()
+                    .url("http://magento-29325-63476-210388.cloudwaysapps.com/xmlconnect/cart")
+                    .get()
+                    .addHeader("cookie",cookieValue)
+                    .addHeader("cache-control", "no-cache")
+                    .build();
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    e.printStackTrace();
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+
+                    String cartItems = response.body().string();
+                    Log.e("jeff-response",cartItems);
+                    response.body().close();
+                    response.close();
+
+                }
+            });
+            /**try{
+                Response response = client.newCall(request).execute();
+                if(response.message().equalsIgnoreCase("OK")){
+                    //todo now update the cart table list locally
+                    Log.e("jeff-message", response.message());
+                    Log.e("jeff-response", response.body().charStream().toString());
+                }
+
+                response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }**/
+
+
+            return null;
+        }
+    }
+
 }

@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import es.dmoral.toasty.Toasty;
-
+//todo check network and internet connectivity in each activity
 public class FragmentProductDetailsInfo extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private FragmentProductDetailInfoBinding fragmentProductDetailInfoBinding;
@@ -63,12 +63,12 @@ public class FragmentProductDetailsInfo extends Fragment implements LoaderManage
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //StrictMode
-        StrictMode.VmPolicy vmPolicy = new StrictMode.VmPolicy.Builder()
+         StrictMode.VmPolicy vmPolicy = new StrictMode.VmPolicy.Builder()
                 .detectAll()
                 .penaltyLog()
                 .build();
         StrictMode.setVmPolicy(vmPolicy);
-        /**==============**/
+        /** ==============**/
 
         fragmentProductDetailInfoBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_product_detail_info, container, false);
 

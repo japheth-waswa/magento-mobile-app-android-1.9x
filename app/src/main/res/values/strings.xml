@@ -10,13 +10,15 @@
     <string name="jumbo_product_options">xmlconnect/Catalog/productOptions/id</string>
     <string name="jumbo_product_reviews">xmlconnect/Catalog/productReviews/id</string>
     <string name="jumbo_cart_add_product">xmlconnect/Cart/add/product</string>
-    <string name="jumbo_cart_get_items">xmlconnect/cart</string>
+    <string name="jumbo_cart_get_items">xmlconnect/Cart</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="sign_in">Sign in</string>
     <string name="skip">SKIP</string>
+
+    <string name="preference_file_key">com.japhethwaswa.magentomobileone.JEAN_BABY</string>
 
     <string-array name="product_filters">
         <item>FILTER</item>
